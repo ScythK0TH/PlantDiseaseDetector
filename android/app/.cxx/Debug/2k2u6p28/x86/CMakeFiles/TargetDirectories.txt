@@ -1,0 +1,2 @@
+C:/cygwin64/home/user/PlantDiseaseDetector/android/app/.cxx/Debug/2k2u6p28/x86/CMakeFiles/edit_cache.dir
+C:/cygwin64/home/user/PlantDiseaseDetector/android/app/.cxx/Debug/2k2u6p28/x86/CMakeFiles/rebuild_cache.dir
