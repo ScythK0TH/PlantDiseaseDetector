@@ -1,5 +1,9 @@
+import 'dart:ui';
+
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
+import 'login.dart';
+import 'register.dart';
 
 class FirstPageScreen extends StatefulWidget {
   const FirstPageScreen({super.key});
@@ -73,9 +77,9 @@ class FirstPageScreenState extends State<FirstPageScreen> {
               Padding(
                 padding: EdgeInsets.only(top: 10.0),
                 child: Text(
-                  "PlantHub", // ชื่อแอพที่คุณต้องการ
+                  "Plant Hub", // ชื่อแอพที่คุณต้องการ
                   style: TextStyle(
-                    color: Color(0xFF444444),
+                    color: Color.fromARGB(255, 255, 255, 255),
                     fontSize: 35.0,
                     fontWeight: FontWeight.bold,
                   ),
@@ -98,7 +102,7 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                           TypewriterAnimatedText(
                             textSequence[index],
                             textStyle:
-                                TextStyle(color: Color(0xFF444444), fontSize: 35.0),
+                                TextStyle(color: Color.fromARGB(255, 255, 255, 255), fontSize: 35.0),
                             speed: Duration(milliseconds: 200),
                             cursor: '|',  // Cursor ที่ท้ายข้อความ
                           ),
@@ -119,16 +123,43 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                     children: [
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF444444),
+                          backgroundColor: Color.fromARGB(255, 255, 255, 255),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50.0),
                           ),
                           minimumSize: Size(0.70 * screenWidth, 55.0),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          showModalBottomSheet(
+                            isScrollControlled: true,
+                            context: context, // Allow modal to resize with keyboard
+                            backgroundColor: Colors.transparent, // Make modal transparent
+                            builder: (BuildContext context) {
+                              double keyboardHeight = MediaQuery.of(context).viewInsets.bottom; // Detect keyboard height
+                              return SizedBox(
+                                height: keyboardHeight > 0 ? MediaQuery.of(context).size.height * 0.9 : MediaQuery.of(context).size.height * 0.6, // Increase height when keyboard appears
+                                child: Stack(
+                                  children: [
+                                    // Blur effect
+                                    BackdropFilter(
+                                      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                                      child: Container(
+                                        color: Colors.transparent,
+                                      ),
+                                    ),
+                                    // Modal content
+                                    Positioned(
+                                      child: RegisApp(),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
                         child: Text(
-                          'Sign In',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          'Sign Up',
+                          style: TextStyle(color: Color(0xFF464646), fontSize: 16),
                         ),
                       ),
                       SizedBox(height: 15),
@@ -139,15 +170,42 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                           ),
                           minimumSize: Size(0.70 * screenWidth, 55.0),
                           side: BorderSide(
-                            color: Color(0xFF444444), // สีของเส้นขอบ
+                            color: Color.fromARGB(255, 255, 255, 255), // สีของเส้นขอบ
                             width: 2.0, // ความหนาของเส้นขอบ
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          showModalBottomSheet(
+                            isScrollControlled: true,
+                            context: context, // Allow modal to resize with keyboard
+                            backgroundColor: Colors.transparent, // Make modal transparent
+                            builder: (BuildContext context) {
+                              double keyboardHeight = MediaQuery.of(context).viewInsets.bottom; // Detect keyboard height
+                              return SizedBox(
+                                height: keyboardHeight > 0 ? MediaQuery.of(context).size.height * 0.85 : MediaQuery.of(context).size.height * 0.55, // Increase height when keyboard appears
+                                child: Stack(
+                                  children: [
+                                    // Blur effect
+                                    BackdropFilter(
+                                      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                                      child: Container(
+                                        color: Colors.transparent,
+                                      ),
+                                    ),
+                                    // Modal content
+                                    Positioned(
+                                      child: LoginApp(),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
                         child: Text(
                           'Log In',
                           style:
-                              TextStyle(color: Color(0xFF444444), fontSize: 16),
+                              TextStyle(color: Color.fromARGB(255, 255, 255, 255), fontSize: 16),
                         ),
                       ),
                       SizedBox(height: 15),
