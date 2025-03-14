@@ -49,9 +49,7 @@ class DetailsPage extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Handle delete image
-        },
+        onPressed: () {},
         shape: CircleBorder(),
         backgroundColor: Colors.red,
         child: Icon(

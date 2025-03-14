@@ -86,9 +86,7 @@ class _StoragePageState extends State<StoragePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Handle add new image
-        },
+        onPressed: () {},
         shape: CircleBorder(),
         backgroundColor: Color(0xFF00BA18),
         child: Icon(Icons.add, color: Color(0xFFFFFFFF)),
