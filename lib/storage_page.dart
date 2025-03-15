@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class StoragePage extends StatefulWidget {
+  const StoragePage({super.key});
   @override
-  _StoragePageState createState() => _StoragePageState();
+  State<StoragePage> createState() => _StoragePageState();
 }
 
 class _StoragePageState extends State<StoragePage> {
@@ -18,10 +19,19 @@ class _StoragePageState extends State<StoragePage> {
           ),
         ),
         backgroundColor: Color(0xFF464646),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Color(0xFFFFFFFF),
+            )),
         title: Text(
           'Storage',
           style: TextStyle(color: Color(0xFFFFFFFF)),
         ),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: Icon(Icons.settings, color: Color(0xFFFFFFFF)),
@@ -86,7 +96,9 @@ class _StoragePageState extends State<StoragePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, '/camera');
+        },
         shape: CircleBorder(),
         backgroundColor: Color(0xFF00BA18),
         child: Icon(Icons.add, color: Color(0xFFFFFFFF)),
