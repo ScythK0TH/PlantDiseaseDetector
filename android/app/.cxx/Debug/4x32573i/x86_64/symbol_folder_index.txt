@@ -1,0 +1,1 @@
+C:\Users\prari\PlantDiseaseDetector\build\app\intermediates\cxx\Debug\4x32573i\obj\x86_64
