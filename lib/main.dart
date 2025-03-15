@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:project_pdd/camera.dart';
-import 'package:project_pdd/first_page.dart';
+import 'storage_page.dart';
+import 'details_page.dart';
 
 void main() {
-  runApp(MainApp());
+  runApp(const MainApp());
 }
 
 class MainApp extends StatelessWidget {
@@ -12,8 +12,11 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: CameraScreen()
+      initialRoute: '/',
+      routes: {
+        '/': (context) => StoragePage(),
+        '/details': (context) => DetailsPage(),
+      },
     );
   }
 }
