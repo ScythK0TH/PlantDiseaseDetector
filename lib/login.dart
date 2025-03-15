@@ -32,6 +32,7 @@ class LoginAppState extends State<LoginApp> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
@@ -59,8 +60,8 @@ class LoginAppState extends State<LoginApp> {
                         animatedTexts: [
                           TypewriterAnimatedText(
                             textSequence[index],
-                            textStyle:
-                                TextStyle(color: Color(0xFF464646), fontSize: 35.0),
+                            textStyle: TextStyle(
+                                color: Color(0xFF464646), fontSize: 35.0),
                             speed: Duration(milliseconds: 150),
                             cursor: '|',
                           ),
@@ -73,7 +74,8 @@ class LoginAppState extends State<LoginApp> {
                   SizedBox(height: 10),
                   Text(
                     "Sign into your account",
-                    style: TextStyle(color: const Color(0xFF464646), fontSize: 21.5),
+                    style: TextStyle(
+                        color: const Color(0xFF464646), fontSize: 21.5),
                   ),
                 ],
               ),
@@ -93,12 +95,11 @@ class LoginAppState extends State<LoginApp> {
                               borderSide:
                                   BorderSide(color: Colors.white, width: 2),
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(12))),
+                                  BorderRadius.all(Radius.circular(50.0))),
                           filled: true,
                           fillColor: Colors.white,
                           hintText: "Enter your email",
-                          hintStyle: TextStyle(
-                              color: const Color(0xFF464646))),
+                          hintStyle: TextStyle(color: const Color(0xFF464646))),
                     ),
                   ),
                   Padding(
@@ -108,7 +109,7 @@ class LoginAppState extends State<LoginApp> {
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white, width: 2),
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                          borderRadius: BorderRadius.all(Radius.circular(50.0)),
                         ),
                         filled: true,
                         fillColor: Colors.white,
@@ -116,7 +117,9 @@ class LoginAppState extends State<LoginApp> {
                         hintStyle: TextStyle(color: Color(0xFF464646)),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _isObscure ? Icons.visibility_off : Icons.visibility,
+                            _isObscure
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                           ),
                           onPressed: () {
                             setState(() {
@@ -149,8 +152,9 @@ class LoginAppState extends State<LoginApp> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF464646),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
+                        borderRadius: BorderRadius.circular(50.0),
                       ),
+                      minimumSize: Size(0.50 * screenWidth, 55.0),
                     ),
                     onPressed: () {},
                     child: Container(
@@ -163,15 +167,17 @@ class LoginAppState extends State<LoginApp> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("Don't have an account?",
-                        style: TextStyle(color: const Color.fromARGB(255, 70, 70, 70))),
+                        style: TextStyle(
+                            color: const Color.fromARGB(255, 70, 70, 70))),
                     Container(
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           child: Text("Register now",
                               style: TextStyle(color: Color(0xFF27AC3C))),
-                            onPressed: () {
+                          onPressed: () {
                             Navigator.pop(context); // Close current modal
-                            showSecondModal(context); // Wait before opening the next modal
+                            showSecondModal(
+                                context); // Wait before opening the next modal
                           },
                         )),
                   ],
@@ -191,9 +197,13 @@ void showSecondModal(BuildContext context) {
     context: context, // Allow modal to resize with keyboard
     backgroundColor: Colors.transparent, // Make modal transparent
     builder: (BuildContext context) {
-      double keyboardHeight = MediaQuery.of(context).viewInsets.bottom; // Detect keyboard height
+      double keyboardHeight =
+          MediaQuery.of(context).viewInsets.bottom; // Detect keyboard height
       return SizedBox(
-        height: keyboardHeight > 0 ? MediaQuery.of(context).size.height * 0.9 : MediaQuery.of(context).size.height * 0.6, // Increase height when keyboard appears
+        height: keyboardHeight > 0
+            ? MediaQuery.of(context).size.height * 0.9
+            : MediaQuery.of(context).size.height *
+                0.6, // Increase height when keyboard appears
         child: Stack(
           children: [
             // Blur effect

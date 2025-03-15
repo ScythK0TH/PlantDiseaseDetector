@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_pdd/camera.dart';
 import 'package:project_pdd/first_page.dart';
 
 void main() {
@@ -12,7 +13,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FirstPageScreen()
+      home: CameraScreen()
     );
   }
 }

@@ -33,6 +33,7 @@ class _RegisAppState extends State<RegisApp> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
@@ -91,7 +92,7 @@ class _RegisAppState extends State<RegisApp> {
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderSide: BorderSide(color: Color(0xFF464646), width: 2),
-                          borderRadius: BorderRadius.all(Radius.circular(12))
+                          borderRadius: BorderRadius.all(Radius.circular(50.0))
                         ),
                         filled: true,
                         fillColor: Colors.white,
@@ -107,7 +108,7 @@ class _RegisAppState extends State<RegisApp> {
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderSide: BorderSide(color: Color(0xFF464646), width: 2),
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                          borderRadius: BorderRadius.all(Radius.circular(50.0)),
                         ),
                         filled: true,
                         fillColor: Colors.white,
@@ -133,7 +134,7 @@ class _RegisAppState extends State<RegisApp> {
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderSide: BorderSide(color: Color(0xFF464646), width: 2),
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                          borderRadius: BorderRadius.all(Radius.circular(50.0)),
                         ),
                         filled: true,
                         fillColor: Colors.white,
@@ -166,8 +167,9 @@ class _RegisAppState extends State<RegisApp> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF464646),
                     shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(50.0),
                     ),
+                    minimumSize: Size(0.50 * screenWidth, 55.0),
                   ),
                   onPressed: () {}, 
                   child: Container(
