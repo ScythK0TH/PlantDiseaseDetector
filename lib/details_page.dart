@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class DetailsPage extends StatelessWidget {
+  const DetailsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final Map<String, String> args =
@@ -17,8 +19,9 @@ class DetailsPage extends StatelessWidget {
         ),
         backgroundColor: Color(0xFF464646),
         title: Text(title, style: TextStyle(color: Color(0xFFFFFFFF))),
+        centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Color(0xFFFFFFFF)),
+          icon: Icon(Icons.arrow_back_ios, color: Color(0xFFFFFFFF)),
           onPressed: () {
             Navigator.pop(context);
           },

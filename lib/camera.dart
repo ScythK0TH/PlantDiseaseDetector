@@ -30,9 +30,11 @@ class _CameraScreenState extends State<CameraScreen> {
         )),
         backgroundColor: Color(0xFF464646),
         leading: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pop(context);
+            },
             icon: Icon(
-              Icons.arrow_back,
+              Icons.arrow_back_ios,
               color: Color(0xFFFFFFFF),
             )),
         title: Text(
@@ -104,7 +106,7 @@ class _CameraScreenState extends State<CameraScreen> {
                     icon: Icon(
                       Icons.circle_outlined,
                       color: Colors.white,
-                      size: 80,
+                      size: 70,
                     ),
                   ),
                   Positioned(
@@ -113,7 +115,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       icon: Icon(
                         Icons.circle_rounded, // ไอคอนที่ซ้อนทับ
                         color: Colors.white,
-                        size: 54,
+                        size: 50,
                       ),
                     ),
                   ),

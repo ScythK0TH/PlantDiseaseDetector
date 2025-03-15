@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:project_pdd/storage_page.dart';
 import 'login.dart';
 import 'register.dart';
 
@@ -210,7 +211,13 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                       ),
                       SizedBox(height: 15),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StoragePage())
+                          );
+                        },
                         child: Text(
                           'Continue without an account',
                           style: TextStyle(color: Color(0xFF444444)),
