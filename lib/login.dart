@@ -168,24 +168,27 @@ class LoginAppState extends State<LoginApp> {
                           child: Text("Login",
                               style: TextStyle(
                                   fontSize: 15.0, color: Colors.white)))),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Don't have an account?",
-                          style: TextStyle(
-                              color: const Color.fromARGB(255, 70, 70, 70))),
-                      Container(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            child: Text("Register now",
-                                style: TextStyle(color: Color(0xFF27AC3C))),
-                            onPressed: () {
-                              Navigator.pop(context); // Close current modal
-                              showSecondModal(
-                                  context); // Wait before opening the next modal
-                            },
-                          )),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Don't have an account?",
+                            style: TextStyle(
+                                color: const Color.fromARGB(255, 70, 70, 70))),
+                        Container(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              child: Text("Register now",
+                                  style: TextStyle(color: Color(0xFF27AC3C))),
+                              onPressed: () {
+                                Navigator.pop(context); // Close current modal
+                                showSecondModal(
+                                    context); // Wait before opening the next modal
+                              },
+                            )),
+                      ],
+                    ),
                   ),
                 ],
               ),
