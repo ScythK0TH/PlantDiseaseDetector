@@ -20,8 +20,6 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         shape: RoundedRectangleBorder(
@@ -55,37 +53,23 @@ class _CameraScreenState extends State<CameraScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Expanded(
-                child: Center(
-              child: Container(
-                width: screenWidth * 1.0,
-                height: screenHeight * 1.0,
-                decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 48, 56, 102),
-                    borderRadius: BorderRadius.circular(15.0)),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.crop_free_outlined,
-                        size: 400,
-                        color: Colors.white,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ))
-          ],
+        child: Container(
+          width: MediaQuery.of(context).size.width * 1.0,
+          height: MediaQuery.of(context).size.height * 1.0,
+          decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 48, 56, 102),
+              borderRadius: BorderRadius.circular(15.0)),
+          child: Icon(
+            Icons.crop_free_outlined,
+            size: 400,
+            color: Colors.white,
+          ),
         ),
       ),
       bottomNavigationBar: ClipRRect(
         borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
         child: BottomAppBar(
-          height: screenHeight * 0.12,
+          height: MediaQuery.of(context).size.height * 0.175,
           color: Color(0xFF464646),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -101,14 +85,6 @@ class _CameraScreenState extends State<CameraScreen> {
               Stack(
                 alignment: Alignment.center,
                 children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.circle_outlined,
-                      color: Colors.white,
-                      size: 70,
-                    ),
-                  ),
                   Positioned(
                     child: IconButton(
                       onPressed: () {},
@@ -129,15 +105,26 @@ class _CameraScreenState extends State<CameraScreen> {
                       ),
                     ),
                   ),
+                  Positioned(
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: Icon(
+                        Icons.circle_outlined,
+                        color: Colors.white,
+                        size: 70,
+                      ),
+                    ),
+                  ),
                 ],
               ),
               IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.photo_outlined,
-                    color: Colors.white,
-                    size: 50,
-                  ))
+                onPressed: () {},
+                icon: Icon(
+                  Icons.photo_outlined,
+                  color: Colors.white,
+                  size: 50,
+                )
+              )
             ],
           ),
         ),

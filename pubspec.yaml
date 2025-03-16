@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   animated_text_kit: ^4.2.3
+  auto_size_text: ^3.0.0
+  sizer: ^3.0.5
 
 dev_dependencies:
   flutter_test:
