@@ -1,8 +1,11 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:project_pdd/register.dart';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'package:bcrypt/bcrypt.dart';
+import 'constant.dart';
+import 'storage_page.dart';
 
 class LoginApp extends StatefulWidget {
   const LoginApp({super.key});
@@ -13,6 +16,9 @@ class LoginApp extends StatefulWidget {
 
 class LoginAppState extends State<LoginApp> {
   bool _isObscure = true;
+
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   final List<String> textSequence = [
     "Welcome to our app",
@@ -30,6 +36,55 @@ class LoginAppState extends State<LoginApp> {
     });
   }
 
+  Future<void> _loginUser() async {
+    final email = _emailController.text;
+    final password = _passwordController.text;
+
+    try {
+      print('Connecting to MongoDB...');
+      final db = await mongo.Db.create(MONGO_URL);
+      await db.open();
+      print('Connected to MongoDB.');
+
+      final collection = db.collection('users');
+      print('Finding user...');
+      final user = await collection.findOne({'email': email});
+
+      if (user != null) {
+        final hashedPassword = user['password'];
+        if (BCrypt.checkpw(password, hashedPassword)) {
+          print('Login successful!');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login successful!')),
+          );
+
+          // Navigate to FirstPageScreen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => StoragePage()),
+          );
+        } else {
+          print('Invalid password.');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Invalid password.')),
+          );
+        }
+      } else {
+        print('User not found.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('User not found.')),
+        );
+      }
+
+      await db.close();
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login failed: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -42,7 +97,9 @@ class LoginAppState extends State<LoginApp> {
       ),
       child: SingleChildScrollView(
         padding: EdgeInsets.only(
-          bottom: keyboardHeight > 0 ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.height * 0.05,
+          bottom: keyboardHeight > 0
+              ? MediaQuery.of(context).size.height * 0.35
+              : MediaQuery.of(context).size.height * 0.05,
         ),
         child: Column(
           children: [
@@ -95,26 +152,31 @@ class LoginAppState extends State<LoginApp> {
                     Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: TextFormField(
+                        controller: _emailController,
                         decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.white, width: 2),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(50.0))),
-                            filled: true,
-                            fillColor: Colors.white,
-                            hintText: "Enter your email",
-                            hintStyle: TextStyle(color: const Color(0xFF464646))),
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Color(0xFF464646), width: 2),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(50.0))),
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: "Enter your email",
+                          hintStyle: TextStyle(color: const Color(0xFF464646)),
+                        ),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: TextFormField(
+                        controller: _passwordController,
                         obscureText: _isObscure,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white, width: 2),
-                            borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                            borderSide:
+                                BorderSide(color: Color(0xFF464646), width: 2),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(50.0)),
                           ),
                           filled: true,
                           fillColor: Colors.white,
@@ -161,7 +223,7 @@ class LoginAppState extends State<LoginApp> {
                         ),
                         minimumSize: Size(0.50 * screenWidth, 55.0),
                       ),
-                      onPressed: () {},
+                      onPressed: _loginUser,
                       child: Container(
                           alignment: Alignment.center,
                           width: 100,
