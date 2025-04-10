@@ -33,159 +33,165 @@ class LoginAppState extends State<LoginApp> {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: const Color(0xFFFFFFFF),
         borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
       ),
-      child: Column(
-        children: [
-          Container(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AnimatedSwitcher(
-                    duration: Duration(milliseconds: 500),
-                    transitionBuilder:
-                        (Widget child, Animation<double> animation) {
-                      return FadeTransition(opacity: animation, child: child);
-                    },
-                    child: Container(
-                      key: ValueKey<int>(index),
-                      child: AnimatedTextKit(
-                        animatedTexts: [
-                          TypewriterAnimatedText(
-                            textSequence[index],
-                            textStyle: TextStyle(
-                                color: Color(0xFF464646), fontSize: 35.0),
-                            speed: Duration(milliseconds: 150),
-                            cursor: '|',
-                          ),
-                        ],
-                        isRepeatingAnimation: false,
-                        onFinished: _changeText,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    "Sign into your account",
-                    style: TextStyle(
-                        color: const Color(0xFF464646), fontSize: 21.5),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Container(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.white, width: 2),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(50.0))),
-                          filled: true,
-                          fillColor: Colors.white,
-                          hintText: "Enter your email",
-                          hintStyle: TextStyle(color: const Color(0xFF464646))),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: TextFormField(
-                      obscureText: _isObscure,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white, width: 2),
-                          borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: "Enter your password",
-                        hintStyle: TextStyle(color: Color(0xFF464646)),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isObscure
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isObscure = !_isObscure;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 12.0),
-                    child: Container(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          child: Text("Forgot password?",
-                              style: TextStyle(color: Color(0xFF27AC3C))),
-                          onPressed: () {},
-                        )),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Container(
-            alignment: Alignment.center,
-            child: Column(
-              children: [
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF464646),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                      minimumSize: Size(0.50 * screenWidth, 55.0),
-                    ),
-                    onPressed: () {},
-                    child: Container(
-                        alignment: Alignment.center,
-                        width: 100,
-                        child: Text("Login",
-                            style: TextStyle(
-                                fontSize: 15.0, color: Colors.white)))),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+      child: SingleChildScrollView(
+        padding: EdgeInsets.only(
+          bottom: keyboardHeight > 0 ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.height * 0.05,
+        ),
+        child: Column(
+          children: [
+            Container(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text("Don't have an account?",
-                        style: TextStyle(
-                            color: const Color.fromARGB(255, 70, 70, 70))),
-                    Container(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          child: Text("Register now",
-                              style: TextStyle(color: Color(0xFF27AC3C))),
-                          onPressed: () {
-                            Navigator.pop(context); // Close current modal
-                            showSecondModal(
-                                context); // Wait before opening the next modal
-                          },
-                        )),
+                    AnimatedSwitcher(
+                      duration: Duration(milliseconds: 500),
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                      child: Container(
+                        key: ValueKey<int>(index),
+                        child: AnimatedTextKit(
+                          animatedTexts: [
+                            TypewriterAnimatedText(
+                              textSequence[index],
+                              textStyle: TextStyle(
+                                  color: Color(0xFF464646), fontSize: 35.0),
+                              speed: Duration(milliseconds: 150),
+                              cursor: '|',
+                            ),
+                          ],
+                          isRepeatingAnimation: false,
+                          onFinished: _changeText,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      "Sign into your account",
+                      style: TextStyle(
+                          color: const Color(0xFF464646), fontSize: 21.5),
+                    ),
                   ],
                 ),
-              ],
+              ),
             ),
-          )
-        ],
+            Container(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.white, width: 2),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(50.0))),
+                            filled: true,
+                            fillColor: Colors.white,
+                            hintText: "Enter your email",
+                            hintStyle: TextStyle(color: const Color(0xFF464646))),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: TextFormField(
+                        obscureText: _isObscure,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white, width: 2),
+                            borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: "Enter your password",
+                          hintStyle: TextStyle(color: Color(0xFF464646)),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isObscure
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isObscure = !_isObscure;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 12.0),
+                      child: Container(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            child: Text("Forgot password?",
+                                style: TextStyle(color: Color(0xFF27AC3C))),
+                            onPressed: () {},
+                          )),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              alignment: Alignment.center,
+              child: Column(
+                children: [
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF464646),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
+                        minimumSize: Size(0.50 * screenWidth, 55.0),
+                      ),
+                      onPressed: () {},
+                      child: Container(
+                          alignment: Alignment.center,
+                          width: 100,
+                          child: Text("Login",
+                              style: TextStyle(
+                                  fontSize: 15.0, color: Colors.white)))),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Don't have an account?",
+                          style: TextStyle(
+                              color: const Color.fromARGB(255, 70, 70, 70))),
+                      Container(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            child: Text("Register now",
+                                style: TextStyle(color: Color(0xFF27AC3C))),
+                            onPressed: () {
+                              Navigator.pop(context); // Close current modal
+                              showSecondModal(
+                                  context); // Wait before opening the next modal
+                            },
+                          )),
+                    ],
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
