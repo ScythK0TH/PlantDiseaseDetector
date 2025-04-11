@@ -68,20 +68,11 @@ class _RegisAppState extends State<RegisApp> {
 
       await db.close();
 
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registration successful!')),
-      );
-
       // Navigate to login page
       Navigator.pop(context);
       showFirstModal(context);
     } catch (e) {
       print('Error: $e');
-      // Show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registration failed: $e')),
-      );
     }
   }
 

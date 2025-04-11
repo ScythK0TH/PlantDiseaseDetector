@@ -102,10 +102,11 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         animatedTexts: [
                           TypewriterAnimatedText(
                             textSequence[index],
-                            textStyle:
-                                TextStyle(color: Color.fromARGB(255, 255, 255, 255), fontSize: 35.0),
+                            textStyle: TextStyle(
+                                color: Color.fromARGB(255, 255, 255, 255),
+                                fontSize: 35.0),
                             speed: Duration(milliseconds: 200),
-                            cursor: '|',  // Cursor ที่ท้ายข้อความ
+                            cursor: '|', // Cursor ที่ท้ายข้อความ
                           ),
                         ],
                         isRepeatingAnimation: false,
@@ -133,17 +134,25 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         onPressed: () {
                           showModalBottomSheet(
                             isScrollControlled: true,
-                            context: context, // Allow modal to resize with keyboard
-                            backgroundColor: Colors.transparent, // Make modal transparent
+                            context:
+                                context, // Allow modal to resize with keyboard
+                            backgroundColor:
+                                Colors.transparent, // Make modal transparent
                             builder: (BuildContext context) {
-                              double keyboardHeight = MediaQuery.of(context).viewInsets.bottom; // Detect keyboard height
+                              double keyboardHeight = MediaQuery.of(context)
+                                  .viewInsets
+                                  .bottom; // Detect keyboard height
                               return SizedBox(
-                                height: keyboardHeight > 0 ? MediaQuery.of(context).size.height * 0.9 : MediaQuery.of(context).size.height * 0.6, // Increase height when keyboard appears
+                                height: keyboardHeight > 0
+                                    ? MediaQuery.of(context).size.height * 0.9
+                                    : MediaQuery.of(context).size.height *
+                                        0.6, // Increase height when keyboard appears
                                 child: Stack(
                                   children: [
                                     // Blur effect
                                     BackdropFilter(
-                                      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                                      filter: ImageFilter.blur(
+                                          sigmaX: 5, sigmaY: 5),
                                       child: Container(
                                         color: Colors.transparent,
                                       ),
@@ -160,7 +169,8 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         },
                         child: Text(
                           'Sign Up',
-                          style: TextStyle(color: Color(0xFF464646), fontSize: 16),
+                          style:
+                              TextStyle(color: Color(0xFF464646), fontSize: 16),
                         ),
                       ),
                       SizedBox(height: 15),
@@ -171,24 +181,33 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                           ),
                           minimumSize: Size(0.70 * screenWidth, 55.0),
                           side: BorderSide(
-                            color: Color.fromARGB(255, 255, 255, 255), // สีของเส้นขอบ
+                            color: Color.fromARGB(
+                                255, 255, 255, 255), // สีของเส้นขอบ
                             width: 2.0, // ความหนาของเส้นขอบ
                           ),
                         ),
                         onPressed: () {
                           showModalBottomSheet(
                             isScrollControlled: true,
-                            context: context, // Allow modal to resize with keyboard
-                            backgroundColor: Colors.transparent, // Make modal transparent
+                            context:
+                                context, // Allow modal to resize with keyboard
+                            backgroundColor:
+                                Colors.transparent, // Make modal transparent
                             builder: (BuildContext context) {
-                              double keyboardHeight = MediaQuery.of(context).viewInsets.bottom; // Detect keyboard height
+                              double keyboardHeight = MediaQuery.of(context)
+                                  .viewInsets
+                                  .bottom; // Detect keyboard height
                               return SizedBox(
-                                height: keyboardHeight > 0 ? MediaQuery.of(context).size.height * 0.85 : MediaQuery.of(context).size.height * 0.55, // Increase height when keyboard appears
+                                height: keyboardHeight > 0
+                                    ? MediaQuery.of(context).size.height * 0.85
+                                    : MediaQuery.of(context).size.height *
+                                        0.55, // Increase height when keyboard appears
                                 child: Stack(
                                   children: [
                                     // Blur effect
                                     BackdropFilter(
-                                      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                                      filter: ImageFilter.blur(
+                                          sigmaX: 5, sigmaY: 5),
                                       child: Container(
                                         color: Colors.transparent,
                                       ),
@@ -205,8 +224,9 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         },
                         child: Text(
                           'Log In',
-                          style:
-                              TextStyle(color: Color.fromARGB(255, 255, 255, 255), fontSize: 16),
+                          style: TextStyle(
+                              color: Color.fromARGB(255, 255, 255, 255),
+                              fontSize: 16),
                         ),
                       ),
                       SizedBox(height: 15),
@@ -215,7 +235,9 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => StoragePage())
+                              builder: (context) =>
+                                  StoragePage(userId: 'guest'),
+                            ),
                           );
                         },
                         child: Text(

@@ -54,14 +54,13 @@ class LoginAppState extends State<LoginApp> {
         final hashedPassword = user['password'];
         if (BCrypt.checkpw(password, hashedPassword)) {
           print('Login successful!');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Login successful!')),
-          );
 
-          // Navigate to FirstPageScreen
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => StoragePage()),
+            MaterialPageRoute(
+              builder: (context) =>
+                  StoragePage(userId: user['_id'].toHexString()),
+            ),
           );
         } else {
           print('Invalid password.');
@@ -69,19 +68,11 @@ class LoginAppState extends State<LoginApp> {
             SnackBar(content: Text('Invalid password.')),
           );
         }
-      } else {
-        print('User not found.');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('User not found.')),
-        );
       }
 
       await db.close();
     } catch (e) {
       print('Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed: $e')),
-      );
     }
   }
 

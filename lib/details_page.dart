@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 
 class DetailsPage extends StatelessWidget {
-  const DetailsPage({super.key});
+  final Map<String, dynamic> plant; // Accept plant data
+  const DetailsPage({required this.plant, super.key});
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, String> args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, String>;
-    final String title = args['title']!;
-    final String subtitle = args['subtitle']!;
-
     return Scaffold(
       appBar: AppBar(
         shape: RoundedRectangleBorder(
@@ -18,7 +14,8 @@ class DetailsPage extends StatelessWidget {
           ),
         ),
         backgroundColor: Color(0xFF464646),
-        title: Text(title, style: TextStyle(color: Color(0xFFFFFFFF))),
+        title: Text(plant['label'] ?? 'Plant Details',
+            style: TextStyle(color: Color(0xFFFFFFFF))),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Color(0xFFFFFFFF)),
@@ -42,17 +39,21 @@ class DetailsPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 20),
-            Text('Disease: $subtitle', style: TextStyle(fontSize: 18)),
+            Text('Disease: ${plant['predict'] ?? 'Unknown'}',
+                style: TextStyle(fontSize: 18)),
             SizedBox(height: 10),
-            Text('Date: dd/mm/yyyy hh:mm:ss', style: TextStyle(fontSize: 18)),
+            Text('Date: ${plant['date'] ?? 'Unknown'}',
+                style: TextStyle(fontSize: 18)),
             SizedBox(height: 10),
-            Text('Note: something lorem yipsum',
+            Text('Status: ${plant['status'] ?? 'Unknown'}',
                 style: TextStyle(fontSize: 18)),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          // Add delete functionality here if needed
+        },
         shape: CircleBorder(),
         backgroundColor: Colors.red,
         child: Icon(
