@@ -1,137 +1,176 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:image/image.dart' as img;
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:project_pdd/classifier/classifier.dart';
+import 'package:project_pdd/bloc/recogniser_bloc.dart';
+import 'package:project_pdd/bloc/recogniser_event.dart';
+import 'package:project_pdd/bloc/recogniser_state.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/photo_view.dart';
 
-const _labelsFileName = 'labels.txt';
-const _modelFileName = 'assets/my_model/plantVillage_model.tflite';
-
-class Recogniser extends StatefulWidget {
+class Recogniser extends StatelessWidget {
   const Recogniser({super.key});
-
-  @override
-  State<Recogniser> createState() => _RecogniserState();
-}
-
-enum _ResultStatus { notStarted, notFound, found }
-
-class _RecogniserState extends State<Recogniser> {
-  bool _isAnalyzing = false;
-  final picker = ImagePicker();
-  File? _selectedImageFile;
-
-  _ResultStatus _resultStatus = _ResultStatus.notStarted;
-  String _plantLabel = '';
-  double _accuracy = 0.0;
-
-  late Classifier _classifier;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadClassifier();
-  }
-
-  Future<void> _loadClassifier() async {
-    debugPrint(
-      'Start loading of Classifier with '
-      'labels at $_labelsFileName, '
-      'model at $_modelFileName',
-    );
-
-    final classifier = await Classifier.loadWith(
-      labelsFileName: _labelsFileName,
-      modelFileName: _modelFileName,
-    );
-    _classifier = classifier!;
-  }
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
-    return Scaffold(
-      appBar: AppBar(
+
+    return BlocProvider(
+      create: (_) => RecogniserBloc()..add(RecogniserStarted()),
+      child: Scaffold(
+        appBar: AppBar(
           backgroundColor: primaryColor,
           leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
             icon: Icon(Icons.close, color: bgColor),
             iconSize: 36.0,
+            onPressed: () => Navigator.pop(context),
           ),
           title: Text('Plant Hub',
-              style: subTitleTextStyleWhite(fontWeight: FontWeight.bold)),
+              style: subTitleTextStyleWhite(fontWeight: FontWeight.normal)),
           centerTitle: true,
-          toolbarHeight: screenHeight * 0.075),
-      body: Container(
-        alignment: Alignment.center,
-        child: Column(
-          children: [
-            SizedBox(
-              height: 20.0,
-            ),
-            _buildPhotolView(),
-            SizedBox(
-              height: 20.0,
-            ),
-            _buildResultView(),
-            const Spacer(flex: 2),
-            _buildPickPhotoButton(
-              title: 'Take a photo',
-              width: screenWidth * 0.55,
-              source: ImageSource.camera,
-              isOutlined: false,
-            ),
-            SizedBox(
-              height: 20.0,
-            ),
-            _buildPickPhotoButton(
-              title: 'Pick from gallery',
-              width: screenWidth * 0.55,
-              source: ImageSource.gallery,
-              isOutlined: true,
-            ),
-            const Spacer(),
-          ],
+          toolbarHeight: screenHeight * 0.085,
+        ),
+        body: BlocBuilder<RecogniserBloc, RecogniserState>(
+          builder: (context, state) {
+            return SingleChildScrollView(
+              child: Container(
+                alignment: Alignment.center,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 20),
+                    PhotoViewScreen(file: state.image),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      height: 150,
+                      child: SingleChildScrollView(
+                          child: _buildResultView(state, context)),
+                    ),
+                    const SizedBox(height: 40),
+                    _buildPickButton(context, 'Take a photo',
+                        ImageSource.camera, screenWidth, false, 'photo'),
+                    const SizedBox(height: 20),
+                    _buildPickButton(context, 'Pick from gallery',
+                        ImageSource.gallery, screenWidth, true, 'gallery'),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildPhotolView() {
-    return Stack(
-      alignment: AlignmentDirectional.center,
+  Widget _buildResultView(RecogniserState state, BuildContext context) {
+    if (state.status == RecogniserStatus.analyzing) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(
+            color: primaryColor,
+            strokeWidth: 3,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Analyzing...',
+            style: subTitleTextStyleDark(fontWeight: FontWeight.bold),
+          ),
+        ],
+      );
+    }
+
+    if (state.status == RecogniserStatus.initial) {
+      return const SizedBox();
+    }
+
+    final label = switch (state.status) {
+      RecogniserStatus.found => state.label,
+      RecogniserStatus.timeout => 'Please try again.',
+      _ => 'Fail to recognise',
+    };
+
+    final accuracy = state.status == RecogniserStatus.found
+        ? 'Accuracy: ${(state.accuracy * 100).toStringAsFixed(2)}%'
+        : '';
+
+    List<String> splitText(String text, TextStyle style, double maxWidth) {
+      final textPainter = TextPainter(
+        text: TextSpan(text: text, style: style),
+        maxLines: 1000,
+        textDirection: TextDirection.ltr,
+      )..layout(maxWidth: maxWidth);
+
+      final words = text.split(' ');
+      List<String> lines = [];
+      String currentLine = '';
+
+      for (var word in words) {
+        final tempLine = '$currentLine$word ';
+        textPainter.text = TextSpan(text: tempLine, style: style);
+        textPainter.layout(maxWidth: maxWidth);
+
+        if (textPainter.didExceedMaxLines) {
+          lines.add(currentLine.trim());
+          currentLine = '$word ';
+        } else {
+          currentLine = tempLine;
+        }
+      }
+
+      if (currentLine.isNotEmpty) {
+        lines.add(currentLine.trim());
+      }
+
+      return lines;
+    }
+
+    final maxWidth = MediaQuery.of(context).size.width * 0.8;
+
+    List<String> labelLines = splitText(
+        label, subTitleTextStyleDark(fontWeight: FontWeight.bold), maxWidth);
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        PhotoViewScreen(
-          file: _selectedImageFile,
-        ),
-        _buildAnalyzingText(),
+        for (var line in labelLines)
+          Text(
+            line,
+            style: subTitleTextStyleDark(fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+        const SizedBox(height: 12),
+        if (accuracy.isNotEmpty)
+          Text(
+            accuracy,
+            style: successTextStyle(fontWeight: FontWeight.bold),
+          ),
       ],
     );
   }
 
-  Widget _buildAnalyzingText() {
-    if (!_isAnalyzing) {
-      return const SizedBox.shrink();
-    }
-    return Text('Analyzing...',
-        style: subTitleTextStyleDark(fontWeight: FontWeight.normal));
-  }
+  Widget _buildPickButton(BuildContext context, String title,
+      ImageSource source, double width, bool isOutlined, String type) {
+    // Determine the icon based on the type
+    IconData icon = type == 'photo' ? Icons.camera_alt : Icons.photo_library;
 
-  Widget _buildPickPhotoButton({
-    required ImageSource source,
-    required String title,
-    double width = 300.0,
-    double height = 70.0,
-    bool isOutlined = false,
-  }) {
     return ElevatedButton(
-      onPressed: () => _onPickPhoto(source),
+      onPressed: () async {
+        final picker = ImagePicker();
+        final pickedFile = await picker.pickImage(
+          source: source,
+        );
+        if (pickedFile != null) {
+          context
+              .read<RecogniserBloc>()
+              .add(PhotoPicked(File(pickedFile.path)));
+        }
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: isOutlined ? Colors.transparent : primaryColor,
         shape: RoundedRectangleBorder(
@@ -140,89 +179,26 @@ class _RecogniserState extends State<Recogniser> {
               ? BorderSide(color: primaryColor, width: 3.0)
               : BorderSide.none,
         ),
-        minimumSize: Size(width, height),
+        minimumSize: Size(width, 60.0),
         elevation: isOutlined ? 0 : null,
       ),
-      child: Container(
-        alignment: Alignment.center,
-        width: width,
-        height: height,
-        child: Text(
-          title,
-          style: isOutlined
-              ? descTextStyleDark(fontWeight: FontWeight.normal)
-              : descTextStyleWhite(fontWeight: FontWeight.normal),
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center, // Center content
+        children: [
+          Icon(
+            icon,
+            color: isOutlined ? primaryColor : Colors.white,
+            size: 24.0, // Icon size
+          ),
+          const SizedBox(width: 10), // Space between icon and text
+          Text(
+            title,
+            style: isOutlined
+                ? descTextStyleDark(fontWeight: FontWeight.normal)
+                : descTextStyleWhite(fontWeight: FontWeight.normal),
+          ),
+        ],
       ),
     );
-  }
-
-  Widget _buildResultView() {
-    var title = '';
-
-    if (_resultStatus == _ResultStatus.notFound) {
-      title = 'Fail to recognise';
-    } else if (_resultStatus == _ResultStatus.found) {
-      title = _plantLabel;
-    } else {
-      title = '';
-    }
-
-    var accuracyLabel = '';
-    if (_resultStatus == _ResultStatus.found) {
-      accuracyLabel = 'Accuracy: ${(_accuracy * 100).toStringAsFixed(2)}%';
-    }
-
-    return Column(
-      children: [
-        Text(title, style: subTitleTextStyleDark(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 20),
-        Text(accuracyLabel,
-            style: successTextStyle(fontWeight: FontWeight.bold)),
-      ],
-    );
-  }
-
-  void _setAnalyzing(bool flag) {
-    setState(() {
-      _isAnalyzing = flag;
-    });
-  }
-
-  void _onPickPhoto(ImageSource source) async {
-    final pickedFile = await picker.pickImage(source: source);
-
-    if (pickedFile == null) {
-      return;
-    }
-
-    final imageFile = File(pickedFile.path);
-    setState(() {
-      _selectedImageFile = imageFile;
-    });
-
-    _analyzeImage(imageFile);
-  }
-
-  void _analyzeImage(File image) {
-    _setAnalyzing(true);
-
-    final imageInput = img.decodeImage(image.readAsBytesSync())!;
-
-    final resultCategory = _classifier.predict(imageInput);
-
-    final result = resultCategory.score >= 0.8
-        ? _ResultStatus.found
-        : _ResultStatus.notFound;
-    final plantLabel = resultCategory.label;
-    final accuracy = resultCategory.score;
-
-    _setAnalyzing(false);
-
-    setState(() {
-      _resultStatus = result;
-      _plantLabel = plantLabel;
-      _accuracy = accuracy;
-    });
   }
 }

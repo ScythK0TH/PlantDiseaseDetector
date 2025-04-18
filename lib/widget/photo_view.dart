@@ -12,13 +12,13 @@ class PhotoViewScreen extends StatelessWidget {
     final double screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
-      width: screenWidth * 0.6,
+      width: screenWidth * 0.8,
       height: screenHeight * 0.35,
       decoration: BoxDecoration(
         color: primaryColor,
         borderRadius: BorderRadius.circular(36),
       ),
-      clipBehavior: Clip.antiAlias, 
+      clipBehavior: Clip.antiAlias,
       child: (file == null)
           ? _buildEmptyView()
           : Image.file(file!, fit: BoxFit.cover),
@@ -27,9 +27,27 @@ class PhotoViewScreen extends StatelessWidget {
 
   Widget _buildEmptyView() {
     return Center(
-      child: Text(
-        'Please pick a photo',
-        style: subTitleTextStyleWhite(fontWeight: FontWeight.bold),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.image,
+              size: 50,
+              color: bgColor,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Please pick a photo',
+              style: descTextStyleWhite(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+            ),
+          ],
+        ),
       ),
     );
   }
