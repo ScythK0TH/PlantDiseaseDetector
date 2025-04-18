@@ -59,6 +59,22 @@ TextStyle descTextStyleWhite({FontWeight fontWeight = FontWeight.normal}) =>
       decoration: TextDecoration.none,
     );
 
+TextStyle subDescTextStyleDark({FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 14,
+      fontWeight: fontWeight,
+      color: primaryColor,
+      decoration: TextDecoration.none,
+    );
+
+TextStyle subDescTextStyleWhite({FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 14,
+      fontWeight: fontWeight,
+      color: bgColor,
+      decoration: TextDecoration.none,
+    );
+
 // Alert & Success
 TextStyle alertTextStyle({FontWeight fontWeight = FontWeight.normal}) =>
     GoogleFonts.inter(
@@ -71,6 +87,22 @@ TextStyle alertTextStyle({FontWeight fontWeight = FontWeight.normal}) =>
 TextStyle successTextStyle({FontWeight fontWeight = FontWeight.normal}) =>
     GoogleFonts.inter(
       fontSize: 18,
+      fontWeight: fontWeight,
+      color: successColor,
+      decoration: TextDecoration.none,
+    );
+
+TextStyle subAlertTextStyle({FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 14,
+      fontWeight: fontWeight,
+      color: alertColor,
+      decoration: TextDecoration.none,
+    );
+
+TextStyle subSuccessTextStyle({FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 14,
       fontWeight: fontWeight,
       color: successColor,
       decoration: TextDecoration.none,

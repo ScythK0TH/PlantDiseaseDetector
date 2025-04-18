@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/storage_page.dart';
 import 'login.dart';
 import 'register.dart';
@@ -77,14 +78,9 @@ class FirstPageScreenState extends State<FirstPageScreen> {
               // เพิ่มชื่อแอพใต้ภาพ
               Padding(
                 padding: EdgeInsets.only(top: 10.0),
-                child: Text(
-                  "Plant Hub", // ชื่อแอพที่คุณต้องการ
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 255, 255, 255),
-                    fontSize: 35.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: Text('Plant Hub',
+                    style:
+                        mainTitleTextStyleWhite(fontWeight: FontWeight.bold)),
               ),
               Flexible(
                 flex: 1, // เพิ่มส่วนนี้สำหรับข้อความที่พิมพ์
@@ -102,9 +98,7 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         animatedTexts: [
                           TypewriterAnimatedText(
                             textSequence[index],
-                            textStyle: TextStyle(
-                                color: Color.fromARGB(255, 255, 255, 255),
-                                fontSize: 35.0),
+                            textStyle: subTitleTextStyleWhite(fontWeight: FontWeight.normal),
                             speed: Duration(milliseconds: 200),
                             cursor: '|', // Cursor ที่ท้ายข้อความ
                           ),
@@ -125,9 +119,9 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                     children: [
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                          backgroundColor: bgColor,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50.0),
+                            borderRadius: BorderRadius.circular(36.0),
                           ),
                           minimumSize: Size(0.70 * screenWidth, 55.0),
                         ),
@@ -170,19 +164,18 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         child: Text(
                           'Sign Up',
                           style:
-                              TextStyle(color: Color(0xFF464646), fontSize: 16),
+                              descTextStyleDark(fontWeight: FontWeight.normal),
                         ),
                       ),
                       SizedBox(height: 15),
                       OutlinedButton(
                         style: OutlinedButton.styleFrom(
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50.0),
+                            borderRadius: BorderRadius.circular(36.0),
                           ),
                           minimumSize: Size(0.70 * screenWidth, 55.0),
                           side: BorderSide(
-                            color: Color.fromARGB(
-                                255, 255, 255, 255), // สีของเส้นขอบ
+                            color: bgColor, // สีของเส้นขอบ
                             width: 2.0, // ความหนาของเส้นขอบ
                           ),
                         ),
@@ -224,9 +217,7 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         },
                         child: Text(
                           'Log In',
-                          style: TextStyle(
-                              color: Color.fromARGB(255, 255, 255, 255),
-                              fontSize: 16),
+                          style: descTextStyleWhite(fontWeight: FontWeight.normal),
                         ),
                       ),
                       SizedBox(height: 15),
@@ -242,7 +233,7 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         },
                         child: Text(
                           'Continue without an account',
-                          style: TextStyle(color: Color(0xFF444444)),
+                          style: subDescTextStyleDark(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],

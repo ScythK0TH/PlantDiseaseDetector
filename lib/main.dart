@@ -20,7 +20,7 @@ class MainApp extends StatelessWidget {
         initialRoute: '/',
         routes: {
           '/': (context) => FirstPageScreen(),
-          '/recogniser': (context) => Recogniser(),
+          '/camera': (context) => Recogniser(),
         });
   }
 }

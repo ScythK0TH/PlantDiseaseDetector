@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:bcrypt/bcrypt.dart';
 import 'package:project_pdd/constant.dart';
+import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/login.dart';
 
 class RegisApp extends StatefulWidget {
@@ -83,8 +84,8 @@ class _RegisAppState extends State<RegisApp> {
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 255, 255, 255),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
+        color: bgColor,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(36.0)),
       ),
       child: SingleChildScrollView(
         padding: EdgeInsets.only(
@@ -113,8 +114,7 @@ class _RegisAppState extends State<RegisApp> {
                           animatedTexts: [
                             TypewriterAnimatedText(
                               textSequence[index],
-                              textStyle: TextStyle(
-                                  color: Color(0xFF464646), fontSize: 35.0),
+                              textStyle: subTitleTextStyleDark(fontWeight: FontWeight.bold),
                               speed: Duration(milliseconds: 150),
                               cursor: '|',
                             ),
@@ -127,8 +127,7 @@ class _RegisAppState extends State<RegisApp> {
                     SizedBox(height: 10),
                     Text(
                       "Create your account",
-                      style:
-                          TextStyle(color: Color(0xFF464646), fontSize: 21.5),
+                      style: descTextStyleDark(fontWeight: FontWeight.normal),
                     ),
                   ],
                 ),
@@ -147,13 +146,13 @@ class _RegisAppState extends State<RegisApp> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                               borderSide: BorderSide(
-                                  color: Color(0xFF464646), width: 2),
+                                  color: primaryColor, width: 2),
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(50.0))),
+                                  BorderRadius.all(Radius.circular(36.0))),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: bgColor,
                           hintText: "Enter your email",
-                          hintStyle: TextStyle(color: const Color(0xFF464646)),
+                          hintStyle: subDescTextStyleDark(fontWeight: FontWeight.normal),
                         ),
                         onChanged: (_) => _validateForm(),
                       ),
@@ -166,14 +165,14 @@ class _RegisAppState extends State<RegisApp> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: Color(0xFF464646), width: 2),
+                                BorderSide(color: primaryColor, width: 2),
                             borderRadius:
-                                BorderRadius.all(Radius.circular(50.0)),
+                                BorderRadius.all(Radius.circular(36.0)),
                           ),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: bgColor,
                           hintText: "Enter your password",
-                          hintStyle: TextStyle(color: Color(0xFF464646)),
+                          hintStyle: subDescTextStyleDark(fontWeight: FontWeight.normal),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isObscure1
@@ -198,14 +197,14 @@ class _RegisAppState extends State<RegisApp> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: Color(0xFF464646), width: 2),
+                                BorderSide(color: primaryColor, width: 2),
                             borderRadius:
-                                BorderRadius.all(Radius.circular(50.0)),
+                                BorderRadius.all(Radius.circular(36.0)),
                           ),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: bgColor,
                           hintText: "Confirm your password",
-                          hintStyle: TextStyle(color: Color(0xFF464646)),
+                          hintStyle: subDescTextStyleDark(fontWeight: FontWeight.normal),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isObscure2
@@ -235,10 +234,10 @@ class _RegisAppState extends State<RegisApp> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _isRegisterEnabled
-                            ? Color(0xFF464646)
-                            : Colors.grey,
+                            ? primaryColor
+                            : secondaryColor,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50.0),
+                          borderRadius: BorderRadius.circular(36.0),
                         ),
                         minimumSize: Size(0.50 * screenWidth, 55.0),
                       ),
@@ -249,7 +248,7 @@ class _RegisAppState extends State<RegisApp> {
                         child: Text("Register",
                             style: TextStyle(
                                 fontSize: 15.0,
-                                color: Color.fromARGB(255, 255, 255, 255))),
+                                color: bgColor,)),
                       ),
                     ),
                   ),
@@ -259,12 +258,12 @@ class _RegisAppState extends State<RegisApp> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text("Already have an account?",
-                            style: TextStyle(color: Color(0xFF464646))),
+                            style: subDescTextStyleDark(fontWeight: FontWeight.normal)),
                         Container(
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             child: Text("Login now",
-                                style: TextStyle(color: Color(0xFF27AC3C))),
+                                style: subSuccessTextStyle(fontWeight: FontWeight.bold)),
                             onPressed: () {
                               Navigator.pop(context);
                               showFirstModal(context);
