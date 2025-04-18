@@ -14,30 +14,65 @@ class Recogniser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
 
     return BlocProvider(
       create: (_) => RecogniserBloc()..add(RecogniserStarted()),
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: primaryColor,
-          leading: IconButton(
-            icon: Icon(Icons.close, color: bgColor),
-            iconSize: 36.0,
-            onPressed: () => Navigator.pop(context),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          title: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_circle_left_rounded,
+                        color: primaryColor,
+                        size: 24.0,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      'Plant Hub',
+                      style: subTitleTextStyleDark(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.flag,
+                        color: primaryColor,
+                        size: 24.0,
+                      ),
+                      onPressed: () {
+                        // Do something
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          title: Text('Plant Hub',
-              style: subTitleTextStyleWhite(fontWeight: FontWeight.normal)),
-          centerTitle: true,
-          toolbarHeight: screenHeight * 0.085,
+          centerTitle: true, // ไม่จำเป็นมากเพราะจัดตำแหน่งเองแล้ว
         ),
         body: BlocBuilder<RecogniserBloc, RecogniserState>(
           builder: (context, state) {
             return SingleChildScrollView(
               child: Container(
                 alignment: Alignment.center,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

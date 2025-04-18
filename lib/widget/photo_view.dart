@@ -12,8 +12,8 @@ class PhotoViewScreen extends StatelessWidget {
     final double screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
-      width: screenWidth * 0.8,
-      height: screenHeight * 0.35,
+      width: screenWidth * 1.8,
+      height: 300,
       decoration: BoxDecoration(
         color: primaryColor,
         borderRadius: BorderRadius.circular(36),
