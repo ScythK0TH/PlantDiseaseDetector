@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:project_pdd/widget/first_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
 
 void main() {
@@ -18,7 +19,8 @@ class MainApp extends StatelessWidget {
         ),
         initialRoute: '/',
         routes: {
-          '/': (context) => Recogniser(),
+          '/': (context) => FirstPageScreen(),
+          '/recogniser': (context) => Recogniser(),
         });
   }
 }

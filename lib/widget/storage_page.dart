@@ -1,13 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'package:project_pdd/constant.dart';
+import 'details_page.dart';
 
 class StoragePage extends StatefulWidget {
-  const StoragePage({super.key});
+  final String userId; // Pass the logged-in user's _id
+  const StoragePage({required this.userId, super.key});
+
   @override
   State<StoragePage> createState() => _StoragePageState();
 }
 
 class _StoragePageState extends State<StoragePage> {
+  List<Map<String, dynamic>> _plants = []; // Store plant documents
   String? _selectedCategory;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPlants(); // Fetch plants when the page loads
+  }
+
+  Future<void> _fetchPlants() async {
+    try {
+      print('Connecting to MongoDB...');
+      final db = await mongo.Db.create(MONGO_URL);
+      await db.open();
+      print('Connected to MongoDB.');
+
+      final collection = db.collection('plants');
+      print('Fetching plants for user: ${widget.userId}...');
+
+      // Ensure userId is a valid ObjectId
+      final query = widget.userId is mongo.ObjectId
+          ? {'userid': widget.userId}
+          : {
+              'userid': mongo.ObjectId.parse(widget.userId
+                  .replaceAll(RegExp(r'^ObjectId\("(.*)"\)$'), r'\1'))
+            };
+
+      print('Query: $query');
+
+      final plants = await collection.find(query).toList();
+      print('Fetched plants: $plants');
+
+      setState(() {
+        _plants = plants; // Update the state with fetched plants
+      });
+
+      await db.close();
+      print('MongoDB connection closed.');
+    } catch (e) {
+      print('Error fetching plants: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,62 +85,25 @@ class _StoragePageState extends State<StoragePage> {
           ),
         ],
       ),
-      body: ListView(
-        children: [
-          ListTile(
-            title: Row(
-              children: [
-                SizedBox(width: 8.0),
-                DropdownButton<String>(
-                  value: _selectedCategory,
-                  items: <String>['ทั้งหมด', 'สุขภาพดี', 'เป็นโรค']
-                      .map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
+      body: _plants.isEmpty
+          ? Center(child: Text('No plants found.'))
+          : ListView(
+              children: _plants.map((plant) {
+                return ListTile(
+                  title: Text(plant['label'] ?? 'Unknown Plant'),
+                  subtitle: Text(plant['predict'] ?? 'Unknown Prediction'),
+                  trailing: Icon(Icons.image),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailsPage(plant: plant),
+                      ),
                     );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedCategory = newValue;
-                    });
                   },
-                  hint: Text('ทั้งหมด'),
-                ),
-              ],
+                );
+              }).toList(),
             ),
-          ),
-          ListTile(
-            title: Text('Plant01'),
-            subtitle: Text('Healthy'),
-            trailing: Icon(Icons.image),
-            onTap: () {
-              Navigator.pushNamed(context, '/details',
-                  arguments: {'title': 'Plant01', 'subtitle': 'healthy'});
-            },
-          ),
-          ListTile(
-            title: Text('Plant02'),
-            subtitle: Text('Healthy'),
-            trailing: Icon(Icons.image),
-            onTap: () {
-              Navigator.pushNamed(context, '/details',
-                  arguments: {'title': 'Plant02', 'subtitle': 'healthy'});
-            },
-          ),
-          ListTile(
-            title: Text('Plant03'),
-            subtitle: Text('Powdery mildew'),
-            trailing: Icon(Icons.image),
-            onTap: () {
-              Navigator.pushNamed(context, '/details', arguments: {
-                'title': 'Plant03',
-                'subtitle': 'Powdery mildew'
-              });
-            },
-          ),
-        ],
-      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, '/camera');

@@ -233,9 +233,12 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                       TextButton(
                         onPressed: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => StoragePage()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  StoragePage(userId: 'guest'),
+                            ),
+                          );
                         },
                         child: Text(
                           'Continue without an account',
