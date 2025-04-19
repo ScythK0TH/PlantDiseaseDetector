@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/constant.dart';
 import 'package:project_pdd/style.dart';
+import 'package:project_pdd/widget/first_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
 import 'details_page.dart';
 import 'package:project_pdd/main.dart'; 
@@ -18,12 +19,15 @@ class StoragePage extends StatefulWidget {
 
 class _StoragePageState extends State<StoragePage> with RouteAware {
   List<Map<String, dynamic>> _plants = [];
-  bool _isLoading = false; // Add this line
+  bool _isLoading = false;
+  bool _isSearching = false;
+  String _searchText = '';
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _fetchPlants();
+    _fetchPlants('');
   }
 
   @override
@@ -35,44 +39,45 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
   @override
   void dispose() {
     routeObserver.unsubscribe(this);
+    _searchController.dispose();
     super.dispose();
   }
 
   @override
   void didPopNext() {
-    _fetchPlants();
+    _fetchPlants(_searchText);
   }
 
-  Future<void> _fetchPlants() async {
+  Future<void> _fetchPlants(String search) async {
     setState(() {
-      _isLoading = true; // Start loading
+      _isLoading = true;
     });
     try {
-      print('Connecting to MongoDB...');
       final db = await mongo.Db.create(MONGO_URL);
       await db.open();
-      print('Connected to MongoDB.');
-
       final collection = db.collection('plants');
-      print('Fetching plants for user: ${widget.userId}...');
-
       final query = {'userId': mongo.ObjectId.fromHexString(widget.userId)};
-      print('Query: $query');
-
       final plants = await collection.find(query).toList();
-      print('Fetched plants: $plants');
+
+      if (search.isNotEmpty) {
+        _plants = plants.where((plant) {
+          final title = plant['title']?.toString().toLowerCase() ?? '';
+          return title.contains(search.toLowerCase());
+        }).toList();
+      } else {
+        _plants = plants;
+      }
 
       setState(() {
-        _plants = plants;
+        _plants = _plants;
       });
 
       await db.close();
-      print('MongoDB connection closed.');
     } catch (e) {
       print('Error fetching plants: $e');
     } finally {
       setState(() {
-        _isLoading = false; // Stop loading
+        _isLoading = false;
       });
     }
   }
@@ -89,19 +94,50 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Row(
             children: [
-              Text(
-                'Gallery',
-                style: subTitleTextStyleDark(fontWeight: FontWeight.bold),
-              ),
-              Spacer(),
-              IconButton(
-                icon: Icon(
-                  Icons.search,
-                  color: primaryColor,
-                  size: 24.0,
+              if (_isSearching)
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: 'Search plants...',
+                      border: InputBorder.none,
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _searchText = value;
+                      });
+                      _fetchPlants(_searchText);
+                    },
+                  ),
+                )
+              else
+                Text(
+                  'Gallery',
+                  style: subTitleTextStyleDark(fontWeight: FontWeight.bold),
                 ),
-                onPressed: () {},
-              ),
+              Spacer(),
+              if (_isSearching)
+                IconButton(
+                  icon: Icon(Icons.close, color: primaryColor, size: 24.0),
+                  onPressed: () {
+                    setState(() {
+                      _isSearching = false;
+                      _searchText = '';
+                      _searchController.clear();
+                    });
+                    _fetchPlants('');
+                  },
+                )
+              else
+                IconButton(
+                  icon: Icon(Icons.search, color: primaryColor, size: 24.0),
+                  onPressed: () {
+                    setState(() {
+                      _isSearching = true;
+                    });
+                  },
+                ),
               IconButton(
                 icon: Icon(
                   Icons.logout,
@@ -109,7 +145,12 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                   size: 24.0,
                 ),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FirstPageScreen(),
+                    ),
+                  );
                 },
               ),
             ],
@@ -294,13 +335,6 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
             ),
             label: 'Profile',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.settings,
-              size: 24.0,
-            ),
-            label: 'Setting',
-          ),
         ],
         onTap: (index) {
           switch (index) {
@@ -317,9 +351,6 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
               break;
             case 2:
               // Add route to profile page if available
-              break;
-            case 3:
-              // Add route to setting page if available
               break;
           }
         },
