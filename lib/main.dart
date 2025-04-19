@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:project_pdd/widget/first_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
 
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+
 void main() {
   runApp(const MainApp());
 }
@@ -18,9 +20,9 @@ class MainApp extends StatelessWidget {
           textTheme: GoogleFonts.promptTextTheme(),
         ),
         initialRoute: '/',
+        navigatorObservers: [routeObserver], // <-- Add this line
         routes: {
           '/': (context) => FirstPageScreen(),
-          '/camera': (context) => Recogniser(),
         });
   }
 }

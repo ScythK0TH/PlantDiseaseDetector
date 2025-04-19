@@ -1,15 +1,27 @@
 import 'dart:io';
+import 'dart:convert';
+import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'package:project_pdd/constant.dart';
 import 'package:project_pdd/bloc/recogniser_bloc.dart';
 import 'package:project_pdd/bloc/recogniser_event.dart';
 import 'package:project_pdd/bloc/recogniser_state.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/photo_view.dart';
+import 'package:project_pdd/widget/storage_page.dart';
 
-class Recogniser extends StatelessWidget {
-  const Recogniser({super.key});
+class Recogniser extends StatefulWidget {
+  final String userId; // Pass the logged-in user's _id
+  const Recogniser({required this.userId, super.key});
+
+  @override
+  State<Recogniser> createState() => _RecogniserState();
+}
+
+class _RecogniserState extends State<Recogniser> {
 
   @override
   Widget build(BuildContext context) {
@@ -78,19 +90,30 @@ class Recogniser extends StatelessWidget {
                   children: [
                     const SizedBox(height: 20),
                     PhotoViewScreen(file: state.image),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 50),
                     SizedBox(
                       height: 150,
                       child: SingleChildScrollView(
                           child: _buildResultView(state, context)),
                     ),
-                    const SizedBox(height: 40),
-                    _buildPickButton(context, 'Take a photo',
-                        ImageSource.camera, screenWidth, false, 'photo'),
                     const SizedBox(height: 20),
-                    _buildPickButton(context, 'Pick from gallery',
-                        ImageSource.gallery, screenWidth, true, 'gallery'),
-                    const SizedBox(height: 20),
+                    if (state.status != RecogniserStatus.analyzing) ...[
+                      if (state.status == RecogniserStatus.found) ...[
+                      _buildResultButton(context, 'Save Result',
+                        screenWidth, false, 'save', state),
+                      const SizedBox(height: 20),
+                      _buildResultButton(context, 'Cancel',
+                        screenWidth, true, 'cancel', state),
+                      const SizedBox(height: 20),
+                      ] else ...[
+                        _buildPickButton(context, 'Take a photo',
+                          ImageSource.camera, screenWidth, false, 'photo'),
+                        const SizedBox(height: 20),
+                        _buildPickButton(context, 'Pick from gallery',
+                            ImageSource.gallery, screenWidth, true, 'gallery'),
+                        const SizedBox(height: 20),
+                      ],
+                    ],
                   ],
                 ),
               ),
@@ -100,6 +123,8 @@ class Recogniser extends StatelessWidget {
       ),
     );
   }
+
+  // ElevatedButton SaveButton() => ElevatedButton(onPressed: onPressed, child: child);
 
   Widget _buildResultView(RecogniserState state, BuildContext context) {
     if (state.status == RecogniserStatus.analyzing) {
@@ -236,4 +261,131 @@ class Recogniser extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildResultButton(BuildContext context, String title,
+    double width, bool isOutlined, String type, RecogniserState state) {
+
+    return ElevatedButton(
+      onPressed: () async {
+        if (type == 'save') {
+          await _savedData(context, state, widget.userId);
+        } else if (type == 'cancel') {
+          //Refresh the page
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Recogniser(userId: widget.userId),
+            ),
+          );
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isOutlined ? Colors.transparent : primaryColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(36.0),
+          side: isOutlined
+              ? BorderSide(color: primaryColor, width: 3.0)
+              : BorderSide.none,
+        ),
+        minimumSize: Size(width, 60.0),
+        elevation: isOutlined ? 0 : null,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center, // Center content
+        children: [
+          const SizedBox(width: 10), // Space between icon and text
+          Text(
+            title,
+            style: isOutlined
+                ? descTextStyleDark(fontWeight: FontWeight.normal)
+                : descTextStyleWhite(fontWeight: FontWeight.normal),
+          ),
+        ],
+      ),
+    );
+  }
 }
+
+Future<String> cropAndResizeToContainer(File file, double containerWidth, double containerHeight) async {
+  final originalBytes = await file.readAsBytes();
+  final image = img.decodeImage(originalBytes);
+  if (image == null) throw Exception('Failed to decode image');
+
+  // Calculate aspect ratio of the container
+  final containerAspect = containerWidth / containerHeight;
+  final imageAspect = image.width / image.height;
+
+  int cropWidth, cropHeight, offsetX, offsetY;
+
+  if (imageAspect > containerAspect) {
+    // Image is wider than container: crop width
+    cropHeight = image.height;
+    cropWidth = (cropHeight * containerAspect).toInt();
+    offsetX = ((image.width - cropWidth) / 2).toInt();
+    offsetY = 0;
+  } else {
+    // Image is taller than container: crop height
+    cropWidth = image.width;
+    cropHeight = (cropWidth / containerAspect).toInt();
+    offsetX = 0;
+    offsetY = ((image.height - cropHeight) / 2).toInt();
+  }
+
+  final cropped = img.copyCrop(image, x: offsetX, y: offsetY, width: cropWidth, height: cropHeight);
+
+  // Resize to container size (optional, or set a fixed size)
+  final resized = img.copyResize(cropped, width: containerWidth.toInt(), height: containerHeight.toInt());
+
+  return base64Encode(img.encodeJpg(resized, quality: 80));
+}
+
+Future<void> _savedData(BuildContext context, RecogniserState state, String userId) async {
+    if (userId.isEmpty) {
+      print('Error: userId is empty.');
+      return;
+    }
+
+    mongo.ObjectId mongoUserId;
+    try {
+      mongoUserId = mongo.ObjectId.fromHexString(userId); // Convert userId to ObjectId
+    } catch (e) {
+      print('Error: Invalid userId format. ' + e.toString());
+      return;
+    }
+    final predict = state.label;
+    final image = state.image != null ? await cropAndResizeToContainer(state.image!, 350, 300) : null;
+    final title = state.image != null ? state.image!.path.split('/').last : 'Unknown';
+    final accuracy = state.accuracy;
+    final dateTime = DateTime.now().toString();
+
+    try {
+      print('Connecting to MongoDB...');
+      final db = await mongo.Db.create(MONGO_URL);
+      await db.open();
+      print('Connected to MongoDB.');
+
+      final collection = db.collection('plants');
+      if (image != null) {
+        await collection.insert({
+          'userId': mongoUserId,
+          'image': image,
+          'date': dateTime,
+          'predict': predict,
+          'title': title,
+          'accuracy': accuracy,
+        });
+      } else {
+        print('Error: Image is null.');
+      }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              StoragePage(userId: userId),
+        ),
+      );
+      await db.close();
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
