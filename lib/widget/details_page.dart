@@ -87,11 +87,9 @@ class DetailsPage extends StatelessWidget {
             Text('Predict: ${plant['predict'] ?? 'Unknown'}',
                 style: TextStyle(fontSize: 18)),
             SizedBox(height: 10),
-            Text('Label: ${plant['label'] ?? 'Unknown'}',
+            Text('Title: ${plant['title'] ?? 'Unknown'}',
                 style: TextStyle(fontSize: 18)),
             SizedBox(height: 10),
-            Text('Status: ${plant['status'] ?? 'Unknown'}',
-                style: TextStyle(fontSize: 18)),
           ],
         ),
       ),
@@ -99,7 +97,11 @@ class DetailsPage extends StatelessWidget {
         onPressed: () {
           // Your edit logic here
         },
-        child: Icon(Icons.edit, color: bgColor, size: 24,),
+        child: Icon(
+          Icons.edit,
+          color: bgColor,
+          size: 24,
+        ),
         backgroundColor: primaryColor, // You can change the color
       ),
       bottomNavigationBar: BottomNavigationBar(
