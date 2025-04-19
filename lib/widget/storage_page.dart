@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
@@ -24,6 +25,8 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
   bool _isSearching = false;
   String _searchText = '';
   final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
+  int _searchToken = 0; // Add this line
 
   @override
   void initState() {
@@ -41,6 +44,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
   void dispose() {
     routeObserver.unsubscribe(this);
     _searchController.dispose();
+    _debounce?.cancel(); // Cancel debounce timer
     super.dispose();
   }
 
@@ -49,10 +53,20 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
     _fetchPlants(_searchText);
   }
 
-  Future<void> _fetchPlants(String search) async {
+  void _onSearchChanged(String value) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      _searchToken++; // Increment token for each new search
+      _fetchPlants(value, token: _searchToken);
+    });
+  }
+
+  Future<void> _fetchPlants(String search, {int? token}) async {
+    final currentToken = token ?? ++_searchToken;
     if (!mounted) return;
     setState(() {
       _isLoading = true;
+      _searchText = search;
     });
     try {
       final db = await mongo.Db.create(MONGO_URL);
@@ -61,25 +75,27 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
       final query = {'userId': mongo.ObjectId.fromHexString(widget.userId)};
       final plants = await collection.find(query).toList();
 
+      List<Map<String, dynamic>> filtered;
       if (search.isNotEmpty) {
-        _plants = plants.where((plant) {
+        filtered = plants.where((plant) {
           final title = plant['title']?.toString().toLowerCase() ?? '';
           return title.contains(search.toLowerCase());
         }).toList();
       } else {
-        _plants = plants;
+        filtered = plants;
       }
 
-      if (!mounted) return;
+      // Only update if this is the latest search
+      if (!mounted || currentToken != _searchToken) return;
       setState(() {
-        _plants = _plants;
+        _plants = filtered;
       });
 
       await db.close();
     } catch (e) {
       print('Error fetching plants: $e');
     } finally {
-      if (!mounted) return;
+      if (!mounted || token != null && token != _searchToken) return;
       setState(() {
         _isLoading = false;
       });
@@ -107,12 +123,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                       hintText: 'Search plants...',
                       border: InputBorder.none,
                     ),
-                    onChanged: (value) {
-                      setState(() {
-                        _searchText = value;
-                      });
-                      _fetchPlants(_searchText);
-                    },
+                    onChanged: _onSearchChanged, // Use the debounced function
                   ),
                 )
               else
