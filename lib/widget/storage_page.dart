@@ -5,6 +5,7 @@ import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/constant.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/first_page.dart';
+import 'package:project_pdd/widget/profile_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
 import 'details_page.dart';
 import 'package:project_pdd/main.dart'; 
@@ -49,6 +50,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
   }
 
   Future<void> _fetchPlants(String search) async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
     });
@@ -68,6 +70,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
         _plants = plants;
       }
 
+      if (!mounted) return;
       setState(() {
         _plants = _plants;
       });
@@ -76,6 +79,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
     } catch (e) {
       print('Error fetching plants: $e');
     } finally {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
@@ -114,12 +118,12 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
               else
                 Text(
                   'Gallery',
-                  style: subTitleTextStyleDark(fontWeight: FontWeight.bold),
+                  style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
                 ),
               Spacer(),
               if (_isSearching)
                 IconButton(
-                  icon: Icon(Icons.close, color: primaryColor, size: 24.0),
+                  icon: Icon(Icons.close, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, size: 24.0),
                   onPressed: () {
                     setState(() {
                       _isSearching = false;
@@ -131,7 +135,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                 )
               else
                 IconButton(
-                  icon: Icon(Icons.search, color: primaryColor, size: 24.0),
+                  icon: Icon(Icons.search, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, size: 24.0),
                   onPressed: () {
                     setState(() {
                       _isSearching = true;
@@ -141,7 +145,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
               IconButton(
                 icon: Icon(
                   Icons.logout,
-                  color: primaryColor,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
                   size: 24.0,
                 ),
                 onPressed: () {
@@ -159,7 +163,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
         centerTitle: false,
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: primaryColor))
+          ? Center(child: CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor))
           : _plants.isEmpty
               ? Center(child: Text('No plants found.'))
               : Container(
@@ -191,7 +195,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                 'Latest',
                                 style: selectedButton == 'Latest'
                                     ? successTextStyle(fontWeight: FontWeight.bold)
-                                    : descTextStyleDark(
+                                    : descTextStyleDark(context,
                                         fontWeight: FontWeight.normal),
                               ),
                             ),
@@ -207,7 +211,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                 'All',
                                 style: selectedButton == 'All'
                                     ? successTextStyle(fontWeight: FontWeight.bold)
-                                    : descTextStyleDark(
+                                    : descTextStyleDark(context,
                                         fontWeight: FontWeight.normal),
                               ),
                             ),
@@ -252,7 +256,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                         width: double.infinity,
                                         height: 150.0,
                                         decoration: BoxDecoration(
-                                          color: primaryColor, // สีพื้นหลังที่แทนภาพ
+                                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, // สีพื้นหลังที่แทนภาพ
                                           borderRadius:
                                               BorderRadius.circular(36.0), // ขอบมน
                                         ),
@@ -269,7 +273,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                         width: double.infinity,
                                         height: 150.0,
                                         decoration: BoxDecoration(
-                                          color: primaryColor, // สีพื้นหลังที่แทนภาพ
+                                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, // สีพื้นหลังที่แทนภาพ
                                           borderRadius:
                                             BorderRadius.circular(36.0), // ขอบมน
                                         ),
@@ -291,7 +295,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                     // แสดงชื่อของ plant
                                     Text(
                                       plant['title'] ?? 'Unknown Plant',
-                                      style: descTextStyleDark(
+                                      style: descTextStyleDark(context,
                                           fontWeight: FontWeight.normal),
                                       textAlign: TextAlign.center,
                                     ),
@@ -310,7 +314,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
         type: BottomNavigationBarType.fixed,
         currentIndex: 1,
         selectedItemColor: successColor,
-        unselectedItemColor: primaryColor,
+        unselectedItemColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
         showSelectedLabels: true,
         showUnselectedLabels: true,
         items: [
@@ -346,11 +350,13 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                   ),
                 );
               break;
-            case 1:
-              // Already on Gallery, do nothing or reload if needed
-              break;
             case 2:
-              // Add route to profile page if available
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfilePage(userId: widget.userId), // Pass userId to Recogniser
+                  ),
+                );
               break;
           }
         },

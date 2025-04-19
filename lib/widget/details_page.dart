@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:project_pdd/style.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/constant.dart';
+import 'package:project_pdd/widget/profile_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
 
 class DetailsPage extends StatefulWidget {
@@ -72,7 +73,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     child: IconButton(
                       icon: Icon(
                         Icons.arrow_circle_left_rounded,
-                        color: primaryColor,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
                         size: 24.0,
                       ),
                       onPressed: () {
@@ -82,14 +83,14 @@ class _DetailsPageState extends State<DetailsPage> {
                   ),
                   Center(
                     child: Text('Image Details',
-                        style: subTitleTextStyleDark(fontWeight: FontWeight.bold)),
+                        style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold)),
                   ),
                   Align(
                     alignment: Alignment.centerRight,
                     child: IconButton(
                       icon: Icon(
                         Icons.delete,
-                        color: primaryColor,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
                         size: 24.0,
                       ),
                       onPressed: () {
@@ -119,7 +120,7 @@ class _DetailsPageState extends State<DetailsPage> {
                       ? Container(
                           height: 300,
                           decoration: BoxDecoration(
-                            color: primaryColor,
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
                             borderRadius: BorderRadius.circular(36),
                           ),
                           clipBehavior: Clip.antiAlias,
@@ -134,14 +135,14 @@ class _DetailsPageState extends State<DetailsPage> {
                       : Container(
                           height: 300,
                           decoration: BoxDecoration(
-                            color: primaryColor,
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
                             borderRadius: BorderRadius.circular(36),
                           ),
                           child: Center(
                             child: Icon(
                               Icons.image,
                               size: 50,
-                              color: bgColor,
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
                             ),
                           ),
                         ),
@@ -208,14 +209,14 @@ class _DetailsPageState extends State<DetailsPage> {
                 }
               }
             },
-            child: Icon(Icons.edit, color: bgColor, size: 24),
-            backgroundColor: primaryColor,
+            backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+            child: Icon(Icons.edit, color: (Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white), size: 24),
           ),
           bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             currentIndex: 1,
             selectedItemColor: successColor,
-            unselectedItemColor: primaryColor,
+            unselectedItemColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
             showSelectedLabels: true,
             showUnselectedLabels: true,
             items: [
@@ -251,9 +252,13 @@ class _DetailsPageState extends State<DetailsPage> {
                     ),
                   );
                   break;
-                case 1:
-                  break;
                 case 2:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePage(userId: widget.userId), // Pass userId to Recogniser
+                    ),
+                  );
                   break;
               }
             },
@@ -264,8 +269,8 @@ class _DetailsPageState extends State<DetailsPage> {
             filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
             child: Container(
               color: const Color.fromARGB(255, 255, 255, 255).withValues(alpha: 0.2),
-              child: const Center(
-          child: CircularProgressIndicator(color: primaryColor),
+              child: Center(
+          child: CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor),
               ),
             ),
           ),

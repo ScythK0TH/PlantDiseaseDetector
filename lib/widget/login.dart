@@ -84,7 +84,7 @@ class LoginAppState extends State<LoginApp> {
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: bgColor,
+        color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(36.0)),
       ),
       child: SingleChildScrollView(
@@ -115,6 +115,7 @@ class LoginAppState extends State<LoginApp> {
                             TypewriterAnimatedText(
                               textSequence[index],
                               textStyle: subTitleTextStyleDark(
+                                  context,
                                   fontWeight: FontWeight.bold),
                               speed: Duration(milliseconds: 150),
                               cursor: '|',
@@ -128,7 +129,7 @@ class LoginAppState extends State<LoginApp> {
                     SizedBox(height: 10),
                     Text(
                       "Sign into your account",
-                      style: descTextStyleDark(fontWeight: FontWeight.normal),
+                      style: descTextStyleDark(context, fontWeight: FontWeight.normal),
                     ),
                   ],
                 ),
@@ -147,13 +148,14 @@ class LoginAppState extends State<LoginApp> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                               borderSide:
-                                  BorderSide(color: primaryColor, width: 2),
+                                  BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 2),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(36.0))),
                           filled: true,
                           fillColor: Colors.white,
                           hintText: "Enter your email",
                           hintStyle: subDescTextStyleDark(
+                              context,
                               fontWeight: FontWeight.normal),
                         ),
                       ),
@@ -166,14 +168,15 @@ class LoginAppState extends State<LoginApp> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: primaryColor, width: 2),
+                                BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 2),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(36.0)),
                           ),
                           filled: true,
-                          fillColor: bgColor,
+                          fillColor: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
                           hintText: "Enter your password",
                           hintStyle: subDescTextStyleDark(
+                              context,
                               fontWeight: FontWeight.normal),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -211,7 +214,7 @@ class LoginAppState extends State<LoginApp> {
                 children: [
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
+                        backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(36.0),
                         ),
@@ -229,6 +232,7 @@ class LoginAppState extends State<LoginApp> {
                     children: [
                       Text("Don't have an account?",
                           style: subDescTextStyleDark(
+                              context,
                               fontWeight: FontWeight.normal)),
                       Container(
                           alignment: Alignment.centerRight,

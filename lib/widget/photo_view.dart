@@ -15,17 +15,17 @@ class PhotoViewScreen extends StatelessWidget {
       width: screenWidth * 1.8,
       height: 300,
       decoration: BoxDecoration(
-        color: primaryColor,
+        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
         borderRadius: BorderRadius.circular(36),
       ),
       clipBehavior: Clip.antiAlias,
       child: (file == null)
-          ? _buildEmptyView()
+          ? _buildEmptyView(context)
           : Image.file(file!, fit: BoxFit.cover),
     );
   }
 
-  Widget _buildEmptyView() {
+  Widget _buildEmptyView(BuildContext context) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -36,12 +36,12 @@ class PhotoViewScreen extends StatelessWidget {
             Icon(
               Icons.image,
               size: 50,
-              color: bgColor,
+              color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
             ),
             const SizedBox(height: 20),
             Text(
               'Please pick a photo',
-              style: descTextStyleWhite(fontWeight: FontWeight.bold),
+              style: descTextStyleWhite(context, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               maxLines: 2,

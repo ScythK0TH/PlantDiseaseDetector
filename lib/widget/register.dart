@@ -84,7 +84,7 @@ class _RegisAppState extends State<RegisApp> {
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: bgColor,
+        color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(36.0)),
       ),
       child: SingleChildScrollView(
@@ -114,7 +114,7 @@ class _RegisAppState extends State<RegisApp> {
                           animatedTexts: [
                             TypewriterAnimatedText(
                               textSequence[index],
-                              textStyle: subTitleTextStyleDark(fontWeight: FontWeight.bold),
+                              textStyle: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
                               speed: Duration(milliseconds: 150),
                               cursor: '|',
                             ),
@@ -127,7 +127,7 @@ class _RegisAppState extends State<RegisApp> {
                     SizedBox(height: 10),
                     Text(
                       "Create your account",
-                      style: descTextStyleDark(fontWeight: FontWeight.normal),
+                      style: descTextStyleDark(context, fontWeight: FontWeight.normal),
                     ),
                   ],
                 ),
@@ -146,13 +146,15 @@ class _RegisAppState extends State<RegisApp> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                               borderSide: BorderSide(
-                                  color: primaryColor, width: 2),
+                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 2),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(36.0))),
                           filled: true,
-                          fillColor: bgColor,
+                          fillColor: Theme.of(context).brightness == Brightness.dark
+                              ? primaryColor
+                              : Colors.white,
                           hintText: "Enter your email",
-                          hintStyle: subDescTextStyleDark(fontWeight: FontWeight.normal),
+                          hintStyle: subDescTextStyleDark(context, fontWeight: FontWeight.normal),
                         ),
                         onChanged: (_) => _validateForm(),
                       ),
@@ -165,14 +167,16 @@ class _RegisAppState extends State<RegisApp> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: primaryColor, width: 2),
+                                BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 2),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(36.0)),
                           ),
                           filled: true,
-                          fillColor: bgColor,
+                          fillColor: Theme.of(context).brightness == Brightness.dark
+                              ? primaryColor
+                              : Colors.white,
                           hintText: "Enter your password",
-                          hintStyle: subDescTextStyleDark(fontWeight: FontWeight.normal),
+                          hintStyle: subDescTextStyleDark(context, fontWeight: FontWeight.normal),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isObscure1
@@ -197,14 +201,16 @@ class _RegisAppState extends State<RegisApp> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: primaryColor, width: 2),
+                                BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 2),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(36.0)),
                           ),
                           filled: true,
-                          fillColor: bgColor,
+                          fillColor: Theme.of(context).brightness == Brightness.dark
+                              ? primaryColor
+                              : Colors.white,
                           hintText: "Confirm your password",
-                          hintStyle: subDescTextStyleDark(fontWeight: FontWeight.normal),
+                          hintStyle: subDescTextStyleDark(context, fontWeight: FontWeight.normal),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isObscure2
@@ -248,7 +254,10 @@ class _RegisAppState extends State<RegisApp> {
                         child: Text("Register",
                             style: TextStyle(
                                 fontSize: 15.0,
-                                color: bgColor,)),
+                                color: Theme.of(context).brightness == Brightness.dark
+                                    ? primaryColor
+                                    : Colors.white,
+                                    )),
                       ),
                     ),
                   ),
@@ -258,7 +267,7 @@ class _RegisAppState extends State<RegisApp> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text("Already have an account?",
-                            style: subDescTextStyleDark(fontWeight: FontWeight.normal)),
+                            style: subDescTextStyleDark(context, fontWeight: FontWeight.normal)),
                         Container(
                           alignment: Alignment.centerRight,
                           child: TextButton(

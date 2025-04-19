@@ -46,7 +46,7 @@ class _RecogniserState extends State<Recogniser> {
                     child: IconButton(
                       icon: Icon(
                         Icons.arrow_circle_left_rounded,
-                        color: primaryColor,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
                         size: 24.0,
                       ),
                       onPressed: () {
@@ -57,7 +57,7 @@ class _RecogniserState extends State<Recogniser> {
                   Center(
                     child: Text(
                       'Plant Hub',
-                      style: subTitleTextStyleDark(fontWeight: FontWeight.bold),
+                      style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
                     ),
                   ),
                   Align(
@@ -65,7 +65,7 @@ class _RecogniserState extends State<Recogniser> {
                     child: IconButton(
                       icon: Icon(
                         Icons.flag,
-                        color: primaryColor,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
                         size: 24.0,
                       ),
                       onPressed: () {
@@ -131,14 +131,14 @@ class _RecogniserState extends State<Recogniser> {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const CircularProgressIndicator(
-            color: primaryColor,
+          CircularProgressIndicator(
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Color(0xFF151C21),
             strokeWidth: 3,
           ),
           const SizedBox(height: 12),
           Text(
             'Analyzing...',
-            style: subTitleTextStyleDark(fontWeight: FontWeight.bold),
+            style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
           ),
         ],
       );
@@ -192,7 +192,7 @@ class _RecogniserState extends State<Recogniser> {
     final maxWidth = MediaQuery.of(context).size.width * 0.8;
 
     List<String> labelLines = splitText(
-        label, subTitleTextStyleDark(fontWeight: FontWeight.bold), maxWidth);
+        label, subTitleTextStyleDark(context, fontWeight: FontWeight.bold), maxWidth);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -201,7 +201,7 @@ class _RecogniserState extends State<Recogniser> {
         for (var line in labelLines)
           Text(
             line,
-            style: subTitleTextStyleDark(fontWeight: FontWeight.bold),
+            style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
         const SizedBox(height: 12),
@@ -232,11 +232,11 @@ class _RecogniserState extends State<Recogniser> {
         }
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: isOutlined ? Colors.transparent : primaryColor,
+        backgroundColor: isOutlined ? Colors.transparent : (Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(36.0),
           side: isOutlined
-              ? BorderSide(color: primaryColor, width: 3.0)
+              ? BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 3.0)
               : BorderSide.none,
         ),
         minimumSize: Size(width, 60.0),
@@ -247,15 +247,15 @@ class _RecogniserState extends State<Recogniser> {
         children: [
           Icon(
             icon,
-            color: isOutlined ? primaryColor : Colors.white,
+            color: isOutlined ? (Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor) : (Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white),
             size: 24.0, // Icon size
           ),
           const SizedBox(width: 10), // Space between icon and text
           Text(
             title,
             style: isOutlined
-                ? descTextStyleDark(fontWeight: FontWeight.normal)
-                : descTextStyleWhite(fontWeight: FontWeight.normal),
+                ? descTextStyleDark(context, fontWeight: FontWeight.normal)
+                : descTextStyleWhite(context, fontWeight: FontWeight.normal),
           ),
         ],
       ),
@@ -280,11 +280,11 @@ class _RecogniserState extends State<Recogniser> {
         }
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: isOutlined ? Colors.transparent : primaryColor,
+        backgroundColor: isOutlined ? Colors.transparent : (Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(36.0),
           side: isOutlined
-              ? BorderSide(color: primaryColor, width: 3.0)
+              ? BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 3.0)
               : BorderSide.none,
         ),
         minimumSize: Size(width, 60.0),
@@ -297,8 +297,8 @@ class _RecogniserState extends State<Recogniser> {
           Text(
             title,
             style: isOutlined
-                ? descTextStyleDark(fontWeight: FontWeight.normal)
-                : descTextStyleWhite(fontWeight: FontWeight.normal),
+                ? descTextStyleDark(context, fontWeight: FontWeight.normal)
+                : descTextStyleWhite(context, fontWeight: FontWeight.normal),
           ),
         ],
       ),
