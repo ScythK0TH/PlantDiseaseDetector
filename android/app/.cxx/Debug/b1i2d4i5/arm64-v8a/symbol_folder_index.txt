@@ -1,0 +1,1 @@
+C:\cygwin64\home\user\PlantDiseaseDetector\build\app\intermediates\cxx\Debug\b1i2d4i5\obj\arm64-v8a

@@ -29,6 +29,8 @@ class _RegisAppState extends State<RegisApp> {
   final _confirmPasswordController = TextEditingController();
 
   bool _isRegisterEnabled = false;
+  String? _emailErrorMessage;
+  String? _passwordErrorMessage;
 
   void _changeText() {
     Future.delayed(Duration(seconds: 1), () {
@@ -40,11 +42,36 @@ class _RegisAppState extends State<RegisApp> {
     });
   }
 
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
+  }
+
   void _validateForm() {
     setState(() {
+      // Email validation
+      if (_emailController.text.isNotEmpty &&
+          !_isValidEmail(_emailController.text)) {
+        _emailErrorMessage = "Please enter a valid email address";
+      } else {
+        _emailErrorMessage = null;
+      }
+
+      // Password validation
+      if (_passwordController.text.isNotEmpty &&
+          _confirmPasswordController.text.isNotEmpty &&
+          _passwordController.text != _confirmPasswordController.text) {
+        _passwordErrorMessage = "Passwords do not match";
+      } else {
+        _passwordErrorMessage = null;
+      }
+
+      // Enable register button only if all validations pass
       _isRegisterEnabled = _passwordController.text.isNotEmpty &&
+          _confirmPasswordController.text.isNotEmpty &&
           _passwordController.text == _confirmPasswordController.text &&
-          _emailController.text.isNotEmpty;
+          _emailController.text.isNotEmpty &&
+          _isValidEmail(_emailController.text);
     });
   }
 
@@ -114,7 +141,8 @@ class _RegisAppState extends State<RegisApp> {
                           animatedTexts: [
                             TypewriterAnimatedText(
                               textSequence[index],
-                              textStyle: subTitleTextStyleDark(fontWeight: FontWeight.bold),
+                              textStyle: subTitleTextStyleDark(
+                                  fontWeight: FontWeight.bold),
                               speed: Duration(milliseconds: 150),
                               cursor: '|',
                             ),
@@ -145,14 +173,16 @@ class _RegisAppState extends State<RegisApp> {
                         controller: _emailController,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: primaryColor, width: 2),
+                              borderSide:
+                                  BorderSide(color: primaryColor, width: 2),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(36.0))),
                           filled: true,
                           fillColor: bgColor,
                           hintText: "Enter your email",
-                          hintStyle: subDescTextStyleDark(fontWeight: FontWeight.normal),
+                          hintStyle: subDescTextStyleDark(
+                              fontWeight: FontWeight.normal),
+                          errorText: _emailErrorMessage,
                         ),
                         onChanged: (_) => _validateForm(),
                       ),
@@ -172,7 +202,8 @@ class _RegisAppState extends State<RegisApp> {
                           filled: true,
                           fillColor: bgColor,
                           hintText: "Enter your password",
-                          hintStyle: subDescTextStyleDark(fontWeight: FontWeight.normal),
+                          hintStyle: subDescTextStyleDark(
+                              fontWeight: FontWeight.normal),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isObscure1
@@ -204,7 +235,8 @@ class _RegisAppState extends State<RegisApp> {
                           filled: true,
                           fillColor: bgColor,
                           hintText: "Confirm your password",
-                          hintStyle: subDescTextStyleDark(fontWeight: FontWeight.normal),
+                          hintStyle: subDescTextStyleDark(
+                              fontWeight: FontWeight.normal),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isObscure2
@@ -217,6 +249,7 @@ class _RegisAppState extends State<RegisApp> {
                               });
                             },
                           ),
+                          errorText: _passwordErrorMessage,
                         ),
                         onChanged: (_) => _validateForm(),
                       ),
@@ -233,9 +266,8 @@ class _RegisAppState extends State<RegisApp> {
                     padding: const EdgeInsets.all(0.0),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _isRegisterEnabled
-                            ? primaryColor
-                            : secondaryColor,
+                        backgroundColor:
+                            _isRegisterEnabled ? primaryColor : secondaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(36.0),
                         ),
@@ -247,8 +279,9 @@ class _RegisAppState extends State<RegisApp> {
                         width: 100,
                         child: Text("Register",
                             style: TextStyle(
-                                fontSize: 15.0,
-                                color: bgColor,)),
+                              fontSize: 15.0,
+                              color: bgColor,
+                            )),
                       ),
                     ),
                   ),
@@ -258,12 +291,14 @@ class _RegisAppState extends State<RegisApp> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text("Already have an account?",
-                            style: subDescTextStyleDark(fontWeight: FontWeight.normal)),
+                            style: subDescTextStyleDark(
+                                fontWeight: FontWeight.normal)),
                         Container(
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             child: Text("Login now",
-                                style: subSuccessTextStyle(fontWeight: FontWeight.bold)),
+                                style: subSuccessTextStyle(
+                                    fontWeight: FontWeight.bold)),
                             onPressed: () {
                               Navigator.pop(context);
                               showFirstModal(context);
