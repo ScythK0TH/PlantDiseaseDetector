@@ -349,7 +349,7 @@ Future<void> _savedData(BuildContext context, RecogniserState state, String user
     try {
       mongoUserId = mongo.ObjectId.fromHexString(userId); // Convert userId to ObjectId
     } catch (e) {
-      print('Error: Invalid userId format. ' + e.toString());
+      print('Error: Invalid userId format. $e');
       return;
     }
     final predict = state.label;

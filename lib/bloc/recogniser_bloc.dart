@@ -38,16 +38,12 @@ class RecogniserBloc extends Bloc<RecogniserEvent, RecogniserState> {
 
       final result = _classifier.predict(processed);
 
-      if (result != null) {
-        emit(state.copyWith(
-          status: RecogniserStatus.found,
-          label: result.label,
-          accuracy: result.score,
-        ));
-      } else {
-        emit(state.copyWith(status: RecogniserStatus.notFound));
-      }
-    } on TimeoutException {
+      emit(state.copyWith(
+        status: RecogniserStatus.found,
+        label: result.label,
+        accuracy: result.score,
+      ));
+        } on TimeoutException {
       emit(state.copyWith(status: RecogniserStatus.timeout));
     } catch (_) {
       emit(state.copyWith(status: RecogniserStatus.notFound));

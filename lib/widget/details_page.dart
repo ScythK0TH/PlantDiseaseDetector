@@ -27,7 +27,7 @@ class _DetailsPageState extends State<DetailsPage> {
       print('Connected to MongoDB.');
 
       final collection = db.collection('plants');
-      print('Fetching plants for user: ${userId}...');
+      print('Fetching plants for user: $userId...');
 
       try {
         final result = await collection.remove({
@@ -208,8 +208,8 @@ class _DetailsPageState extends State<DetailsPage> {
                 }
               }
             },
-            child: Icon(Icons.edit, color: bgColor, size: 24),
             backgroundColor: primaryColor,
+            child: Icon(Icons.edit, color: bgColor, size: 24),
           ),
           bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
