@@ -60,19 +60,6 @@ class _RecogniserState extends State<Recogniser> {
                       style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.flag,
-                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-                        size: 24.0,
-                      ),
-                      onPressed: () {
-                        // Do something
-                      },
-                    ),
-                  ),
                 ],
               ),
             ),

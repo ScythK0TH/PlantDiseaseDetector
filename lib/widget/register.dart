@@ -29,6 +29,8 @@ class _RegisAppState extends State<RegisApp> {
   final _confirmPasswordController = TextEditingController();
 
   bool _isRegisterEnabled = false;
+  String? _emailErrorMessage;
+  String? _passwordErrorMessage;
 
   void _changeText() {
     Future.delayed(Duration(seconds: 1), () {
@@ -40,11 +42,36 @@ class _RegisAppState extends State<RegisApp> {
     });
   }
 
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
+  }
+
   void _validateForm() {
     setState(() {
+      // Email validation
+      if (_emailController.text.isNotEmpty &&
+          !_isValidEmail(_emailController.text)) {
+        _emailErrorMessage = "Please enter a valid email address";
+      } else {
+        _emailErrorMessage = null;
+      }
+
+      // Password validation
+      if (_passwordController.text.isNotEmpty &&
+          _confirmPasswordController.text.isNotEmpty &&
+          _passwordController.text != _confirmPasswordController.text) {
+        _passwordErrorMessage = "Passwords do not match";
+      } else {
+        _passwordErrorMessage = null;
+      }
+
+      // Enable register button only if all validations pass
       _isRegisterEnabled = _passwordController.text.isNotEmpty &&
+          _confirmPasswordController.text.isNotEmpty &&
           _passwordController.text == _confirmPasswordController.text &&
-          _emailController.text.isNotEmpty;
+          _emailController.text.isNotEmpty &&
+          _isValidEmail(_emailController.text);
     });
   }
 
@@ -155,6 +182,7 @@ class _RegisAppState extends State<RegisApp> {
                               : Colors.white,
                           hintText: "Enter your email",
                           hintStyle: subDescTextStyleDark(context, fontWeight: FontWeight.normal),
+                          errorText: _emailErrorMessage,
                         ),
                         onChanged: (_) => _validateForm(),
                       ),
@@ -223,6 +251,7 @@ class _RegisAppState extends State<RegisApp> {
                               });
                             },
                           ),
+                          errorText: _passwordErrorMessage,
                         ),
                         onChanged: (_) => _validateForm(),
                       ),

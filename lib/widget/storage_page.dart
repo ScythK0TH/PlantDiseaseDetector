@@ -27,6 +27,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
   int _searchToken = 0; // Add this line
+  String selectedButton = 'Latest';
 
   @override
   void initState() {
@@ -104,7 +105,26 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
-    String selectedButton = 'Latest';
+    // Filter and sort plants based on selectedButton
+    List<Map<String, dynamic>> displayPlants;
+    if (selectedButton == 'Latest') {
+      displayPlants = List<Map<String, dynamic>>.from(_plants)
+        ..sort((a, b) {
+          final aTime = a['date'] is DateTime
+              ? a['date']
+              : DateTime.tryParse(a['date']?.toString() ?? '') ?? DateTime(1970);
+          final bTime = b['date'] is DateTime
+              ? b['date']
+              : DateTime.tryParse(b['date']?.toString() ?? '') ?? DateTime(1970);
+          return bTime.compareTo(aTime); // Descending
+        });
+      if (displayPlants.length > 4) {
+        displayPlants = displayPlants.take(4).toList();
+      }
+    } else {
+      displayPlants = _plants;
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -160,7 +180,8 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                   size: 24.0,
                 ),
                 onPressed: () {
-                  Navigator.push(
+                  themeModeNotifier.value = ThemeMode.light;
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => FirstPageScreen(),
@@ -239,9 +260,9 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                             childAspectRatio:
                                 0.8, // ปรับอัตราส่วนของลูกในกริด (ความสูง/ความกว้าง)
                           ),
-                          itemCount: _plants.length,
+                          itemCount: displayPlants.length,
                           itemBuilder: (context, index) {
-                            var plant = _plants[index];
+                            var plant = displayPlants[index];
                             return GestureDetector(
                               onTap: () {
                                 // เมื่อกดที่ไอเทม จะไปยังหน้า DetailsPage

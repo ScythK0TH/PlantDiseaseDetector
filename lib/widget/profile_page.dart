@@ -52,9 +52,11 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchUserData().then((_) {
-        setState(() {
-          _showSheet = true;
-        });
+        if (mounted) {
+          setState(() {
+            _showSheet = true;
+          });
+        }
       });
     });
   }

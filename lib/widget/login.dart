@@ -17,6 +17,7 @@ class LoginApp extends StatefulWidget {
 
 class LoginAppState extends State<LoginApp> {
   bool _isObscure = true;
+  String? _errorMessage;
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -38,8 +39,20 @@ class LoginAppState extends State<LoginApp> {
   }
 
   Future<void> _loginUser() async {
+    // Clear any previous error messages
+    setState(() {
+      _errorMessage = null;
+    });
+
     final email = _emailController.text;
     final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      setState(() {
+        _errorMessage = "Email and password cannot be empty";
+      });
+      return;
+    }
 
     try {
       print('Connecting to MongoDB...');
@@ -69,6 +82,11 @@ class LoginAppState extends State<LoginApp> {
             SnackBar(content: Text('Invalid password.')),
           );
         }
+      } else {
+        print('User not found.');
+        setState(() {
+          _errorMessage = "Invalid email or User not found";
+        });
       }
 
       await db.close();
@@ -193,6 +211,14 @@ class LoginAppState extends State<LoginApp> {
                         ),
                       ),
                     ),
+                    if (_errorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
                     Padding(
                       padding: const EdgeInsets.only(right: 12.0),
                       child: Container(
