@@ -1,0 +1,110 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+// const Color bgColor = Color(0xFFFFFFFF);
+const Color primaryColor = Color(0xFF151C21);
+
+const Color secondaryColor = Color(0xFFD9D9D9);
+const Color successColor = Color.fromARGB(255, 76, 192, 107);
+const Color alertColor = Color(0xFFEB5B40);
+
+// Main Title
+TextStyle mainTitleTextStyleDark(BuildContext context, {FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 36,
+      fontWeight: fontWeight,
+      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+      decoration: TextDecoration.none,
+    );
+
+TextStyle mainTitleTextStyleWhite(BuildContext context,
+        {FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 36,
+      fontWeight: fontWeight,
+      color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+      decoration: TextDecoration.none,
+    );
+
+// Subtitle
+TextStyle subTitleTextStyleDark(BuildContext context, {FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 24,
+      fontWeight: fontWeight,
+      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+      decoration: TextDecoration.none,
+    );
+
+TextStyle subTitleTextStyleWhite(BuildContext context, {FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 24,
+      fontWeight: fontWeight,
+      color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+      decoration: TextDecoration.none,
+    );
+
+// Description
+TextStyle descTextStyleDark(BuildContext context, {FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 18,
+      fontWeight: fontWeight,
+      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+      decoration: TextDecoration.none,
+    );
+
+TextStyle descTextStyleWhite(BuildContext context, {FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 18,
+      fontWeight: fontWeight,
+      color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+      decoration: TextDecoration.none,
+    );
+
+TextStyle subDescTextStyleDark(BuildContext context, {FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 14,
+      fontWeight: fontWeight,
+      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+      decoration: TextDecoration.none,
+    );
+
+TextStyle subDescTextStyleWhite(BuildContext context, {FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 14,
+      fontWeight: fontWeight,
+      color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+      decoration: TextDecoration.none,
+    );
+
+// Alert & Success
+TextStyle alertTextStyle({FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 18,
+      fontWeight: fontWeight,
+      color: alertColor,
+      decoration: TextDecoration.none,
+    );
+
+TextStyle successTextStyle({FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 18,
+      fontWeight: fontWeight,
+      color: successColor,
+      decoration: TextDecoration.none,
+    );
+
+TextStyle subAlertTextStyle({FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 14,
+      fontWeight: fontWeight,
+      color: alertColor,
+      decoration: TextDecoration.none,
+    );
+
+TextStyle subSuccessTextStyle({FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.inter(
+      fontSize: 14,
+      fontWeight: fontWeight,
+      color: successColor,
+      decoration: TextDecoration.none,
+    );

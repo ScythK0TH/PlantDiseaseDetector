@@ -1,0 +1,2 @@
+D:/Workstation/Mobile/project_pdd_2/android/app/.cxx/Debug/2y3f6z5t/x86_64/CMakeFiles/edit_cache.dir
+D:/Workstation/Mobile/project_pdd_2/android/app/.cxx/Debug/2y3f6z5t/x86_64/CMakeFiles/rebuild_cache.dir
