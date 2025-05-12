@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:project_pdd/style.dart';
@@ -79,8 +78,8 @@ class FirstPageScreenState extends State<FirstPageScreen> {
               Padding(
                 padding: EdgeInsets.only(top: 10.0),
                 child: Text('Plant Hub',
-                    style:
-                        mainTitleTextStyleWhite(context, fontWeight: FontWeight.bold)),
+                    style: mainTitleTextStyleWhite(context,
+                        fontWeight: FontWeight.bold)),
               ),
               Flexible(
                 flex: 1, // เพิ่มส่วนนี้สำหรับข้อความที่พิมพ์
@@ -98,7 +97,8 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         animatedTexts: [
                           TypewriterAnimatedText(
                             textSequence[index],
-                            textStyle: subTitleTextStyleWhite(context, fontWeight: FontWeight.normal),
+                            textStyle: subTitleTextStyleWhite(context,
+                                fontWeight: FontWeight.normal),
                             speed: Duration(milliseconds: 200),
                             cursor: '|', // Cursor ที่ท้ายข้อความ
                           ),
@@ -119,7 +119,10 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                     children: [
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+                          backgroundColor:
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? primaryColor
+                                  : Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(36.0),
                           ),
@@ -163,8 +166,8 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         },
                         child: Text(
                           'Sign Up',
-                          style:
-                              descTextStyleDark(context, fontWeight: FontWeight.normal),
+                          style: descTextStyleDark(context,
+                              fontWeight: FontWeight.normal),
                         ),
                       ),
                       SizedBox(height: 15),
@@ -175,7 +178,10 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                           ),
                           minimumSize: Size(0.70 * screenWidth, 55.0),
                           side: BorderSide(
-                            color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white, // สีของเส้นขอบ
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? primaryColor
+                                    : Colors.white, // สีของเส้นขอบ
                             width: 2.0, // ความหนาของเส้นขอบ
                           ),
                         ),
@@ -217,7 +223,8 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         },
                         child: Text(
                           'Log In',
-                          style: descTextStyleWhite(context, fontWeight: FontWeight.normal),
+                          style: descTextStyleWhite(context,
+                              fontWeight: FontWeight.normal),
                         ),
                       ),
                       SizedBox(height: 15),
@@ -233,7 +240,8 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         },
                         child: Text(
                           'Continue without an account',
-                          style: subDescTextStyleDark(context, fontWeight: FontWeight.bold),
+                          style: subDescTextStyleDark(context,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
