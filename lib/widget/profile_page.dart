@@ -1,8 +1,11 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_pdd/style.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/constant.dart';
+import 'package:project_pdd/widget/first_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
 import 'package:project_pdd/main.dart';
 import 'package:project_pdd/widget/storage_page.dart';
@@ -19,8 +22,10 @@ class _ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
   bool _showSheet = false;
   bool _isLoading = false;
+  bool _isUpdating = false;
   Map<String, dynamic>? _userData;
   final ValueNotifier<double> _sheetExtent = ValueNotifier(0.7);
+  int? galleryCount;
 
   Future<void> _fetchUserData() async {
     if (!mounted) return;
@@ -31,12 +36,20 @@ class _ProfilePageState extends State<ProfilePage>
     try {
       await db.open();
       final collection = db.collection('users');
+      final galleryCollection = db.collection('plants');
       final user = await collection.findOne(
         mongo.where.eq('_id', mongo.ObjectId.fromHexString(widget.userId)),
       );
+      final gallery = await galleryCollection
+          .find(
+            mongo.where
+                .eq('userId', mongo.ObjectId.fromHexString(widget.userId)),
+          )
+          .toList();
       if (!mounted) return;
       setState(() {
         _userData = user;
+        galleryCount = gallery.length;
       });
       await db.close();
     } catch (e) {
@@ -92,8 +105,8 @@ class _ProfilePageState extends State<ProfilePage>
             return AppBar(
               backgroundColor: Colors.transparent,
               systemOverlayStyle: themeModeNotifier.value == ThemeMode.dark
-              ? SystemUiOverlayStyle.dark
-              : SystemUiOverlayStyle.light,
+                  ? SystemUiOverlayStyle.dark
+                  : SystemUiOverlayStyle.light,
               elevation: 0,
               leading: IconButton(
                 onPressed: () {
@@ -111,7 +124,7 @@ class _ProfilePageState extends State<ProfilePage>
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      '${_userData?['email'] ?? '-'}',
+                      '${_userData?['username'] ?? '-'}',
                       style: mainTitleTextStyleWhite(context,
                           fontWeight: FontWeight.bold),
                     ),
@@ -225,17 +238,192 @@ class _ProfilePageState extends State<ProfilePage>
                         child: ListView(
                           controller: scrollController,
                           children: [
-                            Icon(Icons.account_circle,
-                                size: 48, color: Colors.green),
-                            SizedBox(height: 16),
-                            Text(
-                              'Welcome, ${_userData?['username'] ?? 'User'}!',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 48,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: IconButton(
+                                      onPressed: () async {
+                                        final TextEditingController unameController =
+                                              TextEditingController(text: _userData!['username'] ?? '');
+                                        final newTitle = await showDialog<String>(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            backgroundColor: Theme.of(context).brightness == Brightness.dark
+                                                ? primaryColor
+                                                : Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(36.0),
+                                            ),
+                                            title: Text('Edit Your Name'),
+                                            content: TextField(
+                                              controller: unameController,
+                                              decoration: InputDecoration(hintText: 'Enter new name'),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(context),
+                                                child: Text('Cancel'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(context, unameController.text),
+                                                child: Text('Save'),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                        if (newTitle != null && newTitle.trim().isNotEmpty) {
+                                          setState(() => _isUpdating = true);
+                                          try {
+                                            final db = await mongo.Db.create(MONGO_URL);
+                                            await db.open();
+                                            final collection = db.collection('users');
+                                            await collection.update(
+                                              {'_id': _userData!['_id']},
+                                              {r'$set': {'username': newTitle.trim()}},
+                                            );
+                                            await db.close();
+                                            setState(() {
+                                              _userData!['username'] = newTitle.trim();
+                                            });
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                backgroundColor: Colors.green,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.only(
+                                                    topLeft: Radius.circular(12.0),
+                                                    topRight: Radius.circular(12.0),
+                                                  ),
+                                                ),
+                                                behavior: SnackBarBehavior.floating,
+                                                margin: EdgeInsets.only(
+                                                  bottom: 72, // 56 (nav height) + 16 spacing
+                                                ),
+                                                content: Text('Title updated!')
+                                              ),
+                                            );
+                                          } catch (e) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                backgroundColor: Colors.red,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.only(
+                                                    topLeft: Radius.circular(12.0),
+                                                    topRight: Radius.circular(12.0),
+                                                  ),
+                                                ),
+                                                behavior: SnackBarBehavior.floating,
+                                                margin: EdgeInsets.only(
+                                                  bottom: 72, // 56 (nav height) + 16 spacing
+                                                ),
+                                                content: Text('Failed to update title: $e')
+                                              ),
+                                            );
+                                          } finally {
+                                            setState(() => _isUpdating = false);
+                                          }
+                                        }
+                                      },
+                                      icon: Icon(Icons.edit, size: 24, color: Colors.green),
+                                    )
+                                  ),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: Icon(Icons.account_circle, size: 48, color: Colors.green),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: IconButton(onPressed: () {
+                                      themeModeNotifier.value = ThemeMode.light;
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => FirstPageScreen()),
+                                        (route) => false, // Remove all previous routes
+                                      );
+                                    }, icon: Icon(Icons.logout, size: 24, color: Colors.red),)
+                                  ),
+                                ],
+                              ),
                             ),
-                            SizedBox(height: 8),
-                            Text('User ID: ${widget.userId}'),
                             SizedBox(height: 16),
+                            Center(
+                              child: Text(
+                                'Welcome, ${_userData?['username'] ?? 'User'}!',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Divider(),
+                            Container(
+                              padding: EdgeInsets.all(24),
+                              margin: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.grey[200]
+                                    : primaryColor,
+                                borderRadius: BorderRadius.circular(36),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.3),
+                                    blurRadius: 4,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          'Your Gallery',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.dark
+                                                  ? primaryColor
+                                                  : Colors.white),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text.rich(
+                                          TextSpan(
+                                            children: <TextSpan>[
+                                              TextSpan(
+                                                text: '${galleryCount ?? 0}',
+                                                style: TextStyle(
+                                                    fontSize: 56,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              TextSpan(
+                                                text: ' images',
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                      .brightness ==
+                                                  Brightness.dark
+                                              ? primaryColor
+                                              : Colors.white
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
                           ],
                         ),
                       ),
@@ -303,6 +491,16 @@ class _ProfilePageState extends State<ProfilePage>
                     break;
                 }
               },
+            ),
+          ),
+          if (_isUpdating)
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+            child: Container(
+              color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
+              child: Center(
+            child: CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white),
+              ),
             ),
           ),
         ],

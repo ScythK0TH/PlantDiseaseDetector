@@ -170,6 +170,12 @@ class _DetailsPageState extends State<DetailsPage> {
               final newTitle = await showDialog<String>(
                 context: context,
                 builder: (context) => AlertDialog(
+                  backgroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? primaryColor
+                    : Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(36.0),
+                  ),
                   title: Text('Edit Title'),
                   content: TextField(
                     controller: titleController,
@@ -202,11 +208,29 @@ class _DetailsPageState extends State<DetailsPage> {
                     plant['title'] = newTitle.trim();
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Title updated!')),
+                    SnackBar(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(12.0),
+                          topRight: Radius.circular(12.0),
+                        ),
+                      ),
+                      content: Text('Title updated!')
+                    ),
                   );
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to update title: $e')),
+                    SnackBar(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(12.0),
+                          topRight: Radius.circular(12.0),
+                        ),
+                      ),
+                      content: Text('Failed to update title: $e')
+                    ),
                   );
                 } finally {
                   setState(() => _isUpdating = false);

@@ -229,17 +229,6 @@ class LoginAppState extends State<LoginApp> {
                           style: TextStyle(color: Colors.red),
                         ),
                       ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 12.0),
-                      child: Container(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            child: Text("Forgot password?",
-                                style: subSuccessTextStyle(
-                                    fontWeight: FontWeight.bold)),
-                            onPressed: () {},
-                          )),
-                    ),
                   ],
                 ),
               ),

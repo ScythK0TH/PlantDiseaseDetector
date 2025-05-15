@@ -3,6 +3,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/storage_page.dart';
+import 'package:project_pdd/widget/tos_page.dart';
 import 'login.dart';
 import 'register.dart';
 
@@ -77,7 +78,7 @@ class FirstPageScreenState extends State<FirstPageScreen> {
               // เพิ่มชื่อแอพใต้ภาพ
               Padding(
                 padding: EdgeInsets.only(top: 10.0),
-                child: Text('Plant Hub',
+                child: Text('ใบ รู้ โรค',
                     style: mainTitleTextStyleWhite(context,
                         fontWeight: FontWeight.bold)),
               ),
@@ -227,19 +228,42 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                               fontWeight: FontWeight.normal),
                         ),
                       ),
-                      SizedBox(height: 15),
+                      SizedBox(height: 8),
                       TextButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  StoragePage(userId: 'guest'),
-                            ),
+                          showModalBottomSheet(
+                            isScrollControlled: true,
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            builder: (BuildContext context) {
+                              double keyboardHeight = MediaQuery.of(context)
+                                  .viewInsets
+                                  .bottom;
+                              return SizedBox(
+                                height: keyboardHeight > 0
+                                    ? MediaQuery.of(context).size.height * 0.9
+                                    : MediaQuery.of(context).size.height *
+                                        0.6,
+                                child: Stack(
+                                  children: [
+                                    BackdropFilter(
+                                      filter: ImageFilter.blur(
+                                          sigmaX: 5, sigmaY: 5),
+                                      child: Container(
+                                        color: Colors.transparent,
+                                      ),
+                                    ),
+                                    Positioned(
+                                      child: TermOfServicePage(),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           );
                         },
                         child: Text(
-                          'Continue without an account',
+                          'Term of Service',
                           style: subDescTextStyleDark(context,
                               fontWeight: FontWeight.bold),
                         ),
