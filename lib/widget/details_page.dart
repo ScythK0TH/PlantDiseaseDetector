@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:project_pdd/style.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/constant.dart';
@@ -63,6 +64,9 @@ class _DetailsPageState extends State<DetailsPage> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             automaticallyImplyLeading: false,
+            systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
+                ? SystemUiOverlayStyle.light
+                : SystemUiOverlayStyle.dark,
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: SizedBox(
@@ -154,7 +158,7 @@ class _DetailsPageState extends State<DetailsPage> {
                 Text('Predict: ${plant['predict'] ?? 'Unknown'}',
                     style: TextStyle(fontSize: 18)),
                 SizedBox(height: 10),
-                Text('Accuracy: ${(plant['accuracy'] * 100).toStringAsFixed(2) ?? 'Unknown'}',
+                Text('Probability: ${(plant['probability'] * 100).toStringAsFixed(2) ?? 'Unknown'}',
                     style: TextStyle(fontSize: 18)),
               ],
             ),
@@ -268,7 +272,7 @@ class _DetailsPageState extends State<DetailsPage> {
           BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
             child: Container(
-              color: const Color.fromARGB(255, 255, 255, 255).withValues(alpha: 0.2),
+              color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
               child: Center(
           child: CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor),
               ),

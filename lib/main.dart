@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_pdd/style.dart';
+import 'package:flutter/services.dart';
 import 'package:project_pdd/widget/first_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
 
@@ -8,6 +9,12 @@ final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<v
 final themeModeNotifier = ValueNotifier<ThemeMode>(ThemeMode.light);
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Set the preferred orientations to portrait mode only
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(const MainApp());
 }
 
@@ -23,7 +30,15 @@ class MainApp extends StatelessWidget {
           title: 'Project PDD',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
+            brightness: Brightness.light,
             textTheme: GoogleFonts.promptTextTheme(),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.white,
+            ),
+            scaffoldBackgroundColor: Colors.white,
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+              backgroundColor: Colors.white,
+            ),
           ),
           themeMode: mode,
           darkTheme: ThemeData(

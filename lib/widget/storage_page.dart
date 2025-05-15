@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/constant.dart';
 import 'package:project_pdd/style.dart';
@@ -130,6 +131,9 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
         backgroundColor: Colors.transparent,
         elevation: 0,
         automaticallyImplyLeading: false,
+        systemOverlayStyle: Theme.of(context).brightness == Brightness.dark 
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
         title: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Row(
@@ -181,11 +185,10 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                 ),
                 onPressed: () {
                   themeModeNotifier.value = ThemeMode.light;
-                  Navigator.pushReplacement(
+                  Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => FirstPageScreen(),
-                    ),
+                    MaterialPageRoute(builder: (context) => FirstPageScreen()),
+                    (route) => false, // Remove all previous routes
                   );
                 },
               ),

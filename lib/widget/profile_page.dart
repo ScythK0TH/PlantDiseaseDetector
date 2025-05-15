@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:project_pdd/style.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/constant.dart';
@@ -14,7 +15,8 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStateMixin {
+class _ProfilePageState extends State<ProfilePage>
+    with SingleTickerProviderStateMixin {
   bool _showSheet = false;
   bool _isLoading = false;
   Map<String, dynamic>? _userData;
@@ -62,6 +64,12 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
   }
 
   @override
+  void dispose() {
+    _sheetExtent.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final double bottomNavHeight = 56.0;
     final double minExtent = 0.7;
@@ -69,22 +77,32 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     final double showTitleExtent = 0.9; // When to start showing the title
 
     return Scaffold(
-      backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.white
+          : primaryColor,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: ValueListenableBuilder<double>(
           valueListenable: _sheetExtent,
           builder: (context, extent, _) {
             // Title still appears at showTitleExtent, but you can adjust if needed
-            double tTitle = ((extent - showTitleExtent) / (maxExtent - showTitleExtent)).clamp(0.0, 1.0);
+            double tTitle =
+                ((extent - showTitleExtent) / (maxExtent - showTitleExtent))
+                    .clamp(0.0, 1.0);
             return AppBar(
               backgroundColor: Colors.transparent,
+              systemOverlayStyle: themeModeNotifier.value == ThemeMode.dark
+              ? SystemUiOverlayStyle.dark
+              : SystemUiOverlayStyle.light,
               elevation: 0,
               leading: IconButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                icon: Icon(Icons.arrow_circle_left_rounded, color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white),
+                icon: Icon(Icons.arrow_circle_left_rounded,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? primaryColor
+                        : Colors.white),
               ),
               title: Transform.translate(
                 offset: Offset(0, -40 * (1 - tTitle)), // Slide from above
@@ -94,7 +112,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                     fit: BoxFit.scaleDown,
                     child: Text(
                       '${_userData?['email'] ?? '-'}',
-                      style: mainTitleTextStyleWhite(context, fontWeight: FontWeight.bold),
+                      style: mainTitleTextStyleWhite(context,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -105,7 +124,9 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                     Theme.of(context).brightness == Brightness.dark
                         ? Icons.dark_mode_rounded
                         : Icons.light_mode_rounded,
-                    color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? primaryColor
+                        : Colors.white,
                   ),
                   onPressed: () {
                     // Toggle theme
@@ -126,32 +147,44 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
             valueListenable: _sheetExtent,
             builder: (context, extent, _) {
               // Fade out as soon as sheet starts moving up
-              double t = ((extent - minExtent) / (maxExtent - minExtent)).clamp(0.0, 1.0);
+              double t = ((extent - minExtent) / (maxExtent - minExtent))
+                  .clamp(0.0, 1.0);
               return Center(
                 child: _isLoading
-                    ? CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white)
-                    : Opacity(
-                        opacity: 1 - t, // Fade out as soon as sheet starts to cover
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 24.0),
-                              child: Text(
-                                'User Profile',
-                                style: mainTitleTextStyleWhite(context, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            if (_userData != null)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 16.0),
-                                child: Text(
-                                  'Email: ${_userData!['email'] ?? '-'}',
-                                  style: descTextStyleWhite(context, fontWeight: FontWeight.normal),
+                    ? CircularProgressIndicator(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? primaryColor
+                            : Colors.white)
+                    : _userData == null
+                        ? Text(
+                            'User not found.',
+                            style: descTextStyleWhite(context,
+                                fontWeight: FontWeight.normal),
+                          )
+                        : Opacity(
+                            opacity: 1 -
+                                t, // Fade out as soon as sheet starts to cover
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 24.0),
+                                  child: Text(
+                                    'User Profile',
+                                    style: mainTitleTextStyleWhite(context,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
-                              ),
-                          ],
-                        ),
-                      ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 16.0),
+                                  child: Text(
+                                    'Email: ${_userData!['email'] ?? '-'}',
+                                    style: descTextStyleWhite(context,
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
               );
             },
           ),
@@ -165,7 +198,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                   minChildSize: minExtent,
                   maxChildSize: maxExtent,
                   builder: (context, scrollController) {
-                    return NotificationListener<DraggableScrollableNotification>(
+                    return NotificationListener<
+                        DraggableScrollableNotification>(
                       onNotification: (notification) {
                         _sheetExtent.value = notification.extent;
                         return true;
@@ -173,26 +207,31 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                          colors: Theme.of(context).brightness != Brightness.dark
-                            ? [Colors.white, Colors.white]
-                            : [
-                              Color.fromARGB(255, 11, 48, 54), // 2% blue
-                              Colors.black,
-                              ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
+                            colors: Theme.of(context).brightness !=
+                                    Brightness.dark
+                                ? [Colors.white, Colors.white]
+                                : [
+                                    Color.fromARGB(255, 11, 48, 54), // 2% blue
+                                    Colors.black,
+                                  ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
                           ),
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(36)),
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(36)),
                         ),
-                        padding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, bottomNavHeight + 16),
+                        padding: EdgeInsets.fromLTRB(
+                            24.0, 24.0, 24.0, bottomNavHeight + 16),
                         child: ListView(
                           controller: scrollController,
                           children: [
-                            Icon(Icons.account_circle, size: 48, color: Colors.green),
+                            Icon(Icons.account_circle,
+                                size: 48, color: Colors.green),
                             SizedBox(height: 16),
                             Text(
                               'Welcome, ${_userData?['username'] ?? 'User'}!',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 8),
                             Text('User ID: ${widget.userId}'),
@@ -214,7 +253,10 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
               type: BottomNavigationBarType.fixed,
               currentIndex: 2,
               selectedItemColor: successColor,
-              unselectedItemColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+              unselectedItemColor:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : primaryColor,
               showSelectedLabels: true,
               showUnselectedLabels: true,
               items: [
@@ -254,15 +296,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => StoragePage(userId: widget.userId),
-                      ),
-                    );
-                    break;
-                  case 2:
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProfilePage(userId: widget.userId),
+                        builder: (context) =>
+                            StoragePage(userId: widget.userId),
                       ),
                     );
                     break;

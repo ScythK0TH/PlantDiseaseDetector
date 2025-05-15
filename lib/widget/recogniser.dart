@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,6 +35,9 @@ class _RecogniserState extends State<Recogniser> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           automaticallyImplyLeading: false,
+          systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
+              ? SystemUiOverlayStyle.light
+              : SystemUiOverlayStyle.dark,
           title: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: SizedBox(
@@ -142,7 +146,7 @@ class _RecogniserState extends State<Recogniser> {
     };
 
     final accuracy = state.status == RecogniserStatus.found
-        ? 'Accuracy: ${(state.accuracy * 100).toStringAsFixed(2)}%'
+        ? 'Probability: ${(state.accuracy * 100).toStringAsFixed(2)}%'
         : '';
 
     List<String> splitText(String text, TextStyle style, double maxWidth) {
@@ -359,7 +363,7 @@ Future<void> _savedData(BuildContext context, RecogniserState state, String user
           'date': dateTime,
           'predict': predict,
           'title': title,
-          'accuracy': accuracy,
+          'probability': accuracy,
         });
       } else {
         print('Error: Image is null.');
