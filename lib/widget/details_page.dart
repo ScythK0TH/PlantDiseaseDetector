@@ -194,6 +194,21 @@ class _DetailsPageState extends State<DetailsPage> {
                 ),
               );
               if (newTitle != null && newTitle.trim().isNotEmpty) {
+                if (newTitle.trim().length > 15) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(12.0),
+                          topRight: Radius.circular(12.0),
+                        ),
+                      ),
+                      content: Text('Title must be 15 characters or less!'),
+                    ),
+                  );
+                  return; // Stop further execution
+                }
                 setState(() => _isUpdating = true);
                 try {
                   final db = await mongo.Db.create(MONGO_URL);

@@ -6,6 +6,7 @@ import 'package:bcrypt/bcrypt.dart';
 import 'package:project_pdd/constant.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/register.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'storage_page.dart';
 
 class LoginApp extends StatefulWidget {
@@ -38,6 +39,12 @@ class LoginAppState extends State<LoginApp> {
     });
   }
 
+  // Call this after successful login
+  Future<void> saveLoginState(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userId', userId);
+  }
+
   Future<void> _loginUser() async {
     setState(() {
       _errorMessage = null;
@@ -67,6 +74,7 @@ class LoginAppState extends State<LoginApp> {
         final hashedPassword = user['password'];
         if (BCrypt.checkpw(password, hashedPassword)) {
           print('Login successful!');
+          await saveLoginState(user['_id'].toHexString());
 
           Navigator.pushReplacement(
             context,

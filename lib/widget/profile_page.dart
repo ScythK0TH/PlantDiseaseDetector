@@ -9,6 +9,7 @@ import 'package:project_pdd/widget/first_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
 import 'package:project_pdd/main.dart';
 import 'package:project_pdd/widget/storage_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, required this.userId});
@@ -26,6 +27,11 @@ class _ProfilePageState extends State<ProfilePage>
   Map<String, dynamic>? _userData;
   final ValueNotifier<double> _sheetExtent = ValueNotifier(0.7);
   int? galleryCount;
+
+  Future<void> clearLoginState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userId');
+  }
 
   Future<void> _fetchUserData() async {
     if (!mounted) return;
@@ -90,9 +96,13 @@ class _ProfilePageState extends State<ProfilePage>
     final double showTitleExtent = 0.9; // When to start showing the title
 
     return Scaffold(
-      backgroundColor: Theme.of(context).brightness == Brightness.dark
-          ? Colors.white
-          : primaryColor,
+      backgroundColor: _isLoading
+          ? Theme.of(context).brightness == Brightness.dark
+              ? primaryColor
+              : Colors.white
+          : Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : primaryColor,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: ValueListenableBuilder<double>(
@@ -164,10 +174,13 @@ class _ProfilePageState extends State<ProfilePage>
                   .clamp(0.0, 1.0);
               return Center(
                 child: _isLoading
-                    ? CircularProgressIndicator(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? primaryColor
-                            : Colors.white)
+                    ? Container(
+                      margin: EdgeInsets.only(bottom: bottomNavHeight + 24),
+                      child: CircularProgressIndicator(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : primaryColor),
+                    )
                     : _userData == null
                         ? Text(
                             'User not found.',
@@ -277,6 +290,25 @@ class _ProfilePageState extends State<ProfilePage>
                                           ),
                                         );
                                         if (newTitle != null && newTitle.trim().isNotEmpty) {
+                                          if (newTitle.trim().length > 20) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                backgroundColor: Colors.red,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.only(
+                                                    topLeft: Radius.circular(12.0),
+                                                    topRight: Radius.circular(12.0),
+                                                  ),
+                                                ),
+                                                behavior: SnackBarBehavior.floating,
+                                                margin: EdgeInsets.only(
+                                                  bottom: bottomNavHeight, // 56 (nav height) + 16 spacing
+                                                ),
+                                                content: Text('Name must be 20 characters or less!'),
+                                              ),
+                                            );
+                                            return; // Stop further execution
+                                          }
                                           setState(() => _isUpdating = true);
                                           try {
                                             final db = await mongo.Db.create(MONGO_URL);
@@ -301,9 +333,9 @@ class _ProfilePageState extends State<ProfilePage>
                                                 ),
                                                 behavior: SnackBarBehavior.floating,
                                                 margin: EdgeInsets.only(
-                                                  bottom: 72, // 56 (nav height) + 16 spacing
+                                                  bottom: bottomNavHeight, // 56 (nav height) + 16 spacing
                                                 ),
-                                                content: Text('Title updated!')
+                                                content: Text('Name updated!')
                                               ),
                                             );
                                           } catch (e) {
@@ -318,9 +350,9 @@ class _ProfilePageState extends State<ProfilePage>
                                                 ),
                                                 behavior: SnackBarBehavior.floating,
                                                 margin: EdgeInsets.only(
-                                                  bottom: 72, // 56 (nav height) + 16 spacing
+                                                  bottom: bottomNavHeight, // 56 (nav height) + 16 spacing
                                                 ),
-                                                content: Text('Failed to update title: $e')
+                                                content: Text('Failed to update name: $e')
                                               ),
                                             );
                                           } finally {
@@ -339,11 +371,14 @@ class _ProfilePageState extends State<ProfilePage>
                                     alignment: Alignment.centerRight,
                                     child: IconButton(onPressed: () {
                                       themeModeNotifier.value = ThemeMode.light;
-                                      Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => FirstPageScreen()),
-                                        (route) => false, // Remove all previous routes
-                                      );
+                                      clearLoginState().then((_) {
+                                        // Clear the userId from SharedPreferences
+                                        Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => FirstPageScreen()),
+                                          (route) => false, // Remove all previous routes
+                                        );
+                                      });
                                     }, icon: Icon(Icons.logout, size: 24, color: Colors.red),)
                                   ),
                                 ],

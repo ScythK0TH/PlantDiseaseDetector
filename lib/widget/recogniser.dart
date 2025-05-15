@@ -12,6 +12,7 @@ import 'package:project_pdd/bloc/recogniser_event.dart';
 import 'package:project_pdd/bloc/recogniser_state.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/photo_view.dart';
+import 'package:project_pdd/widget/profile_page.dart';
 import 'package:project_pdd/widget/storage_page.dart';
 
 class Recogniser extends StatefulWidget {
@@ -23,6 +24,8 @@ class Recogniser extends StatefulWidget {
 }
 
 class _RecogniserState extends State<Recogniser> {
+  bool isPressing = false;
+  bool isResultButtonPressing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +63,7 @@ class _RecogniserState extends State<Recogniser> {
                   ),
                   Center(
                     child: Text(
-                      'Plant Hub',
+                      'Plant Analyzer',
                       style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -109,6 +112,57 @@ class _RecogniserState extends State<Recogniser> {
                 ),
               ),
             );
+          },
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          currentIndex: 0,
+          selectedItemColor: successColor,
+          unselectedItemColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.camera_alt,
+                size: 24.0,
+              ),
+              label: 'Camera',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.photo,
+                size: 24.0,
+              ),
+              label: 'Gallery',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.person,
+                size: 24.0,
+              ),
+              label: 'Profile',
+            ),
+          ],
+          onTap: (index) {
+            switch (index) {
+              case 1:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => StoragePage(userId: widget.userId),
+                  ),
+                );
+                break;
+              case 2:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePage(userId: widget.userId), // Pass userId to Recogniser
+                    ),
+                  );
+                break;
+            }
           },
         ),
       ),
@@ -207,41 +261,59 @@ class _RecogniserState extends State<Recogniser> {
 
   Widget _buildPickButton(BuildContext context, String title,
       ImageSource source, double width, bool isOutlined, String type) {
-    // Determine the icon based on the type
     IconData icon = type == 'photo' ? Icons.camera_alt : Icons.photo_library;
 
     return ElevatedButton(
-      onPressed: () async {
-        final picker = ImagePicker();
-        final pickedFile = await picker.pickImage(
-          source: source,
-        );
-        if (pickedFile != null) {
-          context
-              .read<RecogniserBloc>()
-              .add(PhotoPicked(File(pickedFile.path)));
-        }
-      },
+      onPressed: isPressing
+          ? null
+          : () async {
+              setState(() => isPressing = true);
+              final picker = ImagePicker();
+              final pickedFile = await picker.pickImage(
+                source: source,
+              );
+              if (pickedFile != null) {
+                context
+                    .read<RecogniserBloc>()
+                    .add(PhotoPicked(File(pickedFile.path)));
+              }
+              await Future.delayed(const Duration(milliseconds: 500));
+              if (mounted) setState(() => isPressing = false);
+            },
       style: ElevatedButton.styleFrom(
-        backgroundColor: isOutlined ? Colors.transparent : (Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor),
+        backgroundColor: isOutlined
+            ? Colors.transparent
+            : (Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : primaryColor),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(36.0),
           side: isOutlined
-              ? BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 3.0)
+              ? BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : primaryColor,
+                  width: 3.0)
               : BorderSide.none,
         ),
         minimumSize: Size(width, 60.0),
         elevation: isOutlined ? 0 : null,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center, // Center content
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             icon,
-            color: isOutlined ? (Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor) : (Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white),
-            size: 24.0, // Icon size
+            color: isOutlined
+                ? (Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : primaryColor)
+                : (Theme.of(context).brightness == Brightness.dark
+                    ? primaryColor
+                    : Colors.white),
+            size: 24.0,
           ),
-          const SizedBox(width: 10), // Space between icon and text
+          const SizedBox(width: 10),
           Text(
             title,
             style: isOutlined
@@ -257,34 +329,46 @@ class _RecogniserState extends State<Recogniser> {
     double width, bool isOutlined, String type, RecogniserState state) {
 
     return ElevatedButton(
-      onPressed: () async {
-        if (type == 'save') {
-          await _savedData(context, state, widget.userId);
-        } else if (type == 'cancel') {
-          //Refresh the page
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Recogniser(userId: widget.userId),
-            ),
-          );
-        }
-      },
+      onPressed: isResultButtonPressing
+          ? null
+          : () async {
+              setState(() => isResultButtonPressing = true);
+              if (type == 'save') {
+                await _savedData(context, state, widget.userId);
+              } else if (type == 'cancel') {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Recogniser(userId: widget.userId),
+                  ),
+                );
+              }
+              await Future.delayed(const Duration(milliseconds: 500));
+              if (mounted) setState(() => isResultButtonPressing = false);
+            },
       style: ElevatedButton.styleFrom(
-        backgroundColor: isOutlined ? Colors.transparent : (Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor),
+        backgroundColor: isOutlined
+            ? Colors.transparent
+            : (Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : primaryColor),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(36.0),
           side: isOutlined
-              ? BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 3.0)
+              ? BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : primaryColor,
+                  width: 3.0)
               : BorderSide.none,
         ),
         minimumSize: Size(width, 60.0),
         elevation: isOutlined ? 0 : null,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center, // Center content
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(width: 10), // Space between icon and text
+          const SizedBox(width: 10),
           Text(
             title,
             style: isOutlined
@@ -345,7 +429,10 @@ Future<void> _savedData(BuildContext context, RecogniserState state, String user
     }
     final predict = state.label;
     final image = state.image != null ? await cropAndResizeToContainer(state.image!, 350, 300) : null;
-    final title = state.image != null ? state.image!.path.split('/').last : 'Unknown';
+    String title = state.image != null ? state.image!.path.split('/').last : 'Unknown';
+    if (title.length > 15) {
+      title = title.substring(title.length - 15);
+    }
     final accuracy = state.accuracy;
     final dateTime = DateTime.now().toString();
 

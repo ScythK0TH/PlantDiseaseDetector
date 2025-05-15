@@ -9,6 +9,7 @@ import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/first_page.dart';
 import 'package:project_pdd/widget/profile_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'details_page.dart';
 import 'package:project_pdd/main.dart'; 
 
@@ -61,6 +62,11 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
       _searchToken++; // Increment token for each new search
       _fetchPlants(value, token: _searchToken);
     });
+  }
+
+  Future<void> clearLoginState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userId');
   }
 
   Future<void> _fetchPlants(String search, {int? token}) async {
@@ -128,6 +134,38 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
 
     return PopScope(
       canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          final shouldExit = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Exit'),
+              content: Text('Are you sure you want to logout?'),
+              backgroundColor: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(36.0),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    clearLoginState(); // ฟังก์ชันของคุณ
+                    SystemNavigator.pop();
+                  },
+                  child: Text('Logout'),
+                ),
+              ],
+            ),
+          );
+
+          if (shouldExit == true) {
+            Navigator.of(context).pop(); // ทำการ pop จริง ๆ ถ้าผู้ใช้กดยืนยัน
+          }
+        }
+      },
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -181,17 +219,14 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                   ),
                 IconButton(
                   icon: Icon(
-                    Icons.logout,
+                    Icons.exit_to_app,
                     color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
                     size: 24.0,
                   ),
                   onPressed: () {
                     themeModeNotifier.value = ThemeMode.light;
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => FirstPageScreen()),
-                      (route) => false, // Remove all previous routes
-                    );
+                    //Exit the app
+                    SystemNavigator.pop();
                   },
                 ),
               ],

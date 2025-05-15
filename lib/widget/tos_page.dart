@@ -1,8 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:project_pdd/style.dart';
-import 'package:project_pdd/widget/register.dart';
 
 class TermOfServicePage extends StatefulWidget {
   const TermOfServicePage({super.key});
@@ -87,37 +85,4 @@ class TermOfServicePageState extends State<TermOfServicePage> {
       ),
     );
   }
-}
-
-void showSecondModal(BuildContext context) {
-  showModalBottomSheet(
-    isScrollControlled: true,
-    context: context, // Allow modal to resize with keyboard
-    backgroundColor: Colors.transparent, // Make modal transparent
-    builder: (BuildContext context) {
-      double keyboardHeight =
-          MediaQuery.of(context).viewInsets.bottom; // Detect keyboard height
-      return SizedBox(
-        height: keyboardHeight > 0
-            ? MediaQuery.of(context).size.height * 0.9
-            : MediaQuery.of(context).size.height *
-                0.6, // Increase height when keyboard appears
-        child: Stack(
-          children: [
-            // Blur effect
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              child: Container(
-                color: Colors.transparent,
-              ),
-            ),
-            // Modal content
-            Positioned(
-              child: RegisApp(),
-            ),
-          ],
-        ),
-      );
-    },
-  );
 }

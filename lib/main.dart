@@ -4,22 +4,31 @@ import 'package:project_pdd/style.dart';
 import 'package:flutter/services.dart';
 import 'package:project_pdd/widget/first_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
+import 'package:project_pdd/widget/storage_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 final themeModeNotifier = ValueNotifier<ThemeMode>(ThemeMode.light);
 
-void main() {
+Future<String?> getSavedUserId() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('userId');
+}
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final userId = await getSavedUserId();
   // Set the preferred orientations to portrait mode only
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  runApp(const MainApp());
+  runApp(MainApp(userId: userId));
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  final String? userId;
+  const MainApp({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +68,10 @@ class MainApp extends StatelessWidget {
               unselectedIconTheme: IconThemeData(color: Colors.white),
             ),
           ),
-          initialRoute: '/',
           navigatorObservers: [routeObserver],
-          routes: {
-            '/': (context) => FirstPageScreen(),
-          },
+          home: userId == null
+              ? FirstPageScreen()
+              : StoragePage(userId: userId!),
         );
       },
     );
