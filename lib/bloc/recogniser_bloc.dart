@@ -41,6 +41,7 @@ class RecogniserBloc extends Bloc<RecogniserEvent, RecogniserState> {
       if (result != null) {
         emit(state.copyWith(
           status: RecogniserStatus.found,
+          pid: result.pid,
           label: result.label,
           accuracy: result.score,
         ));

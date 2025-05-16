@@ -435,6 +435,7 @@ Future<void> _savedData(BuildContext context, RecogniserState state, String user
     }
     final accuracy = state.accuracy;
     final dateTime = DateTime.now().toString();
+    final pid = state.pid;
 
     try {
       print('Connecting to MongoDB...');
@@ -448,6 +449,7 @@ Future<void> _savedData(BuildContext context, RecogniserState state, String user
           'userId': mongoUserId,
           'image': image,
           'date': dateTime,
+          'predict_id': pid,
           'predict': predict,
           'title': title,
           'probability': accuracy,

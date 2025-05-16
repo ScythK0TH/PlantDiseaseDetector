@@ -150,8 +150,8 @@ class Classifier {
       final label = _labels[i];
       final confidence = output[i];
 
-      categoryList.add(ClassifierCategory(label, confidence));
-      debugPrint('label: $label, score: $confidence');
+      categoryList.add(ClassifierCategory(label, confidence, i));
+      debugPrint('id: $i, label: $label, score: $confidence');
     }
 
     categoryList.sort((a, b) => b.score.compareTo(a.score));

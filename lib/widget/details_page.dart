@@ -6,8 +6,11 @@ import 'package:flutter/services.dart';
 import 'package:project_pdd/style.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/constant.dart';
+import 'package:project_pdd/widget/gemini.dart';
 import 'package:project_pdd/widget/profile_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
+
+const _detfname = 'details.json';
 
 class DetailsPage extends StatefulWidget {
   final Map<String, dynamic> plant;
@@ -50,6 +53,28 @@ class _DetailsPageState extends State<DetailsPage> {
     } catch (e) {
       print('Error db: $e');
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getDetails(widget.plant);
+  }
+
+  Future<void> getDetails(plant) async {
+    await rootBundle.loadString('assets/my_model/$_detfname').then((String jsonString) {
+        final List<dynamic> details = json.decode(jsonString);
+        for (var detail in details) {
+          if (detail['id'] == plant['predict_id']) {
+            setState(() {
+              plant['treatment'] = detail['treatment'];
+              plant['prevention'] = detail['prevention'];
+            });
+            break; // Exit the loop once the matching detail is found
+          }
+        }
+      }
+    );
   }
 
   @override
@@ -110,150 +135,180 @@ class _DetailsPageState extends State<DetailsPage> {
           ),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 20),
-                Center(
-                  child: Text('${plant['title'] ?? 'Unknown'}',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ),
-                SizedBox(height: 20),
-                Flexible(
-                  child: plant['image'] != null
-                      ? Container(
-                          height: 300,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-                            borderRadius: BorderRadius.circular(36),
-                          ),
-                          clipBehavior: Clip.antiAlias,
-                          child: Image.memory(
-                            base64Decode(plant['image']),
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                            alignment: Alignment.center,
-                          ),
-                        )
-                      : Container(
-                          height: 300,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-                            borderRadius: BorderRadius.circular(36),
-                          ),
-                          child: Center(
-                            child: Icon(
-                              Icons.image,
-                              size: 50,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20),
+                  Center(
+                    child: Text('${plant['title'] ?? 'Unknown'}',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    height: 300,
+                    width: double.infinity,
+                    child: plant['image'] != null
+                        ? Container(
+                            decoration: BoxDecoration(
                               color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+                              borderRadius: BorderRadius.circular(36),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: Image.memory(
+                              base64Decode(plant['image']),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                              alignment: Alignment.center,
+                            ),
+                          )
+                        : Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+                              borderRadius: BorderRadius.circular(36),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.image,
+                                size: 50,
+                                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+                              ),
                             ),
                           ),
-                        ),
-                ),
-                SizedBox(height: 20),
-                Text('Date: ${plant['date'] ?? 'Unknown'}',
-                    style: TextStyle(fontSize: 18)),
-                SizedBox(height: 10),
-                Text('Predict: ${plant['predict'] ?? 'Unknown'}',
-                    style: TextStyle(fontSize: 18)),
-                SizedBox(height: 10),
-                Text('Probability: ${(plant['probability'] * 100).toStringAsFixed(2) ?? 'Unknown'}',
-                    style: TextStyle(fontSize: 18)),
-              ],
+                  ),
+                  SizedBox(height: 20),
+                  Text('Date: ${plant['date'] ?? 'Unknown'}',
+                      style: TextStyle(fontSize: 18)),
+                  SizedBox(height: 10),
+                  Text('Predict: ${plant['predict'] ?? 'Unknown'}',
+                      style: TextStyle(fontSize: 18)),
+                  SizedBox(height: 10),
+                  Text('Treatment: ${(plant['treatment']) ?? 'Unknown'}',
+                      style: TextStyle(fontSize: 18)),
+                  SizedBox(height: 10),
+                  Text('Prevention: ${(plant['prevention']) ?? 'Unknown'}',
+                      style: TextStyle(fontSize: 18)),
+                ],
+              ),
             ),
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              final TextEditingController titleController =
-                  TextEditingController(text: plant['title'] ?? '');
-              final newTitle = await showDialog<String>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  backgroundColor: Theme.of(context).brightness == Brightness.dark
-                    ? primaryColor
-                    : Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(36.0),
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                FloatingActionButton.extended(
+                    heroTag: 'assistance_fab',
+                    backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+                    foregroundColor: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+                    icon: const Icon(Icons.support_agent),
+                    label: const Text('Assistance'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GeminiChatPage(plant: plant, userId: userId),
+                        ),
+                      );
+                    },
                   ),
-                  title: Text('Edit Title'),
-                  content: TextField(
-                    controller: titleController,
-                    decoration: InputDecoration(hintText: 'Enter new title'),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, titleController.text),
-                      child: Text('Save'),
-                    ),
-                  ],
+                FloatingActionButton(
+                  heroTag: 'edit_fab',
+                  onPressed: () async {
+                    final TextEditingController titleController =
+                        TextEditingController(text: plant['title'] ?? '');
+                    final newTitle = await showDialog<String>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        backgroundColor: Theme.of(context).brightness == Brightness.dark
+                          ? primaryColor
+                          : Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(36.0),
+                        ),
+                        title: Text('Edit Title'),
+                        content: TextField(
+                          controller: titleController,
+                          decoration: InputDecoration(hintText: 'Enter new title'),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, titleController.text),
+                            child: Text('Save'),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (newTitle != null && newTitle.trim().isNotEmpty) {
+                      if (newTitle.trim().length > 15) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(12.0),
+                                topRight: Radius.circular(12.0),
+                              ),
+                            ),
+                            content: Text('Title must be 15 characters or less!'),
+                          ),
+                        );
+                        return; // Stop further execution
+                      }
+                      setState(() => _isUpdating = true);
+                      try {
+                        final db = await mongo.Db.create(MONGO_URL);
+                        await db.open();
+                        final collection = db.collection('plants');
+                        await collection.update(
+                          {'_id': plant['_id']},
+                          {r'$set': {'title': newTitle.trim()}},
+                        );
+                        await db.close();
+                        setState(() {
+                          plant['title'] = newTitle.trim();
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.green,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(12.0),
+                                topRight: Radius.circular(12.0),
+                              ),
+                            ),
+                            content: Text('Title updated!')
+                          ),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(12.0),
+                                topRight: Radius.circular(12.0),
+                              ),
+                            ),
+                            content: Text('Failed to update title: $e')
+                          ),
+                        );
+                      } finally {
+                        setState(() => _isUpdating = false);
+                      }
+                    }
+                  },
+                  backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+                  child: Icon(Icons.edit, color: (Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white), size: 24),
                 ),
-              );
-              if (newTitle != null && newTitle.trim().isNotEmpty) {
-                if (newTitle.trim().length > 15) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(12.0),
-                          topRight: Radius.circular(12.0),
-                        ),
-                      ),
-                      content: Text('Title must be 15 characters or less!'),
-                    ),
-                  );
-                  return; // Stop further execution
-                }
-                setState(() => _isUpdating = true);
-                try {
-                  final db = await mongo.Db.create(MONGO_URL);
-                  await db.open();
-                  final collection = db.collection('plants');
-                  await collection.update(
-                    {'_id': plant['_id']},
-                    {r'$set': {'title': newTitle.trim()}},
-                  );
-                  await db.close();
-                  setState(() {
-                    plant['title'] = newTitle.trim();
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      backgroundColor: Colors.green,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(12.0),
-                          topRight: Radius.circular(12.0),
-                        ),
-                      ),
-                      content: Text('Title updated!')
-                    ),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(12.0),
-                          topRight: Radius.circular(12.0),
-                        ),
-                      ),
-                      content: Text('Failed to update title: $e')
-                    ),
-                  );
-                } finally {
-                  setState(() => _isUpdating = false);
-                }
-              }
-            },
-            backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-            child: Icon(Icons.edit, color: (Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white), size: 24),
+              ],
+            ),
           ),
           bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_pdd/style.dart';
 import 'package:flutter/services.dart';
 import 'package:project_pdd/widget/first_page.dart';
+import 'package:project_pdd/widget/gemini.dart';
 import 'package:project_pdd/widget/recogniser.dart';
 import 'package:project_pdd/widget/storage_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,6 +25,7 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  await dotenv.load(fileName: "assets/.env");
   runApp(MainApp(userId: userId));
 }
 
