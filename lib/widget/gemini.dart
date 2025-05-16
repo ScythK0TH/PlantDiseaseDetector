@@ -247,7 +247,12 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
                                 : Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: Text(text),
+                          child: RichText(
+                            text: TextSpan(
+                              style: DefaultTextStyle.of(context).style,
+                              children: parseBoldText(text),
+                            ),
+                          ),
                         ),
                       );
                     },
