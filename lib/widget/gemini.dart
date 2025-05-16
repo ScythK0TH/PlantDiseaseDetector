@@ -106,7 +106,7 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
         "parts": [
           {
             "text":
-                "คุณคือผู้ช่วยที่มีความรู้เกี่ยวกับการเกษตรและพืชสวน คุณสามารถให้คำแนะนำเกี่ยวกับการปลูกพืช การดูแลพืช และการจัดการศัตรูพืชได้..."
+                "คุณคือผู้ช่วยที่มีความรู้เกี่ยวกับการเกษตรและพืชสวน คุณสามารถให้คำแนะนำเกี่ยวกับการปลูกพืช การดูแลพืช และการจัดการศัตรูพืชได้ โดยคุณจะต้องตอบคำถามของผู้ใช้ในลักษณะที่เป็นมิตรและให้ข้อมูลที่ถูกต้อง คุณจะไม่พูดถึงตัวเองหรือแสดงความรู้สึกส่วนตัว คุณจะต้องให้ข้อมูลที่เป็นประโยชน์และมีคุณค่าแก่ผู้ใช้เสมอ คุณจะให้คำตอบที่ชัดเจนและเข้าใจง่าย และจะไม่ใช้ศัพท์เทคนิคที่ซับซ้อนเกินไป คุณจะปฏิเสธการให้คำแนะนำกับคำถามที่ไม่เกี่ยวข้องกับการเกษตรหรือพืชสวน"
           },
           {
             "text": "ข้อมูลการทำนาย: ${widget.plant['predict'] ?? 'ไม่มีข้อมูล'}"
@@ -138,7 +138,7 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      final text = data['candidates']?[0]?['content']?['parts']?[0]?['text'];
+      final text = (data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? '').trim();
       setState(() {
         responseText = text;
       });
@@ -220,33 +220,40 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            if (isLoading) Center(child: const CircularProgressIndicator()),
-            if (responseText != null)
-              Expanded(
-                child: ListView.builder(
-                  itemCount: chatHistory.length,
-                  itemBuilder: (context, index) {
-                    final msg = chatHistory[index];
-                    final isUser = msg['role'] == 'user';
-                    final text = msg['parts'][0]['text'] ?? '';
-                    return Align(
-                      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 4),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: isUser
-                              ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
-                              : Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(text),
-                      ),
-                    );
-                  },
+            if (isLoading)
+              const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
                 ),
-              ),
+              )
+            else ...[
+              const SizedBox(height: 20),
+              if (responseText != null)
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: chatHistory.length,
+                    itemBuilder: (context, index) {
+                      final msg = chatHistory[index];
+                      final isUser = msg['role'] == 'user';
+                      final text = msg['parts'][0]['text'] ?? '';
+                      return Align(
+                        alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: isUser
+                                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
+                                : Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(text),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+            ],
           ],
         ),
       ),
@@ -288,7 +295,10 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
                     : () {
                         final text = _controller.text.trim();
                         if (text.isNotEmpty) {
-                          getGeminiResponse(text);
+                          getGeminiResponse(text, 
+                              withImageAndPredict: false,
+                              cacheUserId: widget.userId,
+                              cachePlantId: widget.plant['_id'].toString());
                           _controller.clear();
                         }
                       },
