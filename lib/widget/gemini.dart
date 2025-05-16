@@ -26,6 +26,8 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
 
   List<Map<String, dynamic>> chatHistory = [];
 
+  final ScrollController _scrollController = ScrollController();
+
   Future<void> saveCache(String userId, String plantId, List<Map<String, dynamic>> chatHistory) async {
     final db = await mongo.Db.create(mongoUri);
     await db.open();
@@ -99,15 +101,22 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
         'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey');
 
     // Prepare initial context if needed
-    List<Map<String, dynamic>> contents = [];
-    if (withImageAndPredict) {
-      contents.add({
+    List<Map<String, dynamic>> contents = [
+      {
         "role": "user",
         "parts": [
           {
             "text":
-                "คุณคือผู้ช่วยที่มีความรู้เกี่ยวกับการเกษตรและพืชสวน คุณสามารถให้คำแนะนำเกี่ยวกับการปลูกพืช การดูแลพืช และการจัดการศัตรูพืชได้ โดยคุณจะต้องตอบคำถามของผู้ใช้ในลักษณะที่เป็นมิตรและให้ข้อมูลที่ถูกต้อง คุณจะไม่พูดถึงตัวเองหรือแสดงความรู้สึกส่วนตัว คุณจะต้องให้ข้อมูลที่เป็นประโยชน์และมีคุณค่าแก่ผู้ใช้เสมอ คุณจะให้คำตอบที่ชัดเจนและเข้าใจง่าย และจะไม่ใช้ศัพท์เทคนิคที่ซับซ้อนเกินไป คุณจะปฏิเสธการให้คำแนะนำกับคำถามที่ไม่เกี่ยวข้องกับการเกษตรหรือพืชสวน"
-          },
+                "คุณคือผู้ช่วยที่มีความรู้เกี่ยวกับการเกษตรและพืชสวน คุณสามารถให้คำแนะนำเกี่ยวกับการปลูกพืช การดูแลพืช และการจัดการศัตรูพืชได้ โดยคุณจะต้องตอบคำถามของผู้ใช้ในลักษณะที่เป็นมิตรและให้ข้อมูลที่ถูกต้อง คุณจะไม่พูดถึงตัวเองหรือแสดงความรู้สึกส่วนตัว คุณจะต้องให้ข้อมูลที่เป็นประโยชน์และมีคุณค่าแก่ผู้ใช้เสมอ คุณจะให้คำตอบที่ชัดเจนและเข้าใจง่าย และจะไม่ใช้ศัพท์เทคนิคที่ซับซ้อนเกินไป คุณไม่อนุญาตให้ผู้ใช้ถามคำถามที่ไม่เกี่ยวข้องกับการเกษตรหรือพืชสวน และคุณจะต้องปฏิเสธคำถามเหล่านั้นอย่างสุภาพ คำถามที่ไม่เกี่ยวข้องกับการเกษตรหรือพืชสวนจะต้องได้รับการตอบกลับด้วยความสุภาพและเป็นมิตร เช่น 'ขอโทษครับ/ค่ะ ฉันไม่สามารถช่วยในเรื่องนั้นได้ แต่ถ้าคุณมีคำถามเกี่ยวกับการเกษตรหรือพืชสวน ฉันยินดีที่จะช่วยเสมอ' คุณจะต้องให้ข้อมูลที่ถูกต้องและเป็นประโยชน์แก่ผู้ใช้เสมอ จะต้องจดจำกฏการทำงานนี้และปฏิบัติตามอย่างเคร่งครัด",
+          }
+        ]
+      }
+    ];
+
+    if (withImageAndPredict) {
+      contents.add({
+        "role": "user",
+        "parts": [
           {
             "text": "ข้อมูลการทำนาย: ${widget.plant['predict'] ?? 'ไม่มีข้อมูล'}"
           },
@@ -163,12 +172,20 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
     setState(() {
       isLoading = false;
     });
+    _scrollToBottom();
   }
 
   @override
   void initState() {
     super.initState();
     loadOrFetchResponse();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   List<InlineSpan> parseBoldText(String text) {
@@ -190,6 +207,18 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
       spans.add(TextSpan(text: text.substring(start)));
     }
     return spans;
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
@@ -231,6 +260,7 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
               if (responseText != null)
                 Expanded(
                   child: ListView.builder(
+                    controller: _scrollController,
                     itemCount: chatHistory.length,
                     itemBuilder: (context, index) {
                       final msg = chatHistory[index];
@@ -294,7 +324,9 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
               ),
               IconButton(
                 icon: const Icon(Icons.send),
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).brightness == Brightness.light
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.white,
                 onPressed: isLoading
                     ? null
                     : () {
