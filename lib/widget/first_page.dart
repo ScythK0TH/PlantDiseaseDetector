@@ -80,8 +80,11 @@ class FirstPageScreenState extends State<FirstPageScreen> {
               Padding(
                 padding: EdgeInsets.only(top: 10.0),
                 child: Text('BaiRooRok'.tr(),
-                    style: mainTitleTextStyleFirst(context,
-                        fontWeight: FontWeight.bold)),
+                    style: context.locale.languageCode == 'en'
+                        ? mainTitleTextStyleWhite(context,
+                            fontWeight: FontWeight.bold)
+                        : mainTitleTextStyleFirst(context,
+                            fontWeight: FontWeight.bold)),
               ),
               Flexible(
                 flex: 1, // เพิ่มส่วนนี้สำหรับข้อความที่พิมพ์
