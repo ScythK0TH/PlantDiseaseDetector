@@ -78,8 +78,8 @@ class FirstPageScreenState extends State<FirstPageScreen> {
               // เพิ่มชื่อแอพใต้ภาพ
               Padding(
                 padding: EdgeInsets.only(top: 10.0),
-                child: Text('ใบ รู้ โรค',
-                    style: mainTitleTextStyleWhite(context,
+                child: Text('ใบรู้โรค',
+                    style: mainTitleTextStyleFirst(context,
                         fontWeight: FontWeight.bold)),
               ),
               Flexible(

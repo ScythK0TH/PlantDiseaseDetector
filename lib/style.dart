@@ -26,6 +26,15 @@ TextStyle mainTitleTextStyleWhite(BuildContext context,
       decoration: TextDecoration.none,
     );
 
+TextStyle mainTitleTextStyleFirst(BuildContext context,
+        {FontWeight fontWeight = FontWeight.normal}) =>
+    GoogleFonts.sriracha(
+      fontSize: 48,
+      fontWeight: fontWeight,
+      color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+      decoration: TextDecoration.none,
+    );
+
 // Subtitle
 TextStyle subTitleTextStyleDark(BuildContext context, {FontWeight fontWeight = FontWeight.normal}) =>
     GoogleFonts.inter(
