@@ -18,10 +18,23 @@ Future<String?> getSavedUserId() async {
   return prefs.getString('userId');
 }
 
+Future<void> saveThemeMode(ThemeMode mode) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('themeMode', mode == ThemeMode.dark ? 'dark' : 'light');
+}
+
+Future<ThemeMode> loadThemeMode() async {
+  final prefs = await SharedPreferences.getInstance();
+  final theme = prefs.getString('themeMode');
+  if (theme == 'dark') return ThemeMode.dark;
+  return ThemeMode.light;
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   final userId = await getSavedUserId();
+  final themeMode = await loadThemeMode();
   // Set the preferred orientations to portrait mode only
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -33,15 +46,18 @@ void main() async {
     path: 'assets/languages',
     fallbackLocale: const Locale('en', 'US'),
     startLocale: const Locale('th', 'TH'),
-    child: MainApp(userId: userId)));
+    child: MainApp(userId: userId, initialThemeMode: themeMode)));
 }
 
 class MainApp extends StatelessWidget {
   final String? userId;
-  const MainApp({super.key, required this.userId});
+  final ThemeMode initialThemeMode;
+  const MainApp({super.key, required this.userId, required this.initialThemeMode});
 
   @override
   Widget build(BuildContext context) {
+    // Set the initial theme mode based on the saved preference
+    themeModeNotifier.value = initialThemeMode;
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeModeNotifier,
       builder: (context, mode, _) {

@@ -158,11 +158,10 @@ class _ProfilePageState extends State<ProfilePage>
                         : Colors.white,
                   ),
                   onPressed: () {
-                    // Toggle theme
-                    themeModeNotifier.value =
-                        Theme.of(context).brightness == Brightness.dark
-                            ? ThemeMode.light
-                            : ThemeMode.dark;
+                    final isDark = Theme.of(context).brightness == Brightness.dark;
+                    final newMode = isDark ? ThemeMode.light : ThemeMode.dark;
+                    themeModeNotifier.value = newMode;
+                    saveThemeMode(newMode); // <-- save to SharedPreferences
                   },
                 ),
               ],
