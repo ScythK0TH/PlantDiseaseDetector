@@ -176,12 +176,13 @@ class _ProfilePageState extends State<ProfilePage>
               return Center(
                 child: _isLoading
                     ? Container(
-                      margin: EdgeInsets.only(bottom: bottomNavHeight + 24),
-                      child: CircularProgressIndicator(
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white
-                              : primaryColor),
-                    )
+                        margin: EdgeInsets.only(bottom: bottomNavHeight + 24),
+                        child: CircularProgressIndicator(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : primaryColor),
+                      )
                     : _userData == null
                         ? Text(
                             'User not found.'.tr(),
@@ -259,136 +260,197 @@ class _ProfilePageState extends State<ProfilePage>
                                 alignment: Alignment.center,
                                 children: [
                                   Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: IconButton(
-                                      onPressed: () async {
-                                        final TextEditingController unameController =
-                                              TextEditingController(text: _userData!['username'] ?? '');
-                                        final newTitle = await showDialog<String>(
-                                          context: context,
-                                          builder: (context) => AlertDialog(
-                                            backgroundColor: Theme.of(context).brightness == Brightness.dark
-                                                ? primaryColor
-                                                : Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(36.0),
+                                      alignment: Alignment.centerLeft,
+                                      child: IconButton(
+                                        onPressed: () async {
+                                          final TextEditingController
+                                              unameController =
+                                              TextEditingController(
+                                                  text:
+                                                      _userData!['username'] ??
+                                                          '');
+                                          final newTitle =
+                                              await showDialog<String>(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              backgroundColor: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.dark
+                                                  ? primaryColor
+                                                  : Colors.white,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(36.0),
+                                              ),
+                                              title:
+                                                  Text('Edit Your Name'.tr()),
+                                              content: TextField(
+                                                controller: unameController,
+                                                decoration: InputDecoration(
+                                                    hintText:
+                                                        'Enter new name'.tr()),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
+                                                  child: Text('Cancel'.tr()),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context,
+                                                          unameController.text),
+                                                  child: Text('Save'.tr()),
+                                                ),
+                                              ],
                                             ),
-                                            title: Text('Edit Your Name'.tr()),
-                                            content: TextField(
-                                              controller: unameController,
-                                              decoration: InputDecoration(hintText: 'Enter new name'.tr()),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () => Navigator.pop(context),
-                                                child: Text('Cancel'.tr()),
-                                              ),
-                                              TextButton(
-                                                onPressed: () => Navigator.pop(context, unameController.text),
-                                                child: Text('Save'.tr()),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                        if (newTitle != null && newTitle.trim().isNotEmpty) {
-                                          if (newTitle.trim().length > 20) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                backgroundColor: Colors.red,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.only(
-                                                    topLeft: Radius.circular(12.0),
-                                                    topRight: Radius.circular(12.0),
+                                          );
+                                          if (newTitle != null &&
+                                              newTitle.trim().isNotEmpty) {
+                                            if (newTitle.trim().length > 20) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  backgroundColor: Colors.red,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(12.0),
+                                                      topRight:
+                                                          Radius.circular(12.0),
+                                                    ),
                                                   ),
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
+                                                  margin: EdgeInsets.only(
+                                                    bottom:
+                                                        bottomNavHeight, // 56 (nav height) + 16 spacing
+                                                  ),
+                                                  content: Text(
+                                                      'Name must be 20 characters or less!'
+                                                          .tr()),
                                                 ),
-                                                behavior: SnackBarBehavior.floating,
-                                                margin: EdgeInsets.only(
-                                                  bottom: bottomNavHeight, // 56 (nav height) + 16 spacing
-                                                ),
-                                                content: Text('Name must be 20 characters or less!'.tr()),
-                                              ),
-                                            );
-                                            return; // Stop further execution
+                                              );
+                                              return; // Stop further execution
+                                            }
+                                            setState(() => _isUpdating = true);
+                                            try {
+                                              final db = await mongo.Db.create(
+                                                  MONGO_URL);
+                                              await db.open();
+                                              final collection =
+                                                  db.collection('users');
+                                              await collection.update(
+                                                {'_id': _userData!['_id']},
+                                                {
+                                                  r'$set': {
+                                                    'username': newTitle.trim()
+                                                  }
+                                                },
+                                              );
+                                              await db.close();
+                                              setState(() {
+                                                _userData!['username'] =
+                                                    newTitle.trim();
+                                              });
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                    backgroundColor:
+                                                        Colors.green,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                        topLeft:
+                                                            Radius.circular(
+                                                                12.0),
+                                                        topRight:
+                                                            Radius.circular(
+                                                                12.0),
+                                                      ),
+                                                    ),
+                                                    behavior: SnackBarBehavior
+                                                        .floating,
+                                                    margin: EdgeInsets.only(
+                                                      bottom:
+                                                          bottomNavHeight, // 56 (nav height) + 16 spacing
+                                                    ),
+                                                    content: Text(
+                                                        'Name updated!'.tr())),
+                                              );
+                                            } catch (e) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                    backgroundColor: Colors.red,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                        topLeft:
+                                                            Radius.circular(
+                                                                12.0),
+                                                        topRight:
+                                                            Radius.circular(
+                                                                12.0),
+                                                      ),
+                                                    ),
+                                                    behavior: SnackBarBehavior
+                                                        .floating,
+                                                    margin: EdgeInsets.only(
+                                                      bottom:
+                                                          bottomNavHeight, // 56 (nav height) + 16 spacing
+                                                    ),
+                                                    content: Text(
+                                                        'Failed to update name:'
+                                                                .tr() +
+                                                            ' $e')),
+                                              );
+                                            } finally {
+                                              setState(
+                                                  () => _isUpdating = false);
+                                            }
                                           }
-                                          setState(() => _isUpdating = true);
-                                          try {
-                                            final db = await mongo.Db.create(MONGO_URL);
-                                            await db.open();
-                                            final collection = db.collection('users');
-                                            await collection.update(
-                                              {'_id': _userData!['_id']},
-                                              {r'$set': {'username': newTitle.trim()}},
-                                            );
-                                            await db.close();
-                                            setState(() {
-                                              _userData!['username'] = newTitle.trim();
-                                            });
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                backgroundColor: Colors.green,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.only(
-                                                    topLeft: Radius.circular(12.0),
-                                                    topRight: Radius.circular(12.0),
-                                                  ),
-                                                ),
-                                                behavior: SnackBarBehavior.floating,
-                                                margin: EdgeInsets.only(
-                                                  bottom: bottomNavHeight, // 56 (nav height) + 16 spacing
-                                                ),
-                                                content: Text('Name updated!'.tr())
-                                              ),
-                                            );
-                                          } catch (e) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                backgroundColor: Colors.red,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.only(
-                                                    topLeft: Radius.circular(12.0),
-                                                    topRight: Radius.circular(12.0),
-                                                  ),
-                                                ),
-                                                behavior: SnackBarBehavior.floating,
-                                                margin: EdgeInsets.only(
-                                                  bottom: bottomNavHeight, // 56 (nav height) + 16 spacing
-                                                ),
-                                                content: Text('Failed to update name:'.tr() + ' $e')
-                                              ),
-                                            );
-                                          } finally {
-                                            setState(() => _isUpdating = false);
-                                          }
-                                        }
-                                      },
-                                      icon: Icon(Icons.edit, size: 24, color: Colors.green),
-                                    )
-                                  ),
+                                        },
+                                        icon: Icon(Icons.edit,
+                                            size: 24, color: Colors.green),
+                                      )),
                                   Align(
                                     alignment: Alignment.center,
-                                    child: Icon(Icons.account_circle, size: 48, color: Colors.green),
+                                    child: Icon(Icons.account_circle,
+                                        size: 48, color: Colors.green),
                                   ),
                                   Align(
-                                    alignment: Alignment.centerRight,
-                                    child: IconButton(onPressed: () {
-                                      themeModeNotifier.value = ThemeMode.light;
-                                      clearLoginState().then((_) {
-                                        // Clear the userId from SharedPreferences
-                                        Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(builder: (context) => FirstPageScreen()),
-                                          (route) => false, // Remove all previous routes
-                                        );
-                                      });
-                                    }, icon: Icon(Icons.logout, size: 24, color: Colors.red),)
-                                  ),
+                                      alignment: Alignment.centerRight,
+                                      child: IconButton(
+                                        onPressed: () {
+                                          themeModeNotifier.value =
+                                              ThemeMode.light;
+                                          clearLoginState().then((_) {
+                                            // Clear the userId from SharedPreferences
+                                            Navigator.pushAndRemoveUntil(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      FirstPageScreen()),
+                                              (route) =>
+                                                  false, // Remove all previous routes
+                                            );
+                                          });
+                                        },
+                                        icon: Icon(Icons.logout,
+                                            size: 24, color: Colors.red),
+                                      )),
                                 ],
                               ),
                             ),
                             SizedBox(height: 16),
                             Center(
                               child: Text(
-                                'Welcome,'.tr() + ' ${_userData?['username'] ?? 'User'}!',
+                                'Welcome,'.tr() +
+                                    ' ${_userData?['username'] ?? 'User'}!',
                                 style: TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.bold),
                               ),
@@ -447,12 +509,11 @@ class _ProfilePageState extends State<ProfilePage>
                                             ],
                                           ),
                                           style: TextStyle(
-                                            color: Theme.of(context)
-                                                      .brightness ==
-                                                  Brightness.dark
-                                              ? primaryColor
-                                              : Colors.white
-                                          ),
+                                              color: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.dark
+                                                  ? primaryColor
+                                                  : Colors.white),
                                         ),
                                       ],
                                     ),
@@ -461,66 +522,100 @@ class _ProfilePageState extends State<ProfilePage>
                               ),
                             ),
                             Container(
-                              padding: EdgeInsets.all(24),
-                              margin: EdgeInsets.all(4),
+                              margin: EdgeInsets.symmetric(vertical: 24),
+                              padding: EdgeInsets.all(0),
                               decoration: BoxDecoration(
                                 color: Theme.of(context).brightness ==
                                         Brightness.dark
                                     ? Colors.grey[200]
-                                    : primaryColor,
-                                borderRadius: BorderRadius.circular(36),
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(24),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.3),
-                                    blurRadius: 4,
-                                    offset: Offset(0, 4),
+                                    color: Colors.black.withOpacity(0.08),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
                                   ),
                                 ],
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              child: Row(
                                 children: [
-                                  Container(
-                                    margin: EdgeInsets.all(8.0),
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          'Your Gallery'.tr(),
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Theme.of(context)
-                                                          .brightness ==
-                                                      Brightness.dark
-                                                  ? primaryColor
-                                                  : Colors.white),
-                                        ),
-                                        SizedBox(height: 8),
-                                        Text.rich(
-                                          TextSpan(
-                                            children: <TextSpan>[
-                                              TextSpan(
-                                                text: '${galleryCount ?? 0} ',
-                                                style: TextStyle(
-                                                    fontSize: 56,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              TextSpan(
-                                                text: 'images'.tr(),
-                                                style: TextStyle(fontSize: 16),
-                                              ),
-                                            ],
-                                          ),
-                                          style: TextStyle(
-                                            color: Theme.of(context)
-                                                      .brightness ==
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        await context
+                                            .setLocale(Locale('en', 'US'));
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 24),
+                                        decoration: BoxDecoration(
+                                          color: context.locale.languageCode ==
+                                                  'en'
+                                              ? Colors.green
+                                              : Theme.of(context)
+                                                  .brightness ==
                                                   Brightness.dark
-                                              ? primaryColor
-                                              : Colors.white
+                                                  ? Colors.grey[200]
+                                                  : primaryColor,
+                                          borderRadius: BorderRadius.horizontal(
+                                              left: Radius.circular(24)),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            'EN',
+                                            style: TextStyle(
+                                              fontSize: 28,
+                                              fontWeight: FontWeight.bold,
+                                              color:
+                                                  context.locale.languageCode ==
+                                                          'en'
+                                                      ? Colors.white
+                                                      : Colors.green,
+                                              letterSpacing: 2,
+                                            ),
                                           ),
                                         ),
-                                      ],
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        await context
+                                            .setLocale(Locale('th', 'TH'));
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 24),
+                                        decoration: BoxDecoration(
+                                          color: context.locale.languageCode ==
+                                                  'th'
+                                              ? Colors.green
+                                              : Theme.of(context)
+                                                  .brightness ==
+                                                  Brightness.dark
+                                                  ? Colors.grey[200]
+                                                  : primaryColor,
+                                          borderRadius: BorderRadius.horizontal(
+                                              right: Radius.circular(24)),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            'TH',
+                                            style: TextStyle(
+                                              fontSize: 28,
+                                              fontWeight: FontWeight.bold,
+                                              color:
+                                                  context.locale.languageCode ==
+                                                          'th'
+                                                      ? Colors.white
+                                                      : Colors.green,
+                                              letterSpacing: 2,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -596,15 +691,19 @@ class _ProfilePageState extends State<ProfilePage>
             ),
           ),
           if (_isUpdating)
-          BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-            child: Container(
-              color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
-              child: Center(
-            child: CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white),
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: Container(
+                color:
+                    const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
+                child: Center(
+                  child: CircularProgressIndicator(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? primaryColor
+                          : Colors.white),
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
