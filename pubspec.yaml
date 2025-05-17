@@ -24,6 +24,7 @@ dependencies:
   http: ^1.4.0
   url_launcher: ^6.3.1
   flutter_launcher_icons: ^0.14.3
+  easy_localization: ^3.0.7+1
 
 dev_dependencies:
   flutter_test:
@@ -36,6 +37,7 @@ flutter:
     - assets/images/
     - assets/my_model/
     - assets/.env
+    - assets/languages/
 
 flutter_icons:
   android: true

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_pdd/style.dart';
@@ -183,7 +184,7 @@ class _ProfilePageState extends State<ProfilePage>
                     )
                     : _userData == null
                         ? Text(
-                            'User not found.',
+                            'User not found.'.tr(),
                             style: descTextStyleWhite(context,
                                 fontWeight: FontWeight.normal),
                           )
@@ -195,7 +196,7 @@ class _ProfilePageState extends State<ProfilePage>
                                 Padding(
                                   padding: const EdgeInsets.only(top: 24.0),
                                   child: Text(
-                                    'User Profile',
+                                    'User Profile'.tr(),
                                     style: mainTitleTextStyleWhite(context,
                                         fontWeight: FontWeight.bold),
                                   ),
@@ -272,19 +273,19 @@ class _ProfilePageState extends State<ProfilePage>
                                             shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.circular(36.0),
                                             ),
-                                            title: Text('Edit Your Name'),
+                                            title: Text('Edit Your Name'.tr()),
                                             content: TextField(
                                               controller: unameController,
-                                              decoration: InputDecoration(hintText: 'Enter new name'),
+                                              decoration: InputDecoration(hintText: 'Enter new name'.tr()),
                                             ),
                                             actions: [
                                               TextButton(
                                                 onPressed: () => Navigator.pop(context),
-                                                child: Text('Cancel'),
+                                                child: Text('Cancel'.tr()),
                                               ),
                                               TextButton(
                                                 onPressed: () => Navigator.pop(context, unameController.text),
-                                                child: Text('Save'),
+                                                child: Text('Save'.tr()),
                                               ),
                                             ],
                                           ),
@@ -304,7 +305,7 @@ class _ProfilePageState extends State<ProfilePage>
                                                 margin: EdgeInsets.only(
                                                   bottom: bottomNavHeight, // 56 (nav height) + 16 spacing
                                                 ),
-                                                content: Text('Name must be 20 characters or less!'),
+                                                content: Text('Name must be 20 characters or less!'.tr()),
                                               ),
                                             );
                                             return; // Stop further execution
@@ -335,7 +336,7 @@ class _ProfilePageState extends State<ProfilePage>
                                                 margin: EdgeInsets.only(
                                                   bottom: bottomNavHeight, // 56 (nav height) + 16 spacing
                                                 ),
-                                                content: Text('Name updated!')
+                                                content: Text('Name updated!'.tr())
                                               ),
                                             );
                                           } catch (e) {
@@ -352,7 +353,7 @@ class _ProfilePageState extends State<ProfilePage>
                                                 margin: EdgeInsets.only(
                                                   bottom: bottomNavHeight, // 56 (nav height) + 16 spacing
                                                 ),
-                                                content: Text('Failed to update name: $e')
+                                                content: Text('Failed to update name:'.tr() + ' $e')
                                               ),
                                             );
                                           } finally {
@@ -387,7 +388,7 @@ class _ProfilePageState extends State<ProfilePage>
                             SizedBox(height: 16),
                             Center(
                               child: Text(
-                                'Welcome, ${_userData?['username'] ?? 'User'}!',
+                                'Welcome,'.tr() + ' ${_userData?['username'] ?? 'User'}!',
                                 style: TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.bold),
                               ),
@@ -418,7 +419,7 @@ class _ProfilePageState extends State<ProfilePage>
                                     child: Column(
                                       children: [
                                         Text(
-                                          'Your Gallery',
+                                          'Your Gallery'.tr(),
                                           style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
@@ -433,14 +434,80 @@ class _ProfilePageState extends State<ProfilePage>
                                           TextSpan(
                                             children: <TextSpan>[
                                               TextSpan(
-                                                text: '${galleryCount ?? 0}',
+                                                text: '${galleryCount ?? 0} ',
                                                 style: TextStyle(
                                                     fontSize: 56,
                                                     fontWeight:
                                                         FontWeight.bold),
                                               ),
                                               TextSpan(
-                                                text: ' images',
+                                                text: 'images'.tr(),
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                      .brightness ==
+                                                  Brightness.dark
+                                              ? primaryColor
+                                              : Colors.white
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.all(24),
+                              margin: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.grey[200]
+                                    : primaryColor,
+                                borderRadius: BorderRadius.circular(36),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.3),
+                                    blurRadius: 4,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          'Your Gallery'.tr(),
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.dark
+                                                  ? primaryColor
+                                                  : Colors.white),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text.rich(
+                                          TextSpan(
+                                            children: <TextSpan>[
+                                              TextSpan(
+                                                text: '${galleryCount ?? 0} ',
+                                                style: TextStyle(
+                                                    fontSize: 56,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              TextSpan(
+                                                text: 'images'.tr(),
                                                 style: TextStyle(fontSize: 16),
                                               ),
                                             ],
@@ -488,21 +555,21 @@ class _ProfilePageState extends State<ProfilePage>
                     Icons.camera_alt,
                     size: 24.0,
                   ),
-                  label: 'Camera',
+                  label: 'Camera'.tr(),
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(
                     Icons.photo,
                     size: 24.0,
                   ),
-                  label: 'Gallery',
+                  label: 'Gallery'.tr(),
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(
                     Icons.person,
                     size: 24.0,
                   ),
-                  label: 'Profile',
+                  label: 'Profile'.tr(),
                 ),
               ],
               onTap: (index) {

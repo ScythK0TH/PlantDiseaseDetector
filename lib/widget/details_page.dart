@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_pdd/style.dart';
@@ -111,7 +112,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     ),
                   ),
                   Center(
-                    child: Text('Image Details',
+                    child: Text('Image Details'.tr(),
                         style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold)),
                   ),
                   Align(
@@ -178,16 +179,16 @@ class _DetailsPageState extends State<DetailsPage> {
                           ),
                   ),
                   SizedBox(height: 20),
-                  Text('Date: ${plant['date'] ?? 'Unknown'}',
+                  Text('Date'.tr() + ': ${plant['date'] ?? 'Unknown'}',
                       style: TextStyle(fontSize: 18)),
                   SizedBox(height: 10),
-                  Text('Predict: ${plant['predict'] ?? 'Unknown'}',
+                  Text('Predict'.tr() + ': ${plant['predict'] ?? 'Unknown'}',
                       style: TextStyle(fontSize: 18)),
                   SizedBox(height: 10),
-                  Text('Treatment: ${(plant['treatment']) ?? 'Unknown'}',
+                  Text('Treatment'.tr() + ': ${(plant['treatment']) ?? 'Unknown'}',
                       style: TextStyle(fontSize: 18)),
                   SizedBox(height: 10),
-                  Text('Prevention: ${(plant['prevention']) ?? 'Unknown'}',
+                  Text('Prevention'.tr() + ': ${(plant['prevention']) ?? 'Unknown'}',
                       style: TextStyle(fontSize: 18)),
                 ],
               ),
@@ -204,7 +205,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
                     foregroundColor: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
                     icon: const Icon(Icons.support_agent),
-                    label: const Text('Assistance'),
+                    label: const Text('Assistance').tr(),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -228,19 +229,19 @@ class _DetailsPageState extends State<DetailsPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(36.0),
                         ),
-                        title: Text('Edit Title'),
+                        title: Text('Edit Title'.tr()),
                         content: TextField(
                           controller: titleController,
-                          decoration: InputDecoration(hintText: 'Enter new title'),
+                          decoration: InputDecoration(hintText: 'Enter new title'.tr()),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text('Cancel'),
+                            child: Text('Cancel'.tr()),
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(context, titleController.text),
-                            child: Text('Save'),
+                            child: Text('Save'.tr()),
                           ),
                         ],
                       ),
@@ -256,7 +257,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                 topRight: Radius.circular(12.0),
                               ),
                             ),
-                            content: Text('Title must be 15 characters or less!'),
+                            content: Text('Title must be 15 characters or less!'.tr()),
                           ),
                         );
                         return; // Stop further execution
@@ -283,7 +284,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                 topRight: Radius.circular(12.0),
                               ),
                             ),
-                            content: Text('Title updated!')
+                            content: Text('Title updated!'.tr())
                           ),
                         );
                       } catch (e) {
@@ -296,7 +297,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                 topRight: Radius.circular(12.0),
                               ),
                             ),
-                            content: Text('Failed to update title: $e')
+                            content: Text('Failed to update title:'.tr() + ' $e')
                           ),
                         );
                       } finally {

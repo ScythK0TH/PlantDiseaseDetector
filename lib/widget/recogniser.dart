@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
@@ -63,7 +64,7 @@ class _RecogniserState extends State<Recogniser> {
                   ),
                   Center(
                     child: Text(
-                      'Plant Analyzer',
+                      'Plant Analyzer'.tr(),
                       style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -93,17 +94,17 @@ class _RecogniserState extends State<Recogniser> {
                     const SizedBox(height: 20),
                     if (state.status != RecogniserStatus.analyzing) ...[
                       if (state.status == RecogniserStatus.found) ...[
-                      _buildResultButton(context, 'Save Result',
+                      _buildResultButton(context, 'Save Result'.tr(),
                         screenWidth, false, 'save', state),
                       const SizedBox(height: 20),
-                      _buildResultButton(context, 'Cancel',
+                      _buildResultButton(context, 'Cancel'.tr(),
                         screenWidth, true, 'cancel', state),
                       const SizedBox(height: 20),
                       ] else ...[
-                        _buildPickButton(context, 'Take a photo',
+                        _buildPickButton(context, 'Take a photo'.tr(),
                           ImageSource.camera, screenWidth, false, 'photo'),
                         const SizedBox(height: 20),
-                        _buildPickButton(context, 'Pick from gallery',
+                        _buildPickButton(context, 'Pick from gallery'.tr(),
                             ImageSource.gallery, screenWidth, true, 'gallery'),
                         const SizedBox(height: 20),
                       ],
@@ -127,21 +128,21 @@ class _RecogniserState extends State<Recogniser> {
                 Icons.camera_alt,
                 size: 24.0,
               ),
-              label: 'Camera',
+              label: 'Camera'.tr(),
             ),
             BottomNavigationBarItem(
               icon: Icon(
                 Icons.photo,
                 size: 24.0,
               ),
-              label: 'Gallery',
+              label: 'Gallery'.tr(),
             ),
             BottomNavigationBarItem(
               icon: Icon(
                 Icons.person,
                 size: 24.0,
               ),
-              label: 'Profile',
+              label: 'Profile'.tr(),
             ),
           ],
           onTap: (index) {
@@ -182,7 +183,7 @@ class _RecogniserState extends State<Recogniser> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Analyzing...',
+            'Analyzing...'.tr(),
             style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
           ),
         ],
@@ -207,7 +208,7 @@ class _RecogniserState extends State<Recogniser> {
       final textPainter = TextPainter(
         text: TextSpan(text: text, style: style),
         maxLines: 1000,
-        textDirection: TextDirection.ltr,
+        textDirection: Directionality.of(context),
       )..layout(maxWidth: maxWidth);
 
       final words = text.split(' ');

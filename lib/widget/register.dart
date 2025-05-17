@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:bcrypt/bcrypt.dart';
@@ -16,9 +17,9 @@ class RegisApp extends StatefulWidget {
 
 class _RegisAppState extends State<RegisApp> {
   final List<String> textSequence = [
-    "Register Today!",
-    "Check Disease",
-    "For your plant"
+    "Register Today!".tr(),
+    "Check Disease".tr(),
+    "For your plant".tr()
   ];
   bool _isObscure1 = true;
   bool _isObscure2 = true;
@@ -153,7 +154,7 @@ class _RegisAppState extends State<RegisApp> {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      "Create your account",
+                      "Create your account".tr(),
                       style: descTextStyleDark(context, fontWeight: FontWeight.normal),
                     ),
                   ],
@@ -180,9 +181,9 @@ class _RegisAppState extends State<RegisApp> {
                           fillColor: Theme.of(context).brightness == Brightness.dark
                               ? primaryColor
                               : Colors.white,
-                          hintText: "Enter your email",
+                          hintText: "Enter your email".tr(),
                           hintStyle: subDescTextStyleDark(context, fontWeight: FontWeight.normal),
-                          errorText: _emailErrorMessage,
+                          errorText: _emailErrorMessage?.tr(),
                         ),
                         onChanged: (_) => _validateForm(),
                       ),
@@ -203,7 +204,7 @@ class _RegisAppState extends State<RegisApp> {
                           fillColor: Theme.of(context).brightness == Brightness.dark
                               ? primaryColor
                               : Colors.white,
-                          hintText: "Enter your password",
+                          hintText: "Enter your password".tr(),
                           hintStyle: subDescTextStyleDark(context, fontWeight: FontWeight.normal),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -237,7 +238,7 @@ class _RegisAppState extends State<RegisApp> {
                           fillColor: Theme.of(context).brightness == Brightness.dark
                               ? primaryColor
                               : Colors.white,
-                          hintText: "Confirm your password",
+                          hintText: "Confirm your password".tr(),
                           hintStyle: subDescTextStyleDark(context, fontWeight: FontWeight.normal),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -251,7 +252,7 @@ class _RegisAppState extends State<RegisApp> {
                               });
                             },
                           ),
-                          errorText: _passwordErrorMessage,
+                          errorText: _passwordErrorMessage?.tr(),
                         ),
                         onChanged: (_) => _validateForm(),
                       ),
@@ -280,7 +281,7 @@ class _RegisAppState extends State<RegisApp> {
                       child: Container(
                         alignment: Alignment.center,
                         width: 100,
-                        child: Text("Register",
+                        child: Text("Register".tr(),
                             style: TextStyle(
                                 fontSize: 15.0,
                                 color: Theme.of(context).brightness == Brightness.dark
@@ -295,12 +296,12 @@ class _RegisAppState extends State<RegisApp> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Already have an account?",
+                        Text("Already have an account?".tr(),
                             style: subDescTextStyleDark(context, fontWeight: FontWeight.normal)),
                         Container(
                           alignment: Alignment.centerRight,
                           child: TextButton(
-                            child: Text("Login now",
+                            child: Text("Login now".tr(),
                                 style: subSuccessTextStyle(fontWeight: FontWeight.bold)),
                             onPressed: () {
                               Navigator.pop(context);

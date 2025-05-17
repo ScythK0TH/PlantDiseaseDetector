@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/storage_page.dart';
@@ -16,10 +17,10 @@ class FirstPageScreen extends StatefulWidget {
 
 class FirstPageScreenState extends State<FirstPageScreen> {
   final List<String> textSequence = [
-    "Welcome to our app!!",
-    "Let's get started!!",
-    "Build something great!!",
-    "Join us today!!"
+    "Welcome to our app!!".tr(),
+    "Let's get started!!".tr(),
+    "Build something great!!".tr(),
+    "Join us today!!".tr()
   ];
   int index = 0;
 
@@ -78,7 +79,7 @@ class FirstPageScreenState extends State<FirstPageScreen> {
               // เพิ่มชื่อแอพใต้ภาพ
               Padding(
                 padding: EdgeInsets.only(top: 10.0),
-                child: Text('ใบรู้โรค',
+                child: Text('BaiRooRok'.tr(),
                     style: mainTitleTextStyleFirst(context,
                         fontWeight: FontWeight.bold)),
               ),
@@ -166,7 +167,7 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                           );
                         },
                         child: Text(
-                          'Sign Up',
+                          'Sign Up'.tr(),
                           style: descTextStyleDark(context,
                               fontWeight: FontWeight.normal),
                         ),
@@ -223,7 +224,7 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                           );
                         },
                         child: Text(
-                          'Log In',
+                          'Log In'.tr(),
                           style: descTextStyleWhite(context,
                               fontWeight: FontWeight.normal),
                         ),
@@ -263,7 +264,7 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                           );
                         },
                         child: Text(
-                          'Term of Service',
+                          'Term of Service'.tr(),
                           style: subDescTextStyleDark(context,
                               fontWeight: FontWeight.bold),
                         ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
@@ -139,8 +140,8 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
           final shouldExit = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-              title: Text('Exit'),
-              content: Text('Are you sure you want to logout?'),
+              title: Text('Exit').tr(),
+              content: Text('Are you sure you want to logout?').tr(),
               backgroundColor: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(36.0),
@@ -148,14 +149,14 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: Text('Cancel'),
+                  child: Text('Cancel').tr(),
                 ),
                 TextButton(
                   onPressed: () {
                     clearLoginState(); // ฟังก์ชันของคุณ
                     SystemNavigator.pop();
                   },
-                  child: Text('Logout'),
+                  child: Text('Logout').tr(),
                 ),
               ],
             ),
@@ -184,7 +185,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                       controller: _searchController,
                       autofocus: true,
                       decoration: InputDecoration(
-                        hintText: 'Search plants...',
+                        hintText: 'Search plants...'.tr(),
                         border: InputBorder.none,
                       ),
                       onChanged: _onSearchChanged, // Use the debounced function
@@ -192,7 +193,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                   )
                 else
                   Text(
-                    'Gallery',
+                    'Gallery'.tr(),
                     style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
                   ),
                 Spacer(),
@@ -237,7 +238,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
         body: _isLoading
             ? Center(child: CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor))
             : _plants.isEmpty
-                ? Center(child: Text('No plants found.'))
+                ? Center(child: Text('No plants found.').tr())
                 : Container(
                     width: double.infinity, // ยืดความกว้างให้เต็มที่
                     height: double.infinity, // ยืดความสูงให้เต็มที่
@@ -264,7 +265,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                   });
                                 },
                                 child: Text(
-                                  'Latest',
+                                  'Latest'.tr(),
                                   style: selectedButton == 'Latest'
                                       ? successTextStyle(fontWeight: FontWeight.bold)
                                       : descTextStyleDark(context,
@@ -280,7 +281,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                   });
                                 },
                                 child: Text(
-                                  'All',
+                                  'All'.tr(),
                                   style: selectedButton == 'All'
                                       ? successTextStyle(fontWeight: FontWeight.bold)
                                       : descTextStyleDark(context,
@@ -366,7 +367,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                       SizedBox(height: 8.0),
                                       // แสดงชื่อของ plant
                                       Text(
-                                        plant['title'] ?? 'Unknown Plant',
+                                        plant['title'] ?? 'Unknown Plant'.tr(),
                                         style: descTextStyleDark(context,
                                             fontWeight: FontWeight.normal),
                                         textAlign: TextAlign.center,
@@ -395,21 +396,21 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                 Icons.camera_alt,
                 size: 24.0,
               ),
-              label: 'Camera',
+              label: 'Camera'.tr(),
             ),
             BottomNavigationBarItem(
               icon: Icon(
                 Icons.photo,
                 size: 24.0,
               ),
-              label: 'Gallery',
+              label: 'Gallery'.tr(),
             ),
             BottomNavigationBarItem(
               icon: Icon(
                 Icons.person,
                 size: 24.0,
               ),
-              label: 'Profile',
+              label: 'Profile'.tr(),
             ),
           ],
           onTap: (index) {

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
   final TextEditingController _controller = TextEditingController();
   String? responseText;
   bool isLoading = false;
+  String language = 'en'; // Default language is English
 
   // MongoDB connection string and collection name
   final String mongoUri = MONGO_URL; // <-- change to your MongoDB URI
@@ -121,6 +123,7 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
 7. ไม่มีตัวตนของ AI: ห้ามพูดถึงตัวเอง (เช่น "ฉันถูกสร้างโดย...") หรือแสดงอารมณ์ส่วนตัว เช่น ความเห็น ความรู้สึก หรือความชอบ
 เป้าหมาย: เพื่อให้คำปรึกษาด้านเกษตรที่แม่นยำ เป็นประโยชน์ และปลอดภัยแก่ผู้ใช้
 คุณต้องยึดถือกฎเหล่านี้ทุกครั้งในการตอบคำถาม และห้ามละเมิดโดยเด็ดขาด
+คุณจะตอบเป็นภาษา $language
 ''',
           }
         ]
@@ -270,9 +273,10 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    language = context.locale.languageCode;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Assistant'),
+        title: Text('Assistant'.tr()),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -359,8 +363,8 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
               Expanded(
                 child: TextField(
                   controller: _controller,
-                  decoration: const InputDecoration(
-                    hintText: 'พิมพ์ข้อความ...',
+                  decoration: InputDecoration(
+                    hintText: 'Ask me about your plant'.tr(),
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.symmetric(vertical: 8),

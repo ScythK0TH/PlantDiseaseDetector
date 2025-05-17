@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
@@ -24,8 +25,8 @@ class LoginAppState extends State<LoginApp> {
   final _passwordController = TextEditingController();
 
   final List<String> textSequence = [
-    "Welcome to our app",
-    "Let's get started!!"
+    "Welcome to our app!!".tr(),
+    "Let's get started!!".tr()
   ];
   int index = 0;
 
@@ -154,7 +155,7 @@ class LoginAppState extends State<LoginApp> {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      "Sign into your account",
+                      "Sign into your account".tr(),
                       style: descTextStyleDark(context,
                           fontWeight: FontWeight.normal),
                     ),
@@ -184,7 +185,7 @@ class LoginAppState extends State<LoginApp> {
                                   BorderRadius.all(Radius.circular(36.0))),
                           filled: true,
                           fillColor: Colors.white,
-                          hintText: "Enter your email",
+                          hintText: "Enter your email".tr(),
                           hintStyle: subDescTextStyleDark(context,
                               fontWeight: FontWeight.normal),
                         ),
@@ -211,7 +212,7 @@ class LoginAppState extends State<LoginApp> {
                               Theme.of(context).brightness == Brightness.dark
                                   ? primaryColor
                                   : Colors.white,
-                          hintText: "Enter your password",
+                          hintText: "Enter your password".tr(),
                           hintStyle: subDescTextStyleDark(context,
                               fontWeight: FontWeight.normal),
                           suffixIcon: IconButton(
@@ -233,7 +234,7 @@ class LoginAppState extends State<LoginApp> {
                       Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Text(
-                          _errorMessage!,
+                          _errorMessage!.tr(),
                           style: TextStyle(color: Colors.red),
                         ),
                       ),
@@ -260,19 +261,19 @@ class LoginAppState extends State<LoginApp> {
                       child: Container(
                           alignment: Alignment.center,
                           width: 100,
-                          child: Text("Login",
+                          child: Text("Login".tr(),
                               style: TextStyle(
                                   fontSize: 15.0, color: Colors.white)))),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Don't have an account?",
+                      Text("Don't have an account?".tr(),
                           style: subDescTextStyleDark(context,
                               fontWeight: FontWeight.normal)),
                       Container(
                           alignment: Alignment.centerRight,
                           child: TextButton(
-                            child: Text("Register now",
+                            child: Text("Register now".tr(),
                                 style: subSuccessTextStyle(
                                     fontWeight: FontWeight.bold)),
                             onPressed: () {

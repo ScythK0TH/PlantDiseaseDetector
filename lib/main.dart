@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,6 +20,7 @@ Future<String?> getSavedUserId() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
   final userId = await getSavedUserId();
   // Set the preferred orientations to portrait mode only
   SystemChrome.setPreferredOrientations([
@@ -26,7 +28,12 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
   await dotenv.load(fileName: "assets/.env");
-  runApp(MainApp(userId: userId));
+  runApp(EasyLocalization(
+    supportedLocales: const [Locale('en', 'US'), Locale('th', 'TH')],
+    path: 'assets/languages',
+    fallbackLocale: const Locale('en', 'US'),
+    startLocale: const Locale('th', 'TH'),
+    child: MainApp(userId: userId)));
 }
 
 class MainApp extends StatelessWidget {
@@ -75,6 +82,9 @@ class MainApp extends StatelessWidget {
           home: userId == null
               ? FirstPageScreen()
               : StoragePage(userId: userId!),
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
         );
       },
     );
