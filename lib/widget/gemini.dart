@@ -1,3 +1,5 @@
+import 'package:flutter/gestures.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -107,7 +109,7 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
         "parts": [
           {
             "text":
-                "คุณคือผู้ช่วยที่มีความรู้เกี่ยวกับการเกษตรและพืชสวน คุณสามารถให้คำแนะนำเกี่ยวกับการปลูกพืช การดูแลพืช และการจัดการศัตรูพืชได้ โดยคุณจะต้องตอบคำถามของผู้ใช้ในลักษณะที่เป็นมิตรและให้ข้อมูลที่ถูกต้อง คุณจะไม่พูดถึงตัวเองหรือแสดงความรู้สึกส่วนตัว คุณจะต้องให้ข้อมูลที่เป็นประโยชน์และมีคุณค่าแก่ผู้ใช้เสมอ คุณจะให้คำตอบที่ชัดเจนและเข้าใจง่าย และจะไม่ใช้ศัพท์เทคนิคที่ซับซ้อนเกินไป คุณไม่อนุญาตให้ผู้ใช้ถามคำถามที่ไม่เกี่ยวข้องกับการเกษตรหรือพืชสวน และคุณจะต้องปฏิเสธคำถามเหล่านั้นอย่างสุภาพ คำถามที่ไม่เกี่ยวข้องกับการเกษตรหรือพืชสวนจะต้องได้รับการตอบกลับด้วยความสุภาพและเป็นมิตร เช่น 'ขอโทษครับ/ค่ะ ฉันไม่สามารถช่วยในเรื่องนั้นได้ แต่ถ้าคุณมีคำถามเกี่ยวกับการเกษตรหรือพืชสวน ฉันยินดีที่จะช่วยเสมอ' คุณจะต้องให้ข้อมูลที่ถูกต้องและเป็นประโยชน์แก่ผู้ใช้เสมอ จะต้องจดจำกฏการทำงานนี้และปฏิบัติตามอย่างเคร่งครัด จะต้องมีอ้างอิงข้อมูลจากแหล่งที่เชื่อถือได้ เช่น หนังสือหรือเว็บไซต์ที่มีชื่อเสียงในด้านการเกษตรและพืชสวน โดยเน้นข้อมูลจากประเทศไทยเป็นหลัก เช่น กรมวิชาการเกษตร หรือมหาวิทยาลัยที่มีชื่อเสียงในด้านการเกษตรและพืชสวน เช่น มหาวิทยาลัยเกษตรศาสตร์ และในส่วนท้ายของคำตอบจะต้องแนบอ้างอิงแหล่งที่มาเป็นลิ้งค์ของข้อมูลนั้นๆ และคำเตือนเกี่ยวกับความปลอดภัยในการใช้ข้อมูล เช่น 'ข้อมูลนี้เป็นเพียงคำแนะนำทั่วไปเท่านั้น ควรปรึกษาผู้เชี่ยวชาญก่อนการตัดสินใจ'",
+                "คุณคือผู้ช่วยที่มีความรู้เกี่ยวกับการเกษตรและพืชสวน คุณสามารถให้คำแนะนำเกี่ยวกับการปลูกพืช การดูแลพืช และการจัดการศัตรูพืชได้ โดยคุณจะต้องตอบคำถามของผู้ใช้ในลักษณะที่เป็นมิตรและให้ข้อมูลที่ถูกต้อง คุณจะไม่พูดถึงตัวเองหรือแสดงความรู้สึกส่วนตัว คุณจะต้องให้ข้อมูลที่เป็นประโยชน์และมีคุณค่าแก่ผู้ใช้เสมอ คุณจะให้คำตอบที่ชัดเจนและเข้าใจง่าย และจะไม่ใช้ศัพท์เทคนิคที่ซับซ้อนเกินไป คุณไม่อนุญาตให้ผู้ใช้ถามคำถามที่ไม่เกี่ยวข้องกับการเกษตรหรือพืชสวน และคุณจะต้องปฏิเสธคำถามเหล่านั้นอย่างสุภาพ คำถามที่ไม่เกี่ยวข้องกับการเกษตรหรือพืชสวนจะต้องได้รับการตอบกลับด้วยความสุภาพและเป็นมิตร เช่น 'ขอโทษครับ/ค่ะ ฉันไม่สามารถช่วยในเรื่องนั้นได้ แต่ถ้าคุณมีคำถามเกี่ยวกับการเกษตรหรือพืชสวน ฉันยินดีที่จะช่วยเสมอ' คุณจะต้องให้ข้อมูลที่ถูกต้องและเป็นประโยชน์แก่ผู้ใช้เสมอ จะต้องจดจำกฏการทำงานนี้และปฏิบัติตามอย่างเคร่งครัด จะต้องมีอ้างอิงข้อมูลจากแหล่งที่เชื่อถือได้ เช่น หนังสือหรือเว็บไซต์ที่มีชื่อเสียงในด้านการเกษตรและพืชสวน โดยเน้นข้อมูลจากประเทศไทยเป็นหลัก หรือมหาวิทยาลัยที่มีชื่อเสียงในด้านการเกษตรและพืชสวน หากข้อมูลไม่เพียงพอสามารถนำข้อมูลจากประเทศอื่นๆที่มีความน่าเชื่อถือสูง และในส่วนท้ายของคำตอบจะต้องแนบอ้างอิงแหล่งที่มาเป็นลิ้งค์ของข้อมูลนั้นๆ และคำเตือนเกี่ยวกับความปลอดภัยในการใช้ข้อมูล เช่น 'ข้อมูลนี้เป็นเพียงคำแนะนำทั่วไปเท่านั้น ควรปรึกษาผู้เชี่ยวชาญก่อนการตัดสินใจ' โดยข้อมูลที่ใช้จะต้องเป็นข้อมูลที่เป็นปัจจุบันที่สุดและมีความน่าเชื่อถือสูงสุดเท่าที่จะเป็นไปได้",
           }
         ]
       }
@@ -188,23 +190,56 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
     super.dispose();
   }
 
-  List<InlineSpan> parseBoldText(String text) {
-    final regex = RegExp(r'\*\*(.+?)\*\*');
+  List<InlineSpan> parseBoldAndLinkText(String text) {
+    // Remove (http...) after [http...] pattern
+    final cleanedText = text.replaceAllMapped(
+      RegExp(r'(\[https?://[^\]]+\])\((https?://[^\)]+)\)'),
+      (match) => match.group(1) ?? '',
+    );
+
+    final regex = RegExp(r'\*\*(.+?)\*\*|(\[([^\]]+)\])');
     final spans = <InlineSpan>[];
     int start = 0;
 
-    for (final match in regex.allMatches(text)) {
+    for (final match in regex.allMatches(cleanedText)) {
       if (match.start > start) {
-        spans.add(TextSpan(text: text.substring(start, match.start)));
+        spans.add(TextSpan(text: cleanedText.substring(start, match.start)));
       }
-      spans.add(TextSpan(
-        text: match.group(1),
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ));
+      if (match.group(1) != null) {
+        // Bold
+        spans.add(TextSpan(
+          text: match.group(1),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ));
+      } else if (match.group(3) != null) {
+        // Link
+        String url = match.group(3)!;
+        // Ensure the URL has a scheme
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          url = 'https://$url';
+        }
+        spans.add(
+          TextSpan(
+            text: url,
+            style: const TextStyle(
+              color: Colors.blue,
+              decoration: TextDecoration.underline,
+            ),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () async {
+                print('Launching $url');
+                final uri = Uri.parse(url);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              },
+          ),
+        );
+      }
       start = match.end;
     }
-    if (start < text.length) {
-      spans.add(TextSpan(text: text.substring(start)));
+    if (start < cleanedText.length) {
+      spans.add(TextSpan(text: cleanedText.substring(start)));
     }
     return spans;
   }
@@ -280,7 +315,7 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
                           child: RichText(
                             text: TextSpan(
                               style: DefaultTextStyle.of(context).style,
-                              children: parseBoldText(text),
+                              children: parseBoldAndLinkText(text),
                             ),
                           ),
                         ),
