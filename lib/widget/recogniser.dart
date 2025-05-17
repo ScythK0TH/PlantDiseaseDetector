@@ -57,8 +57,13 @@ class _RecogniserState extends State<Recogniser> {
                         color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
                         size: 24.0,
                       ),
-                      onPressed: () {
-                        Navigator.pop(context);
+                        onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                          builder: (context) => StoragePage(userId: widget.userId),
+                          ),
+                        );
                       },
                     ),
                   ),
@@ -148,7 +153,7 @@ class _RecogniserState extends State<Recogniser> {
           onTap: (index) {
             switch (index) {
               case 1:
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                     builder: (context) => StoragePage(userId: widget.userId),
@@ -156,7 +161,7 @@ class _RecogniserState extends State<Recogniser> {
                 );
                 break;
               case 2:
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => ProfilePage(userId: widget.userId), // Pass userId to Recogniser

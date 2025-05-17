@@ -121,7 +121,12 @@ class _ProfilePageState extends State<ProfilePage>
               elevation: 0,
               leading: IconButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                    builder: (context) => StoragePage(userId: widget.userId),
+                    ),
+                  );
                 },
                 icon: Icon(Icons.arrow_circle_left_rounded,
                     color: Theme.of(context).brightness == Brightness.dark
@@ -670,7 +675,7 @@ class _ProfilePageState extends State<ProfilePage>
               onTap: (index) {
                 switch (index) {
                   case 0:
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (context) => Recogniser(userId: widget.userId),
@@ -678,7 +683,7 @@ class _ProfilePageState extends State<ProfilePage>
                     );
                     break;
                   case 1:
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
