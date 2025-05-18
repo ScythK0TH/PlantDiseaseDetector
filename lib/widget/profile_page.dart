@@ -187,14 +187,11 @@ class _ProfilePageState extends State<ProfilePage>
                   .clamp(0.0, 1.0);
               return Center(
                 child: _isLoading
-                    ? Container(
-                        margin: EdgeInsets.only(bottom: bottomNavHeight + 24),
-                        child: CircularProgressIndicator(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : primaryColor),
-                      )
+                    ? CircularProgressIndicator(
+                        color:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : primaryColor)
                     : _userData == null
                         ? Text(
                             'User not found.'.tr(),
@@ -261,7 +258,7 @@ class _ProfilePageState extends State<ProfilePage>
                               BorderRadius.vertical(top: Radius.circular(36)),
                         ),
                         padding: EdgeInsets.fromLTRB(
-                            24.0, 24.0, 24.0, bottomNavHeight + 16),
+                            24.0, 24.0, 24.0, 0),
                         child: ListView(
                           controller: scrollController,
                           children: [
