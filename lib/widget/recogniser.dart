@@ -49,19 +49,6 @@ class _RecogniserState extends State<Recogniser> {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.arrow_circle_left_rounded,
-                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-                        size: 24.0,
-                      ),
-                        onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
                   Center(
                     child: Text(
                       'Plant Analyzer'.tr(),
@@ -72,7 +59,7 @@ class _RecogniserState extends State<Recogniser> {
               ),
             ),
           ),
-          centerTitle: true, // ไม่จำเป็นมากเพราะจัดตำแหน่งเองแล้ว
+          centerTitle: true,
         ),
         body: BlocBuilder<RecogniserBloc, RecogniserState>(
           builder: (context, state) {
@@ -113,52 +100,6 @@ class _RecogniserState extends State<Recogniser> {
                 ),
               ),
             );
-          },
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          currentIndex: 0,
-          selectedItemColor: successColor,
-          unselectedItemColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-          showSelectedLabels: true,
-          showUnselectedLabels: true,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.camera_alt,
-                size: 24.0,
-              ),
-              label: 'Camera'.tr(),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.photo,
-                size: 24.0,
-              ),
-              label: 'Gallery'.tr(),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.person,
-                size: 24.0,
-              ),
-              label: 'Profile'.tr(),
-            ),
-          ],
-          onTap: (index) {
-            switch (index) {
-              case 1:
-                Navigator.pop(context);
-                break;
-              case 2:
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProfilePage(userId: widget.userId), // Pass userId to Recogniser
-                    ),
-                  );
-                break;
-            }
           },
         ),
       ),

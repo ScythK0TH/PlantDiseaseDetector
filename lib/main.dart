@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:project_pdd/home.dart';
 import 'package:project_pdd/style.dart';
 import 'package:flutter/services.dart';
 import 'package:project_pdd/widget/first_page.dart';
@@ -97,7 +98,7 @@ class MainApp extends StatelessWidget {
           navigatorObservers: [routeObserver],
           home: userId == null
               ? FirstPageScreen()
-              : StoragePage(userId: userId!),
+              : HomePage(userId: userId!),
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,

@@ -141,15 +141,6 @@ class _ProfilePageState extends State<ProfilePage>
                   ? SystemUiOverlayStyle.dark
                   : SystemUiOverlayStyle.light,
               elevation: 0,
-              leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.arrow_circle_left_rounded,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? primaryColor
-                        : Colors.white),
-              ),
               title: Transform.translate(
                 offset: Offset(0, -40 * (1 - tTitle)), // Slide from above
                 child: Opacity(
@@ -653,61 +644,6 @@ class _ProfilePageState extends State<ProfilePage>
                 ),
               ),
             ),
-          // BottomNavigationBar as top-most widget
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: BottomNavigationBar(
-              type: BottomNavigationBarType.fixed,
-              currentIndex: 2,
-              selectedItemColor: successColor,
-              unselectedItemColor:
-                  Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : primaryColor,
-              showSelectedLabels: true,
-              showUnselectedLabels: true,
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.camera_alt,
-                    size: 24.0,
-                  ),
-                  label: 'Camera'.tr(),
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.photo,
-                    size: 24.0,
-                  ),
-                  label: 'Gallery'.tr(),
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.person,
-                    size: 24.0,
-                  ),
-                  label: 'Profile'.tr(),
-                ),
-              ],
-              onTap: (index) {
-                switch (index) {
-                  case 0:
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Recogniser(userId: widget.userId),
-                      ),
-                    );
-                    break;
-                  case 1:
-                    Navigator.pop(context);
-                    break;
-                }
-              },
-            ),
-          ),
           if (_isUpdating)
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),

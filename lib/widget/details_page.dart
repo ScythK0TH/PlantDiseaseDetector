@@ -319,57 +319,6 @@ class _DetailsPageState extends State<DetailsPage> {
               ],
             ),
           ),
-          bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            currentIndex: 1,
-            selectedItemColor: successColor,
-            unselectedItemColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-            showSelectedLabels: true,
-            showUnselectedLabels: true,
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.camera_alt,
-                  size: 24.0,
-                ),
-                label: 'Camera'.tr(),
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.photo,
-                  size: 24.0,
-                ),
-                label: 'Gallery'.tr(),
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.person,
-                  size: 24.0,
-                ),
-                label: 'Profile'.tr(),
-              ),
-            ],
-            onTap: (index) {
-              switch (index) {
-                case 0:
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Recogniser(userId: userId),
-                    ),
-                  );
-                  break;
-                case 2:
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProfilePage(userId: widget.userId), // Pass userId to Recogniser
-                    ),
-                  );
-                  break;
-              }
-            },
-          ),
         ),
         if (_isUpdating)
           BackdropFilter(
