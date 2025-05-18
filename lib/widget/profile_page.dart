@@ -449,6 +449,7 @@ class _ProfilePageState extends State<ProfilePage>
                                         onPressed: () {
                                           themeModeNotifier.value =
                                               ThemeMode.light;
+                                          saveThemeMode(ThemeMode.light);
                                           _ProfilePageState._cachedUserData = null;
                                           _ProfilePageState._cachedGalleryCount = null;
                                           clearLoginState().then((_) {
