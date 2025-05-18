@@ -58,12 +58,7 @@ class _RecogniserState extends State<Recogniser> {
                         size: 24.0,
                       ),
                         onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                          builder: (context) => StoragePage(userId: widget.userId),
-                          ),
-                        );
+                        Navigator.pop(context);
                       },
                     ),
                   ),
@@ -153,12 +148,7 @@ class _RecogniserState extends State<Recogniser> {
           onTap: (index) {
             switch (index) {
               case 1:
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => StoragePage(userId: widget.userId),
-                  ),
-                );
+                Navigator.pop(context);
                 break;
               case 2:
                   Navigator.pushReplacement(

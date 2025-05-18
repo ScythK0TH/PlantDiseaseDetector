@@ -24,18 +24,16 @@ class StoragePage extends StatefulWidget {
 
 class _StoragePageState extends State<StoragePage> with RouteAware {
   List<Map<String, dynamic>> _plants = [];
+  List<Map<String, dynamic>> _allPlants = [];
   bool _isLoading = false;
   bool _isSearching = false;
-  String _searchText = '';
   final TextEditingController _searchController = TextEditingController();
-  Timer? _debounce;
-  int _searchToken = 0; // Add this line
   String selectedButton = 'Latest';
 
   @override
   void initState() {
     super.initState();
-    _fetchPlants('');
+    _fetchAllPlants();
   }
 
   @override
@@ -48,21 +46,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
   void dispose() {
     routeObserver.unsubscribe(this);
     _searchController.dispose();
-    _debounce?.cancel(); // Cancel debounce timer
     super.dispose();
-  }
-
-  @override
-  void didPopNext() {
-    _fetchPlants(_searchText);
-  }
-
-  void _onSearchChanged(String value) {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 400), () {
-      _searchToken++; // Increment token for each new search
-      _fetchPlants(value, token: _searchToken);
-    });
   }
 
   Future<void> clearLoginState() async {
@@ -70,45 +54,37 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
     await prefs.remove('userId');
   }
 
-  Future<void> _fetchPlants(String search, {int? token}) async {
-    final currentToken = token ?? ++_searchToken;
-    if (!mounted) return;
-    setState(() {
-      _isLoading = true;
-      _searchText = search;
-    });
+  Future<void> _fetchAllPlants() async {
+    setState(() => _isLoading = true);
     try {
       final db = await mongo.Db.create(MONGO_URL);
       await db.open();
       final collection = db.collection('plants');
       final query = {'userId': mongo.ObjectId.fromHexString(widget.userId)};
       final plants = await collection.find(query).toList();
-
-      List<Map<String, dynamic>> filtered;
-      if (search.isNotEmpty) {
-        filtered = plants.where((plant) {
-          final title = plant['title']?.toString().toLowerCase() ?? '';
-          return title.contains(search.toLowerCase());
-        }).toList();
-      } else {
-        filtered = plants;
-      }
-
-      // Only update if this is the latest search
-      if (!mounted || currentToken != _searchToken) return;
+      if (!mounted) return;
       setState(() {
-        _plants = filtered;
+        _allPlants = plants;
+        _plants = plants;
       });
-
       await db.close();
     } catch (e) {
       print('Error fetching plants: $e');
     } finally {
-      if (!mounted || token != null && token != _searchToken) return;
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  void _onSearchChanged(String value) {
+    final search = value.trim().toLowerCase();
+    setState(() {
+      _plants = search.isEmpty
+          ? List<Map<String, dynamic>>.from(_allPlants)
+          : _allPlants.where((plant) {
+              final title = plant['title']?.toString().toLowerCase() ?? '';
+              return title.contains(search);
+            }).toList();
+    });
   }
 
   @override
@@ -153,7 +129,8 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                 ),
                 TextButton(
                   onPressed: () {
-                    clearLoginState(); // ฟังก์ชันของคุณ
+                    clearLoginState();
+                    ProfilePage.clearCache();
                     SystemNavigator.pop();
                   },
                   child: Text('Logout').tr(),
@@ -161,9 +138,8 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
               ],
             ),
           );
-
           if (shouldExit == true) {
-            Navigator.of(context).pop(); // ทำการ pop จริง ๆ ถ้าผู้ใช้กดยืนยัน
+            Navigator.of(context).pop();
           }
         }
       },
@@ -188,7 +164,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                         hintText: 'Search plants...'.tr(),
                         border: InputBorder.none,
                       ),
-                      onChanged: _onSearchChanged, // Use the debounced function
+                      onChanged: _onSearchChanged,
                     ),
                   )
                 else
@@ -203,19 +179,16 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                     onPressed: () {
                       setState(() {
                         _isSearching = false;
-                        _searchText = '';
                         _searchController.clear();
+                        _plants = List<Map<String, dynamic>>.from(_allPlants); // Reset to all plants
                       });
-                      _fetchPlants('');
                     },
                   )
                 else
                   IconButton(
                     icon: Icon(Icons.search, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, size: 24.0),
                     onPressed: () {
-                      setState(() {
-                        _isSearching = true;
-                      });
+                      setState(() => _isSearching = true);
                     },
                   ),
                 IconButton(
@@ -240,136 +213,115 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
             : _plants.isEmpty
                 ? Center(child: Text('No plants found.').tr())
                 : Container(
-                    width: double.infinity, // ยืดความกว้างให้เต็มที่
-                    height: double.infinity, // ยืดความสูงให้เต็มที่
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 24.0), // เพิ่ม padding รอบๆ ListView
+                    width: double.infinity,
+                    height: double.infinity,
+                    padding: EdgeInsets.symmetric(horizontal: 24.0),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(36.0)), // ขอบมน
+                      borderRadius: BorderRadius.all(Radius.circular(36.0)),
                       color: Colors.transparent,
                     ),
                     child: Column(
                       children: [
-                        // ปุ่ม TextButton สำหรับ All และ Latest
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 4.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              // ปุ่ม All
                               TextButton(
                                 onPressed: () {
-                                  setState(() {
-                                    selectedButton =
-                                        'Latest'; // เปลี่ยนสถานะเมื่อกดปุ่ม All
-                                  });
+                                  setState(() => selectedButton = 'Latest');
                                 },
                                 child: Text(
                                   'Latest'.tr(),
                                   style: selectedButton == 'Latest'
                                       ? successTextStyle(fontWeight: FontWeight.bold)
-                                      : descTextStyleDark(context,
-                                          fontWeight: FontWeight.normal),
+                                      : descTextStyleDark(context, fontWeight: FontWeight.normal),
                                 ),
                               ),
-                              // ปุ่ม Latest
                               TextButton(
                                 onPressed: () {
-                                  setState(() {
-                                    selectedButton =
-                                        'All'; // เปลี่ยนสถานะเมื่อกดปุ่ม Latest
-                                  });
+                                  setState(() => selectedButton = 'All');
                                 },
                                 child: Text(
                                   'All'.tr(),
                                   style: selectedButton == 'All'
                                       ? successTextStyle(fontWeight: FontWeight.bold)
-                                      : descTextStyleDark(context,
-                                          fontWeight: FontWeight.normal),
+                                      : descTextStyleDark(context, fontWeight: FontWeight.normal),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        // GridView สำหรับแสดงข้อมูล
                         Expanded(
                           child: GridView.builder(
                             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2, // จำนวนคอลัมน์ในแต่ละแถว
-                              crossAxisSpacing: 8.0, // ช่องว่างระหว่างคอลัมน์
-                              mainAxisSpacing: 8.0, // ช่องว่างระหว่างแถว
-                              childAspectRatio:
-                                  0.8, // ปรับอัตราส่วนของลูกในกริด (ความสูง/ความกว้าง)
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 8.0,
+                              mainAxisSpacing: 8.0,
+                              childAspectRatio: 0.8,
                             ),
                             itemCount: displayPlants.length,
                             itemBuilder: (context, index) {
-                              var plant = displayPlants[index];
+                              final plant = displayPlants[index];
                               return GestureDetector(
                                 onTap: () {
-                                  // เมื่อกดที่ไอเทม จะไปยังหน้า DetailsPage
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => DetailsPage(plant: plant, userId: widget.userId), // Pass userId to DetailsPage
+                                      builder: (context) => DetailsPage(plant: plant, userId: widget.userId),
                                     ),
                                   );
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.circular(36.0), // ขอบมน
-                                    color: Colors.transparent, // ใช้สีพื้นหลังแทนภาพ
+                                    borderRadius: BorderRadius.circular(36.0),
+                                    color: Colors.transparent,
                                   ),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      // แสดงพื้นหลังสีแทนภาพ
-                                      if (plant['image'] == null) // ตรวจสอบว่ามีภาพหรือไม่
+                                      if (plant['image'] == null)
                                         Container(
                                           width: double.infinity,
                                           height: 150.0,
                                           decoration: BoxDecoration(
-                                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, // สีพื้นหลังที่แทนภาพ
-                                            borderRadius:
-                                                BorderRadius.circular(36.0), // ขอบมน
+                                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+                                            borderRadius: BorderRadius.circular(36.0),
                                           ),
                                           child: Center(
                                             child: Icon(
-                                              Icons.image, // ไอคอนแทนภาพ
+                                              Icons.image,
                                               size: 50,
-                                              color: Colors.white, // สีของไอคอน
+                                              color: Colors.white,
                                             ),
                                           ),
                                         )
                                       else
-                                          Container(
+                                        Container(
                                           width: double.infinity,
                                           height: 150.0,
                                           decoration: BoxDecoration(
-                                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, // สีพื้นหลังที่แทนภาพ
-                                            borderRadius:
-                                              BorderRadius.circular(36.0), // ขอบมน
+                                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+                                            borderRadius: BorderRadius.circular(36.0),
                                           ),
-                                          clipBehavior: Clip.antiAlias, // Ensure child respects borderRadius
+                                          clipBehavior: Clip.antiAlias,
                                           child: Image.memory(
                                             base64Decode(plant['image']),
                                             fit: BoxFit.cover,
                                             width: double.infinity,
                                             height: 150.0,
                                             errorBuilder: (context, error, stackTrace) {
-                                            return Icon(
-                                              Icons.error,
-                                              color: Colors.red,
-                                            );
+                                              return Icon(
+                                                Icons.error,
+                                                color: Colors.red,
+                                              );
                                             },
                                           ),
-                                          ),
+                                        ),
                                       SizedBox(height: 8.0),
-                                      // แสดงชื่อของ plant
                                       Text(
                                         plant['title'] ?? 'Unknown Plant'.tr(),
-                                        style: descTextStyleDark(context,
-                                            fontWeight: FontWeight.normal),
+                                        style: descTextStyleDark(context, fontWeight: FontWeight.normal),
                                         textAlign: TextAlign.center,
                                       ),
                                       SizedBox(height: 4.0),
@@ -392,44 +344,35 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
           showUnselectedLabels: true,
           items: [
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.camera_alt,
-                size: 24.0,
-              ),
+              icon: Icon(Icons.camera_alt, size: 24.0),
               label: 'Camera'.tr(),
             ),
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.photo,
-                size: 24.0,
-              ),
+              icon: Icon(Icons.photo, size: 24.0),
               label: 'Gallery'.tr(),
             ),
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.person,
-                size: 24.0,
-              ),
+              icon: Icon(Icons.person, size: 24.0),
               label: 'Profile'.tr(),
             ),
           ],
           onTap: (index) {
             switch (index) {
               case 0:
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Recogniser(userId: widget.userId), // Pass userId to Recogniser
-                    ),
-                  );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Recogniser(userId: widget.userId),
+                  ),
+                );
                 break;
               case 2:
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProfilePage(userId: widget.userId), // Pass userId to Recogniser
-                    ),
-                  );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfilePage(userId: widget.userId),
+                  ),
+                );
                 break;
             }
           },

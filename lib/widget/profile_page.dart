@@ -16,12 +16,21 @@ class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, required this.userId});
   final String userId;
 
+  // Add this static method to clear cache
+  static void clearCache() {
+    _ProfilePageState._cachedUserData = null;
+    _ProfilePageState._cachedGalleryCount = null;
+  }
+
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
+  static dynamic _cachedUserData;
+  static dynamic _cachedGalleryCount;
+
   bool _showSheet = false;
   bool _isLoading = false;
   bool _isUpdating = false;
@@ -35,6 +44,16 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   Future<void> _fetchUserData() async {
+    // ถ้ามี cache แล้ว ไม่ต้องโหลดซ้ำ
+    if (_cachedUserData != null && _cachedGalleryCount != null) {
+      setState(() {
+        _userData = _cachedUserData;
+        galleryCount = _cachedGalleryCount;
+        _isLoading = false;
+      });
+      return;
+    }
+
     if (!mounted) return;
     setState(() {
       _isLoading = true;
@@ -57,6 +76,9 @@ class _ProfilePageState extends State<ProfilePage>
       setState(() {
         _userData = user;
         galleryCount = gallery.length;
+        // cache ข้อมูลไว้
+        _cachedUserData = user;
+        _cachedGalleryCount = gallery.length;
       });
       await db.close();
     } catch (e) {
@@ -121,12 +143,7 @@ class _ProfilePageState extends State<ProfilePage>
               elevation: 0,
               leading: IconButton(
                 onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                    builder: (context) => StoragePage(userId: widget.userId),
-                    ),
-                  );
+                  Navigator.pop(context);
                 },
                 icon: Icon(Icons.arrow_circle_left_rounded,
                     color: Theme.of(context).brightness == Brightness.dark
@@ -432,6 +449,8 @@ class _ProfilePageState extends State<ProfilePage>
                                         onPressed: () {
                                           themeModeNotifier.value =
                                               ThemeMode.light;
+                                          _ProfilePageState._cachedUserData = null;
+                                          _ProfilePageState._cachedGalleryCount = null;
                                           clearLoginState().then((_) {
                                             // Clear the userId from SharedPreferences
                                             Navigator.pushAndRemoveUntil(
@@ -682,13 +701,7 @@ class _ProfilePageState extends State<ProfilePage>
                     );
                     break;
                   case 1:
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            StoragePage(userId: widget.userId),
-                      ),
-                    );
+                    Navigator.pop(context);
                     break;
                 }
               },
