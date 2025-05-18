@@ -11,8 +11,6 @@ import 'package:project_pdd/widget/gemini.dart';
 import 'package:project_pdd/widget/profile_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
 
-const _detfname = 'details.json';
-
 class DetailsPage extends StatefulWidget {
   final Map<String, dynamic> plant;
   final String userId;
@@ -24,6 +22,7 @@ class DetailsPage extends StatefulWidget {
 
 class _DetailsPageState extends State<DetailsPage> {
   bool _isUpdating = false;
+  Locale? _lastLocale;
 
   Future<void> deleteFunction(mongo.ObjectId plantId, String userId) async {
     try {
@@ -57,13 +56,21 @@ class _DetailsPageState extends State<DetailsPage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    getDetails(widget.plant);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final currentLocale = context.locale;
+    if (_lastLocale != currentLocale) {
+      _lastLocale = currentLocale;
+      getDetails(widget.plant, currentLocale.languageCode);
+    }
   }
 
-  Future<void> getDetails(plant) async {
-    await rootBundle.loadString('assets/my_model/$_detfname').then((String jsonString) {
+  Future<void> getDetails(plant, locale) async {
+    String detfname = 'details_en.json';
+    if (locale == 'th') {
+      detfname = 'details_th.json';
+    }
+    await rootBundle.loadString('assets/my_model/details/$detfname').then((String jsonString) {
         final List<dynamic> details = json.decode(jsonString);
         for (var detail in details) {
           if (detail['id'] == plant['predict_id']) {
@@ -182,7 +189,7 @@ class _DetailsPageState extends State<DetailsPage> {
                   Text('Date'.tr() + ': ${plant['date'] ?? 'Unknown'}',
                       style: TextStyle(fontSize: 18)),
                   SizedBox(height: 10),
-                  Text('Predict'.tr() + ': ${plant['predict'] ?? 'Unknown'}',
+                  Text('Predict'.tr() + ': ' + '${plant['predict'] ?? 'Unknown'}'.tr(),
                       style: TextStyle(fontSize: 18)),
                   SizedBox(height: 10),
                   Text('Treatment'.tr() + ': ${(plant['treatment']) ?? 'Unknown'}',

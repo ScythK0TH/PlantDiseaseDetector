@@ -1,0 +1,107 @@
+[
+  {
+    "id": 0,
+    "disease": "Pepper bell Bacterial spot",
+    "treatment": "Use copper compounds such as copper hydroxide or copper oxychloride, spray every 7-10 days.",
+    "prevention": "Use disease-free seeds, plant in well-drained plots, avoid watering on leaves.",
+    "note": "Severely infected plants should be burned to reduce spread."
+  },
+  {
+    "id": 1,
+    "disease": "Pepper bell healthy",
+    "treatment": "None",
+    "prevention": "Maintain plant health, regularly check for disease symptoms, practice crop rotation.",
+    "note": "The plant is healthy and shows no abnormal symptoms."
+  },
+  {
+    "id": 2,
+    "disease": "Potato Early blight",
+    "treatment": "Use fungicides such as Mancozeb or Chlorothalonil alternately.",
+    "prevention": "Space plants for good airflow, remove plant debris from the plot, avoid planting in the same place repeatedly.",
+    "note": "Be cautious during rainy and humid periods."
+  },
+  {
+    "id": 3,
+    "disease": "Potato Late blight",
+    "treatment": "Use fungicides such as Metalaxyl or Cymoxanil at the onset of the outbreak.",
+    "prevention": "Plant resistant varieties, control moisture in the plot, inspect plants regularly.",
+    "note": "This is a major disease that spreads rapidly; close monitoring is required."
+  },
+  {
+    "id": 4,
+    "disease": "Potato healthy",
+    "treatment": "None",
+    "prevention": "Control general pests, apply balanced fertilizer, check for diseases regularly.",
+    "note": "The plant is healthy; maintain a suitable environment."
+  },
+  {
+    "id": 5,
+    "disease": "Tomato Bacterial spot",
+    "treatment": "Spray copper compounds such as copper hydroxide alternately with Streptomycin.",
+    "prevention": "Use disease-free seeds, plant in well-drained areas, avoid planting in the same plot repeatedly.",
+    "note": "This disease spreads via water droplets and agricultural tools."
+  },
+  {
+    "id": 6,
+    "disease": "Tomato Early blight",
+    "treatment": "Use Mancozeb or Chlorothalonil when spots first appear on leaves.",
+    "prevention": "Remove lower leaves, avoid planting in the same place, ensure good ventilation in the plot.",
+    "note": "Symptoms start on lower leaves and spread upward."
+  },
+  {
+    "id": 7,
+    "disease": "Tomato Late blight",
+    "treatment": "Use Metalaxyl or Dimethomorph continuously during rainy periods.",
+    "prevention": "Avoid watering in the evening, control humidity, use resistant varieties.",
+    "note": "Leaves will show blight and white mold underneath."
+  },
+  {
+    "id": 8,
+    "disease": "Tomato Leaf Mold",
+    "treatment": "Use fungicides such as Chlorothalonil or Azoxystrobin.",
+    "prevention": "Ensure good ventilation in greenhouses, avoid waterlogging.",
+    "note": "Commonly found in greenhouses or humid plots."
+  },
+  {
+    "id": 9,
+    "disease": "Tomato Septoria leaf spot",
+    "treatment": "Use fungicides such as Mancozeb or copper-based fungicides.",
+    "prevention": "Space plants, remove infected leaves from the plot.",
+    "note": "This disease does not directly affect the fruit but reduces overall yield."
+  },
+  {
+    "id": 10,
+    "disease": "Tomato Spider mites Two spotted spider mite",
+    "treatment": "Use miticides such as Abamectin or sulfur powder sprayed under the leaves.",
+    "prevention": "Regularly spray clean water under the leaves, reduce dust, avoid planting near mite host plants.",
+    "note": "Eggs or fine webs can be found under the leaves."
+  },
+  {
+    "id": 11,
+    "disease": "Tomato Target Spot",
+    "treatment": "Use Mancozeb or Azoxystrobin, remove infected leaves.",
+    "prevention": "Control humidity, avoid waterlogging, do not plant too densely.",
+    "note": "Leaf spots resemble target-like circles."
+  },
+  {
+    "id": 12,
+    "disease": "Tomato YellowLeaf Curl Virus",
+    "treatment": "No direct cure, remove infected plants.",
+    "prevention": "Prevent whiteflies with nets, use resistant varieties, apply insecticides during early stages.",
+    "note": "The virus is mainly spread by whiteflies."
+  },
+  {
+    "id": 13,
+    "disease": "Tomato mosaic virus",
+    "treatment": "No direct cure, immediately destroy infected plants.",
+    "prevention": "Sterilize gardening tools, use virus-free seeds, avoid direct contact with leaves.",
+    "note": "This disease is transmitted through contact and equipment."
+  },
+  {
+    "id": 14,
+    "disease": "Tomato healthy",
+    "treatment": "None",
+    "prevention": "Apply fertilizer regularly, check for diseases and pests, keep the plot clean.",
+    "note": "No abnormal symptoms; the plant is healthy and strong."
+  }
+]

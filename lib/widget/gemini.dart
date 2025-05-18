@@ -75,7 +75,7 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
         isLoading = false;
       });
     } else {
-      final initialPrompt = "โรค ${widget.plant['predict']}";
+      final initialPrompt = "Disease".tr() + " ${widget.plant['predict']}";
       chatHistory.clear();
       await getGeminiResponse(
         initialPrompt,
@@ -285,7 +285,7 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
                 ? null
                 : () async {
                     chatHistory.clear();
-                    final initialPrompt = "โรค ${widget.plant['predict']}";
+                    final initialPrompt = "Disease".tr() + " ${widget.plant['predict']}";
                     await getGeminiResponse(
                       initialPrompt,
                       withImageAndPredict: true,

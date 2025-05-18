@@ -36,6 +36,7 @@ flutter:
   assets:
     - assets/images/
     - assets/my_model/
+    - assets/my_model/details/
     - assets/.env
     - assets/languages/
 

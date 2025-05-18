@@ -206,7 +206,7 @@ class _RecogniserState extends State<Recogniser> {
     };
 
     final accuracy = state.status == RecogniserStatus.found
-        ? 'Probability: ${(state.accuracy * 100).toStringAsFixed(2)}%'
+        ? 'Probability:'.tr() + ' ${(state.accuracy * 100).toStringAsFixed(2)}%'
         : '';
 
     List<String> splitText(String text, TextStyle style, double maxWidth) {
@@ -251,7 +251,7 @@ class _RecogniserState extends State<Recogniser> {
       children: [
         for (var line in labelLines)
           Text(
-            line,
+            line.tr(),
             style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
