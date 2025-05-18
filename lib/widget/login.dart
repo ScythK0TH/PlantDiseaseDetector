@@ -5,10 +5,10 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:bcrypt/bcrypt.dart';
 import 'package:project_pdd/constant.dart';
+import 'package:project_pdd/home.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/register.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'storage_page.dart';
 
 class LoginApp extends StatefulWidget {
   const LoginApp({super.key});
@@ -81,7 +81,7 @@ class LoginAppState extends State<LoginApp> {
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  StoragePage(userId: user['_id'].toHexString()),
+                  HomePage(userId: user['_id'].toHexString()),
             ),
           );
         } else {
