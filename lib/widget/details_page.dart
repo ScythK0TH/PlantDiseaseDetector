@@ -144,6 +144,7 @@ class _DetailsPageState extends State<DetailsPage> {
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 96),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

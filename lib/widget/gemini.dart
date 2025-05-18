@@ -343,7 +343,15 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
           ],
         ),
       ),
-      bottomNavigationBar: SafeArea(
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.only(
+          left: 12,
+          right: 12,
+          bottom: MediaQuery.of(context).viewInsets.bottom > 0
+              ? MediaQuery.of(context).viewInsets.bottom + 12
+              : 48,
+          top: 0,
+        ),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           decoration: BoxDecoration(
@@ -357,7 +365,6 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
               ),
             ],
           ),
-          margin: const EdgeInsets.all(12),
           child: Row(
             children: [
               Expanded(
