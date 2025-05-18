@@ -11,6 +11,7 @@ import 'package:project_pdd/constant.dart';
 import 'package:project_pdd/bloc/recogniser_bloc.dart';
 import 'package:project_pdd/bloc/recogniser_event.dart';
 import 'package:project_pdd/bloc/recogniser_state.dart';
+import 'package:project_pdd/home.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/photo_view.dart';
 import 'package:project_pdd/widget/profile_page.dart';
@@ -276,7 +277,7 @@ class _RecogniserState extends State<Recogniser> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Recogniser(userId: widget.userId),
+                    builder: (context) => HomePage(userId: widget.userId, initialIndex: 0),
                   ),
                 );
               }
@@ -398,7 +399,7 @@ Future<void> _savedData(BuildContext context, RecogniserState state, String user
         context,
         MaterialPageRoute(
           builder: (context) =>
-              StoragePage(userId: userId),
+              HomePage(userId: userId),
         ),
       );
       await db.close();

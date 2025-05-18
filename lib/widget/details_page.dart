@@ -130,9 +130,39 @@ class _DetailsPageState extends State<DetailsPage> {
                         color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
                         size: 24.0,
                       ),
-                      onPressed: () {
-                        deleteFunction(plant["_id"], userId);
-                        Navigator.pop(context);
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.dark
+                                                  ? primaryColor
+                                                  : Colors.white,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(36.0),
+                                              ),
+                            title: Text('Delete?'.tr()),
+                            content: Text('Are you sure you want to delete this photo?'.tr()),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: Text('Cancel'.tr()),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: Text('Delete'.tr()),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirm != true) return;
+
+                        setState(() => _isUpdating = true);
+                        await deleteFunction(plant["_id"], userId);
+                        if (!mounted) return;
+                        Navigator.pop(context, true);
                       },
                     ),
                   ),

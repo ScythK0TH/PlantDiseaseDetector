@@ -380,12 +380,6 @@ class _ProfilePageState extends State<ProfilePage>
                                                                 12.0),
                                                       ),
                                                     ),
-                                                    behavior: SnackBarBehavior
-                                                        .floating,
-                                                    margin: EdgeInsets.only(
-                                                      bottom:
-                                                          bottomNavHeight, // 56 (nav height) + 16 spacing
-                                                    ),
                                                     content: Text(
                                                         'Name updated!'.tr())),
                                               );

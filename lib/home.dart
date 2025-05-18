@@ -7,14 +7,21 @@ import 'package:project_pdd/widget/recogniser.dart';
 
 class HomePage extends StatefulWidget {
   final String userId;
-  const HomePage({required this.userId, super.key});
+  final int initialIndex;
+  const HomePage({required this.userId, this.initialIndex = 1, super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 1; // Default to Gallery
+  late int _selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex;
+  }
 
   @override
   Widget build(BuildContext context) {
