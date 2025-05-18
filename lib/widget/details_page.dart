@@ -331,21 +331,21 @@ class _DetailsPageState extends State<DetailsPage> {
                   Icons.camera_alt,
                   size: 24.0,
                 ),
-                label: 'Camera',
+                label: 'Camera'.tr(),
               ),
               BottomNavigationBarItem(
                 icon: Icon(
                   Icons.photo,
                   size: 24.0,
                 ),
-                label: 'Gallery',
+                label: 'Gallery'.tr(),
               ),
               BottomNavigationBarItem(
                 icon: Icon(
                   Icons.person,
                   size: 24.0,
                 ),
-                label: 'Profile',
+                label: 'Profile'.tr(),
               ),
             ],
             onTap: (index) {
