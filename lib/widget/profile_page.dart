@@ -137,6 +137,7 @@ class _ProfilePageState extends State<ProfilePage>
                     .clamp(0.0, 1.0);
             return AppBar(
               backgroundColor: Colors.transparent,
+              automaticallyImplyLeading: false,
               systemOverlayStyle: themeModeNotifier.value == ThemeMode.dark
                   ? SystemUiOverlayStyle.dark
                   : SystemUiOverlayStyle.light,
