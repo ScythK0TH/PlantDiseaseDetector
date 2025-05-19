@@ -130,7 +130,6 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                 TextButton(
                   onPressed: () {
                     clearLoginState();
-                    ProfilePage.clearCache();
                     SystemNavigator.pop();
                   },
                   child: Text('Logout').tr(),

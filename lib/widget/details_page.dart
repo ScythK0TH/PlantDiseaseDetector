@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:project_pdd/home.dart';
 import 'package:project_pdd/style.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/constant.dart';
@@ -162,7 +163,12 @@ class _DetailsPageState extends State<DetailsPage> {
                         setState(() => _isUpdating = true);
                         await deleteFunction(plant["_id"], userId);
                         if (!mounted) return;
-                        Navigator.pop(context, true);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomePage(userId: userId, key: UniqueKey()),
+                          ),
+                        );
                       },
                     ),
                   ),

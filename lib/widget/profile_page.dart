@@ -16,20 +16,12 @@ class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, required this.userId});
   final String userId;
 
-  // Add this static method to clear cache
-  static void clearCache() {
-    _ProfilePageState._cachedUserData = null;
-    _ProfilePageState._cachedGalleryCount = null;
-  }
-
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
-  static dynamic _cachedUserData;
-  static dynamic _cachedGalleryCount;
 
   bool _showSheet = false;
   bool _isLoading = false;
@@ -44,15 +36,6 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   Future<void> _fetchUserData() async {
-    // ถ้ามี cache แล้ว ไม่ต้องโหลดซ้ำ
-    if (_cachedUserData != null && _cachedGalleryCount != null) {
-      setState(() {
-        _userData = _cachedUserData;
-        galleryCount = _cachedGalleryCount;
-        _isLoading = false;
-      });
-      return;
-    }
 
     if (!mounted) return;
     setState(() {
@@ -76,9 +59,6 @@ class _ProfilePageState extends State<ProfilePage>
       setState(() {
         _userData = user;
         galleryCount = gallery.length;
-        // cache ข้อมูลไว้
-        _cachedUserData = user;
-        _cachedGalleryCount = gallery.length;
       });
       await db.close();
     } catch (e) {
@@ -433,8 +413,6 @@ class _ProfilePageState extends State<ProfilePage>
                                           themeModeNotifier.value =
                                               ThemeMode.light;
                                           saveThemeMode(ThemeMode.light);
-                                          _ProfilePageState._cachedUserData = null;
-                                          _ProfilePageState._cachedGalleryCount = null;
                                           clearLoginState().then((_) {
                                             // Clear the userId from SharedPreferences
                                             Navigator.pushAndRemoveUntil(

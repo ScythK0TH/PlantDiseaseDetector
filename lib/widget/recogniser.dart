@@ -399,7 +399,10 @@ Future<void> _savedData(BuildContext context, RecogniserState state, String user
         context,
         MaterialPageRoute(
           builder: (context) =>
-              HomePage(userId: userId),
+              HomePage(
+                userId: userId,
+                key: UniqueKey(),
+                ),
         ),
       );
       await db.close();
