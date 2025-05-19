@@ -274,12 +274,8 @@ class _RecogniserState extends State<Recogniser> {
               if (type == 'save') {
                 await _savedData(context, state, widget.userId);
               } else if (type == 'cancel') {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HomePage(userId: widget.userId, initialIndex: 0),
-                  ),
-                );
+                //Reset the state
+                context.read<RecogniserBloc>().add(RecogniserReset());
               }
               await Future.delayed(const Duration(milliseconds: 500));
               if (mounted) setState(() => isResultButtonPressing = false);

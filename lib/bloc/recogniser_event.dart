@@ -8,6 +8,8 @@ abstract class RecogniserEvent extends Equatable {
 
 class RecogniserStarted extends RecogniserEvent {}
 
+class RecogniserReset extends RecogniserEvent {}
+
 class PhotoPicked extends RecogniserEvent {
   final File image;
   PhotoPicked(this.image);

@@ -262,14 +262,16 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                               final plant = displayPlants[index];
                               return GestureDetector(
                                 onTap: () async {
-                                  final result = await Navigator.push(
+                                  final result = await Navigator.push<String>(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => DetailsPage(plant: plant, userId: widget.userId),
                                     ),
                                   );
-                                  if (result == true) {
-                                    _fetchAllPlants(); // Refresh after delete
+                                  if (result != null) {
+                                    setState(() {
+                                      plant['title'] = result;
+                                    });
                                   }
                                 },
                                 child: Container(

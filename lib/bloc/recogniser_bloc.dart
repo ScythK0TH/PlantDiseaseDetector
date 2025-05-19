@@ -15,6 +15,9 @@ class RecogniserBloc extends Bloc<RecogniserEvent, RecogniserState> {
 
   RecogniserBloc() : super(const RecogniserState()) {
     on<RecogniserStarted>(_onStarted);
+    on<RecogniserReset>((event, emit) {
+      emit(const RecogniserState());
+    });
     on<PhotoPicked>(_onPhotoPicked);
   }
 
