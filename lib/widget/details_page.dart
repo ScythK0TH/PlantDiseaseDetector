@@ -226,8 +226,14 @@ class _DetailsPageState extends State<DetailsPage> {
                             ),
                     ),
                     SizedBox(height: 20),
-                    Text('Date'.tr() + ': ${plant['date'] ?? 'Unknown'}',
-                        style: TextStyle(fontSize: 18)),
+                    Text(
+                      'Date'.tr() +
+                        ': ' +
+                        (plant['date'] != null
+                          ? DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.tryParse(plant['date']) ?? DateTime.now())
+                          : 'Unknown'),
+                      style: TextStyle(fontSize: 18),
+                    ),
                     SizedBox(height: 10),
                     Text('Predict'.tr() + ': ' + '${plant['predict'] ?? 'Unknown'}'.tr(),
                         style: TextStyle(fontSize: 18)),
