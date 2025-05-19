@@ -12,6 +12,8 @@ import 'package:project_pdd/widget/storage_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final themeModeNotifier = ValueNotifier<ThemeMode>(ThemeMode.light);
+final imageCountUpdateNotifier = ValueNotifier<int>(0);
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
 Future<String?> getSavedUserId() async {
   final prefs = await SharedPreferences.getInstance();
@@ -100,6 +102,7 @@ class MainApp extends StatelessWidget {
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,
+          navigatorObservers: [routeObserver],
         );
       },
     );

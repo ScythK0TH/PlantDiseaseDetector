@@ -39,10 +39,18 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+  
+  @override
+  void didPopNext() {
+    // Called when this route is popped to and the previous route is visible.
+    setState(() {});
   }
 
   @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     _searchController.dispose();
     super.dispose();
   }
@@ -65,6 +73,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
         _allPlants = plants;
         _plants = plants;
       });
+      imageCountUpdateNotifier.value = _plants.length;
       await db.close();
     } catch (e) {
       print('Error fetching plants: $e');
@@ -269,7 +278,11 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                     ),
                                   );
                                   if (result == true) {
-                                    _fetchAllPlants();
+                                    setState(() {
+                                      final plantId = plant['_id'];
+                                      _plants.removeWhere((p) => p['_id'] == plantId);
+                                      _allPlants.removeWhere((p) => p['_id'] == plantId);
+                                    });
                                   }
                                 },
                                 child: Container(

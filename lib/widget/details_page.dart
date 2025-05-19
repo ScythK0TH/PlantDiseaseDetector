@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_pdd/home.dart';
+import 'package:project_pdd/main.dart';
 import 'package:project_pdd/style.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/constant.dart';
@@ -23,7 +24,7 @@ class DetailsPage extends StatefulWidget {
 
 class _DetailsPageState extends State<DetailsPage> {
   bool _isUpdating = false;
-  bool _updatedTitle = false;
+  bool _isDeleted = false;
   Locale? _lastLocale;
 
   Future<void> deleteFunction(mongo.ObjectId plantId, String userId) async {
@@ -42,6 +43,10 @@ class _DetailsPageState extends State<DetailsPage> {
           'userId': mongo.ObjectId.fromHexString(userId)
         });
         if (result['n'] > 0) {
+          setState(() {
+            _isDeleted = true;
+          });
+          imageCountUpdateNotifier.value -= 1;
           print('Plant deleted successfully.');
         } else {
           print('No plant found with the given ID and userId.');
@@ -118,7 +123,7 @@ class _DetailsPageState extends State<DetailsPage> {
                           size: 24.0,
                         ),
                         onPressed: () {
-                          Navigator.pop(context, _updatedTitle);
+                          Navigator.pop(context);
                         },
                       ),
                     ),
@@ -166,12 +171,7 @@ class _DetailsPageState extends State<DetailsPage> {
                           setState(() => _isUpdating = true);
                           await deleteFunction(plant["_id"], userId);
                           if (!mounted) return;
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomePage(userId: userId),
-                            ),
-                          );
+                          Navigator.pop(context, _isDeleted);
                         },
                       ),
                     ),
@@ -319,7 +319,6 @@ class _DetailsPageState extends State<DetailsPage> {
                             {r'$set': {'title': newTitle.trim()}},
                           );
                           await db.close();
-                          _updatedTitle = true;
                           setState(() {
                             plant['title'] = newTitle.trim();
                           });

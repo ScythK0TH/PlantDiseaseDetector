@@ -74,6 +74,7 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   void initState() {
     super.initState();
+    imageCountUpdateNotifier.addListener(_updateGalleryCount);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchUserData().then((_) {
         if (mounted) {
@@ -85,8 +86,19 @@ class _ProfilePageState extends State<ProfilePage>
     });
   }
 
+  void _updateGalleryCount() {
+    final newCount = imageCountUpdateNotifier.value;
+    if (galleryCount == null || galleryCount != newCount) {
+      setState(() {
+        galleryCount = newCount;
+      });
+    }
+  }
+
   @override
   void dispose() {
+    // Add this line to remove listener when widget disposes
+    imageCountUpdateNotifier.removeListener(_updateGalleryCount);
     _sheetExtent.dispose();
     super.dispose();
   }

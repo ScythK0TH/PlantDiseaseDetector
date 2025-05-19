@@ -12,6 +12,7 @@ import 'package:project_pdd/bloc/recogniser_bloc.dart';
 import 'package:project_pdd/bloc/recogniser_event.dart';
 import 'package:project_pdd/bloc/recogniser_state.dart';
 import 'package:project_pdd/home.dart';
+import 'package:project_pdd/main.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/photo_view.dart';
 import 'package:project_pdd/widget/profile_page.dart';
@@ -388,6 +389,7 @@ Future<void> _savedData(BuildContext context, RecogniserState state, String user
           'title': title,
           'probability': accuracy,
         });
+        imageCountUpdateNotifier.value++;
       } else {
         print('Error: Image is null.');
       }
