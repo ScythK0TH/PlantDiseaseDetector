@@ -166,7 +166,7 @@ class _DetailsPageState extends State<DetailsPage> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => HomePage(userId: userId, key: UniqueKey()),
+                            builder: (context) => HomePage(userId: userId),
                           ),
                         );
                       },

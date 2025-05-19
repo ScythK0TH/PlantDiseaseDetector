@@ -401,7 +401,6 @@ Future<void> _savedData(BuildContext context, RecogniserState state, String user
           builder: (context) =>
               HomePage(
                 userId: userId,
-                key: UniqueKey(),
                 ),
         ),
       );

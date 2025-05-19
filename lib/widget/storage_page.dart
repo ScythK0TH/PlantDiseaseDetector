@@ -39,12 +39,10 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    routeObserver.subscribe(this, ModalRoute.of(context)!);
   }
 
   @override
   void dispose() {
-    routeObserver.unsubscribe(this);
     _searchController.dispose();
     super.dispose();
   }

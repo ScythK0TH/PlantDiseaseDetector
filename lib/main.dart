@@ -11,7 +11,6 @@ import 'package:project_pdd/widget/recogniser.dart';
 import 'package:project_pdd/widget/storage_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 final themeModeNotifier = ValueNotifier<ThemeMode>(ThemeMode.light);
 
 Future<String?> getSavedUserId() async {
@@ -95,7 +94,6 @@ class MainApp extends StatelessWidget {
               unselectedIconTheme: IconThemeData(color: Colors.white),
             ),
           ),
-          navigatorObservers: [routeObserver],
           home: userId == null
               ? FirstPageScreen()
               : HomePage(userId: userId!),
