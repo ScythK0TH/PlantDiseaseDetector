@@ -196,7 +196,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     SizedBox(
                       height: 300,
                       width: double.infinity,
-                      child: plant['image'] != null
+                      child: plant['decodedImage'] != null
                           ? Container(
                               decoration: BoxDecoration(
                                 color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
@@ -204,7 +204,7 @@ class _DetailsPageState extends State<DetailsPage> {
                               ),
                               clipBehavior: Clip.antiAlias,
                               child: Image.memory(
-                                base64Decode(plant['image']),
+                                plant['decodedImage'],
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 height: double.infinity,

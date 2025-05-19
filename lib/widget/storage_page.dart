@@ -69,6 +69,18 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
       final query = {'userId': mongo.ObjectId.fromHexString(widget.userId)};
       final plants = await collection.find(query).toList();
       if (!mounted) return;
+      // Optionally decode images for each plant if needed
+      for (var plant in plants) {
+        if (plant['image'] != null) {
+          try {
+            plant['decodedImage'] = base64Decode(plant['image']);
+          } catch (e) {
+            plant['decodedImage'] = null;
+          }
+        } else {
+          plant['decodedImage'] = null;
+        }
+      }
       setState(() {
         _allPlants = plants;
         _plants = plants;
@@ -293,7 +305,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      if (plant['image'] == null)
+                                      if (plant['decodedImage'] == null)
                                         Container(
                                           width: double.infinity,
                                           height: 150.0,
@@ -319,7 +331,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                           ),
                                           clipBehavior: Clip.antiAlias,
                                           child: Image.memory(
-                                            base64Decode(plant['image']),
+                                            plant['decodedImage'],
                                             fit: BoxFit.cover,
                                             width: double.infinity,
                                             height: 150.0,
