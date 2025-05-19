@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
@@ -36,74 +37,92 @@ class _RecogniserState extends State<Recogniser> {
 
     return BlocProvider(
       create: (_) => RecogniserBloc()..add(RecogniserStarted()),
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
-              ? SystemUiOverlayStyle.light
-              : SystemUiOverlayStyle.dark,
-          title: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Center(
-                    child: Text(
-                      'Plant Analyzer'.tr(),
-                      style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          centerTitle: true,
-        ),
-        body: BlocBuilder<RecogniserBloc, RecogniserState>(
-          builder: (context, state) {
-            return SingleChildScrollView(
-              child: Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 20),
-                    PhotoViewScreen(file: state.image),
-                    const SizedBox(height: 50),
-                    SizedBox(
-                      height: 150,
-                      child: SingleChildScrollView(
-                          child: _buildResultView(state, context)),
-                    ),
-                    const SizedBox(height: 20),
-                    if (state.status != RecogniserStatus.analyzing) ...[
-                      if (state.status == RecogniserStatus.found) ...[
-                      _buildResultButton(context, 'Save Result'.tr(),
-                        screenWidth, false, 'save', state),
-                      const SizedBox(height: 20),
-                      _buildResultButton(context, 'Cancel'.tr(),
-                        screenWidth, true, 'cancel', state),
-                      const SizedBox(height: 20),
-                      ] else ...[
-                        _buildPickButton(context, 'Take a photo'.tr(),
-                          ImageSource.camera, screenWidth, false, 'photo'),
-                        const SizedBox(height: 20),
-                        _buildPickButton(context, 'Pick from gallery'.tr(),
-                            ImageSource.gallery, screenWidth, true, 'gallery'),
-                        const SizedBox(height: 20),
-                      ],
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              automaticallyImplyLeading: false,
+              systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
+                  ? SystemUiOverlayStyle.light
+                  : SystemUiOverlayStyle.dark,
+              title: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Center(
+                        child: Text(
+                          'Plant Analyzer'.tr(),
+                          style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
+                        ),
+                      ),
                     ],
-                  ],
+                  ),
                 ),
               ),
-            );
-          },
-        ),
+              centerTitle: true,
+            ),
+            body: BlocBuilder<RecogniserBloc, RecogniserState>(
+              builder: (context, state) {
+                return SingleChildScrollView(
+                  child: Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 20),
+                        PhotoViewScreen(file: state.image),
+                        const SizedBox(height: 50),
+                        SizedBox(
+                          height: 150,
+                          child: SingleChildScrollView(
+                              child: _buildResultView(state, context)),
+                        ),
+                        const SizedBox(height: 20),
+                        if (state.status != RecogniserStatus.analyzing) ...[
+                          if (state.status == RecogniserStatus.found) ...[
+                          _buildResultButton(context, 'Save Result'.tr(),
+                            screenWidth, false, 'save', state),
+                          const SizedBox(height: 20),
+                          _buildResultButton(context, 'Cancel'.tr(),
+                            screenWidth, true, 'cancel', state),
+                          const SizedBox(height: 20),
+                          ] else ...[
+                            _buildPickButton(context, 'Take a photo'.tr(),
+                              ImageSource.camera, screenWidth, false, 'photo'),
+                            const SizedBox(height: 20),
+                            _buildPickButton(context, 'Pick from gallery'.tr(),
+                                ImageSource.gallery, screenWidth, true, 'gallery'),
+                            const SizedBox(height: 20),
+                          ],
+                        ],
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          if (isResultButtonPressing)
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: Container(
+                color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : primaryColor,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
