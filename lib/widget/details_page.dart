@@ -23,6 +23,7 @@ class DetailsPage extends StatefulWidget {
 
 class _DetailsPageState extends State<DetailsPage> {
   bool _isUpdating = false;
+  bool _isUpdated = false;
   Locale? _lastLocale;
 
   Future<void> deleteFunction(mongo.ObjectId plantId, String userId) async {
@@ -115,7 +116,7 @@ class _DetailsPageState extends State<DetailsPage> {
                         size: 24.0,
                       ),
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pop(context, _isUpdated);
                       },
                     ),
                   ),
@@ -316,6 +317,7 @@ class _DetailsPageState extends State<DetailsPage> {
                           {r'$set': {'title': newTitle.trim()}},
                         );
                         await db.close();
+                        _isUpdated = true;
                         setState(() {
                           plant['title'] = newTitle.trim();
                         });
