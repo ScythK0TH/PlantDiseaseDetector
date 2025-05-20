@@ -36,35 +36,61 @@ Future<ThemeMode> loadThemeMode() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  final userId = await getSavedUserId();
-  final themeMode = await loadThemeMode();
-
-  // Connect MongoDB once, globally
-  await MongoService().connect();
   
-  // Set the preferred orientations to portrait mode only
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
   await dotenv.load(fileName: "assets/.env");
-  runApp(EasyLocalization(
-    supportedLocales: const [Locale('en', 'US'), Locale('th', 'TH')],
-    path: 'assets/languages',
-    fallbackLocale: const Locale('en', 'US'),
-    startLocale: const Locale('th', 'TH'),
-    child: MainApp(userId: userId, initialThemeMode: themeMode)));
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('en', 'US'), Locale('th', 'TH')],
+      path: 'assets/languages',
+      fallbackLocale: const Locale('en', 'US'),
+      startLocale: const Locale('th', 'TH'),
+      child: MainApp(),
+    ),
+  );
 }
 
-class MainApp extends StatelessWidget {
-  final String? userId;
-  final ThemeMode initialThemeMode;
-  const MainApp({super.key, required this.userId, required this.initialThemeMode});
+class MainApp extends StatefulWidget {
+  const MainApp({super.key});
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  String? userId;
+  ThemeMode themeMode = ThemeMode.light;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    initialize();
+  }
+
+  Future<void> initialize() async {
+    userId = await getSavedUserId();
+    themeMode = await loadThemeMode();
+    await MongoService().connect();
+    setState(() {
+      isLoading = false;
+      themeModeNotifier.value = themeMode;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Set the initial theme mode based on the saved preference
-    themeModeNotifier.value = initialThemeMode;
+    if (isLoading) {
+      return MaterialApp(
+        home: Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeModeNotifier,
       builder: (context, mode, _) {
