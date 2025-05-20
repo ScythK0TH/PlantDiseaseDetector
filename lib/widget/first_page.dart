@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:project_pdd/main.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/storage_page.dart';
 import 'package:project_pdd/widget/tos_page.dart';
@@ -30,6 +31,16 @@ class FirstPageScreenState extends State<FirstPageScreen> {
         setState(() {
           index = (index + 1) % textSequence.length;
         });
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Theme.of(context).brightness == Brightness.dark) {
+        themeModeNotifier.value = ThemeMode.light;
       }
     });
   }
