@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:bcrypt/bcrypt.dart';
-import 'package:project_pdd/constant.dart';
 import 'package:project_pdd/home.dart';
+import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/register.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -63,13 +63,12 @@ class LoginAppState extends State<LoginApp> {
 
     try {
       print('Connecting to MongoDB...');
-      final db = await mongo.Db.create(MONGO_URL);
-      await db.open();
+      final db = MongoService();
       print('Connected to MongoDB.');
 
-      final collection = db.collection('users');
+      final collection = db.userCollection;
       print('Finding user...');
-      final user = await collection.findOne({'email': email});
+      final user = await collection!.findOne({'email': email});
 
       if (user != null) {
         final hashedPassword = user['password'];
@@ -97,7 +96,6 @@ class LoginAppState extends State<LoginApp> {
         });
       }
 
-      await db.close();
     } catch (e) {
       print('Error: $e');
     }

@@ -3,9 +3,9 @@ import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
-import 'package:project_pdd/constant.dart';
 import 'package:project_pdd/widget/first_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
 import 'package:project_pdd/main.dart';
@@ -41,15 +41,14 @@ class _ProfilePageState extends State<ProfilePage>
     setState(() {
       _isLoading = true;
     });
-    final db = await mongo.Db.create(MONGO_URL);
+    final db = MongoService();
     try {
-      await db.open();
-      final collection = db.collection('users');
-      final galleryCollection = db.collection('plants');
-      final user = await collection.findOne(
+      final collection = db.userCollection;
+      final galleryCollection = db.plantCollection;
+      final user = await collection!.findOne(
         mongo.where.eq('_id', mongo.ObjectId.fromHexString(widget.userId)),
       );
-      final gallery = await galleryCollection
+      final gallery = await galleryCollection!
           .find(
             mongo.where
                 .eq('userId', mongo.ObjectId.fromHexString(widget.userId)),
@@ -60,7 +59,6 @@ class _ProfilePageState extends State<ProfilePage>
         _userData = user;
         galleryCount = gallery.length;
       });
-      await db.close();
     } catch (e) {
       print('Error fetching user data: $e');
     } finally {
@@ -338,12 +336,10 @@ class _ProfilePageState extends State<ProfilePage>
                                             }
                                             setState(() => _isUpdating = true);
                                             try {
-                                              final db = await mongo.Db.create(
-                                                  MONGO_URL);
-                                              await db.open();
+                                              final db = MongoService();
                                               final collection =
-                                                  db.collection('users');
-                                              await collection.update(
+                                                  db.userCollection;
+                                              await collection!.update(
                                                 {'_id': _userData!['_id']},
                                                 {
                                                   r'$set': {
@@ -351,7 +347,6 @@ class _ProfilePageState extends State<ProfilePage>
                                                   }
                                                 },
                                               );
-                                              await db.close();
                                               setState(() {
                                                 _userData!['username'] =
                                                     newTitle.trim();

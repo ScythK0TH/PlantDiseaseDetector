@@ -8,12 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
-import 'package:project_pdd/constant.dart';
 import 'package:project_pdd/bloc/recogniser_bloc.dart';
 import 'package:project_pdd/bloc/recogniser_event.dart';
 import 'package:project_pdd/bloc/recogniser_state.dart';
 import 'package:project_pdd/home.dart';
 import 'package:project_pdd/main.dart';
+import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/photo_view.dart';
 import 'package:project_pdd/widget/profile_page.dart';
@@ -393,13 +393,12 @@ Future<void> _savedData(BuildContext context, RecogniserState state, String user
 
     try {
       print('Connecting to MongoDB...');
-      final db = await mongo.Db.create(MONGO_URL);
-      await db.open();
+      final db = MongoService();
       print('Connected to MongoDB.');
 
-      final collection = db.collection('plants');
+      final collection = db.plantCollection;
       if (image != null) {
-        await collection.insert({
+        await collection!.insert({
           'userId': mongoUserId,
           'image': image,
           'date': dateTime,
@@ -421,7 +420,6 @@ Future<void> _savedData(BuildContext context, RecogniserState state, String user
                 ),
         ),
       );
-      await db.close();
     } catch (e) {
       print('Error: $e');
     }

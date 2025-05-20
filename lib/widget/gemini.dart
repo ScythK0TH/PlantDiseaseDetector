@@ -1,11 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
+import 'package:project_pdd/services/database.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:project_pdd/constant.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'dart:developer';
 
@@ -25,7 +25,6 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
   String language = 'en'; // Default language is English
 
   // MongoDB connection string and collection name
-  final String mongoUri = MONGO_URL; // <-- change to your MongoDB URI
   final String cacheCollection = 'gemini_cache';
 
   List<Map<String, dynamic>> chatHistory = [];
@@ -33,25 +32,21 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
   final ScrollController _scrollController = ScrollController();
 
   Future<void> saveCache(String userId, String plantId, List<Map<String, dynamic>> chatHistory) async {
-    final db = await mongo.Db.create(mongoUri);
-    await db.open();
-    final col = db.collection(cacheCollection);
-    await col.updateOne(
+    final db = MongoService();
+    final col = db.assistantCollection;
+    await col!.updateOne(
       mongo.where.eq('userId', userId).eq('plantId', plantId),
       mongo.modify
           .set('chatHistory', chatHistory)
           .set('updatedAt', DateTime.now().toIso8601String()),
       upsert: true,
     );
-    await db.close();
   }
 
   Future<List<Map<String, dynamic>>?> fetchCache(String userId, String plantId) async {
-    final db = await mongo.Db.create(mongoUri);
-    await db.open();
-    final col = db.collection(cacheCollection);
-    final doc = await col.findOne({'userId': userId, 'plantId': plantId});
-    await db.close();
+    final db = MongoService();
+    final col = db.assistantCollection;
+    final doc = await col!.findOne({'userId': userId, 'plantId': plantId});
     if (doc?['chatHistory'] != null) {
       return List<Map<String, dynamic>>.from(
         (doc!['chatHistory'] as List).map((e) => Map<String, dynamic>.from(e)),

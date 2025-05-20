@@ -5,7 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
-import 'package:project_pdd/constant.dart';
+import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/first_page.dart';
 import 'package:project_pdd/widget/profile_page.dart';
@@ -63,11 +63,10 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
   Future<void> _fetchAllPlants() async {
     setState(() => _isLoading = true);
     try {
-      final db = await mongo.Db.create(MONGO_URL);
-      await db.open();
-      final collection = db.collection('plants');
+      final db = MongoService();
+      final collection = db.plantCollection;
       final query = {'userId': mongo.ObjectId.fromHexString(widget.userId)};
-      final plants = await collection.find(query).toList();
+      final plants = await collection!.find(query).toList();
       if (!mounted) return;
       // Optionally decode images for each plant if needed
       for (var plant in plants) {
@@ -86,7 +85,6 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
         _plants = plants;
       });
       imageCountUpdateNotifier.value = _plants.length;
-      await db.close();
     } catch (e) {
       print('Error fetching plants: $e');
     } finally {

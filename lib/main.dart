@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_pdd/home.dart';
+import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
 import 'package:flutter/services.dart';
 import 'package:project_pdd/widget/first_page.dart';
@@ -37,6 +38,10 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   final userId = await getSavedUserId();
   final themeMode = await loadThemeMode();
+
+  // Connect MongoDB once, globally
+  await MongoService().connect();
+  
   // Set the preferred orientations to portrait mode only
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

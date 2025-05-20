@@ -4,7 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:bcrypt/bcrypt.dart';
-import 'package:project_pdd/constant.dart';
+import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/login.dart';
 
@@ -83,19 +83,16 @@ class _RegisAppState extends State<RegisApp> {
     try {
       final hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
-      final db = await mongo.Db.create(MONGO_URL);
-      await db.open();
+      final db = MongoService();
 
-      final collection = db.collection('users');
-      await collection.insert({
+      final collection = db.userCollection;
+      await collection!.insert({
         'username': email,
         'email': email,
         'password': hashedPassword,
       });
 
       final result = await collection.find({'email': email}).toList();
-
-      await db.close();
 
       // Navigate to login page
       Navigator.pop(context);

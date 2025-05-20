@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_pdd/home.dart';
 import 'package:project_pdd/main.dart';
+import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
-import 'package:project_pdd/constant.dart';
 import 'package:project_pdd/widget/gemini.dart';
 import 'package:project_pdd/widget/profile_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
@@ -30,15 +30,13 @@ class _DetailsPageState extends State<DetailsPage> {
   Future<void> deleteFunction(mongo.ObjectId plantId, String userId) async {
     try {
       print('Connecting to MongoDB...');
-      final db = await mongo.Db.create(MONGO_URL);
-      await db.open();
-      print('Connected to MongoDB.');
+      final db = MongoService();
 
-      final collection = db.collection('plants');
+      final collection = db.plantCollection;
       print('Fetching plants for user: ${userId}...');
 
       try {
-        final result = await collection.remove({
+        final result = await collection!.remove({
           '_id': plantId,
           'userId': mongo.ObjectId.fromHexString(userId)
         });
@@ -54,9 +52,6 @@ class _DetailsPageState extends State<DetailsPage> {
       } catch (e) {
         print('Error deleting plant: $e');
       }
-
-      await db.close();
-      print('MongoDB connection closed.');
     } catch (e) {
       print('Error db: $e');
     }
@@ -317,14 +312,12 @@ class _DetailsPageState extends State<DetailsPage> {
                         }
                         setState(() => _isUpdating = true);
                         try {
-                          final db = await mongo.Db.create(MONGO_URL);
-                          await db.open();
-                          final collection = db.collection('plants');
-                          await collection.update(
+                          final db = MongoService();
+                          final collection = db.plantCollection;
+                          await collection!.update(
                             {'_id': plant['_id']},
                             {r'$set': {'title': newTitle.trim()}},
                           );
-                          await db.close();
                           setState(() {
                             plant['title'] = newTitle.trim();
                           });
