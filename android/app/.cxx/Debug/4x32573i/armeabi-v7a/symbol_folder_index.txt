@@ -1,1 +1,0 @@
-C:\Users\prari\PlantDiseaseDetector\build\app\intermediates\cxx\Debug\4x32573i\obj\armeabi-v7a

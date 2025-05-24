@@ -1,2 +1,0 @@
-C:/Users/prari/PlantDiseaseDetector/android/app/.cxx/Debug/4x32573i/x86/CMakeFiles/edit_cache.dir
-C:/Users/prari/PlantDiseaseDetector/android/app/.cxx/Debug/4x32573i/x86/CMakeFiles/rebuild_cache.dir

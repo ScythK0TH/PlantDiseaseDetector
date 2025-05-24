@@ -1,1 +1,0 @@
-D:\GitKub\PlantDiseaseDetector\build\app\intermediates\cxx\Debug\56i3j3n1\obj\arm64-v8a

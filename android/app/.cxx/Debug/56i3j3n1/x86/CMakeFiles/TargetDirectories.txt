@@ -1,2 +1,0 @@
-D:/GitKub/PlantDiseaseDetector/android/app/.cxx/Debug/56i3j3n1/x86/CMakeFiles/edit_cache.dir
-D:/GitKub/PlantDiseaseDetector/android/app/.cxx/Debug/56i3j3n1/x86/CMakeFiles/rebuild_cache.dir
