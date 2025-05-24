@@ -1,8 +1,9 @@
 class ClassifierCategory {
   final String label;
   final double score;
+  final int pid;
 
-  ClassifierCategory(this.label, this.score);
+  ClassifierCategory(this.label, this.score, this.pid);
 
   @override
   String toString() {

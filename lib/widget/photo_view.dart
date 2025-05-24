@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:project_pdd/style.dart';
 
@@ -40,7 +41,7 @@ class PhotoViewScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Please pick a photo',
+              'Please pick a photo'.tr(),
               style: descTextStyleWhite(context, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,

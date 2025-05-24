@@ -1,16 +1,22 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:ui';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
-import 'package:project_pdd/constant.dart';
 import 'package:project_pdd/bloc/recogniser_bloc.dart';
 import 'package:project_pdd/bloc/recogniser_event.dart';
 import 'package:project_pdd/bloc/recogniser_state.dart';
+import 'package:project_pdd/home.dart';
+import 'package:project_pdd/main.dart';
+import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/photo_view.dart';
+import 'package:project_pdd/widget/profile_page.dart';
 import 'package:project_pdd/widget/storage_page.dart';
 
 class Recogniser extends StatefulWidget {
@@ -22,6 +28,8 @@ class Recogniser extends StatefulWidget {
 }
 
 class _RecogniserState extends State<Recogniser> {
+  bool isPressing = false;
+  bool isResultButtonPressing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -29,84 +37,92 @@ class _RecogniserState extends State<Recogniser> {
 
     return BlocProvider(
       create: (_) => RecogniserBloc()..add(RecogniserStarted()),
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          title: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.arrow_circle_left_rounded,
-                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-                        size: 24.0,
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              automaticallyImplyLeading: false,
+              systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
+                  ? SystemUiOverlayStyle.light
+                  : SystemUiOverlayStyle.dark,
+              title: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Center(
+                        child: Text(
+                          'Plant Analyzer'.tr(),
+                          style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
+                        ),
                       ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
-                  Center(
-                    child: Text(
-                      'Plant Hub',
-                      style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          centerTitle: true, // ไม่จำเป็นมากเพราะจัดตำแหน่งเองแล้ว
-        ),
-        body: BlocBuilder<RecogniserBloc, RecogniserState>(
-          builder: (context, state) {
-            return SingleChildScrollView(
-              child: Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 20),
-                    PhotoViewScreen(file: state.image),
-                    const SizedBox(height: 50),
-                    SizedBox(
-                      height: 150,
-                      child: SingleChildScrollView(
-                          child: _buildResultView(state, context)),
-                    ),
-                    const SizedBox(height: 20),
-                    if (state.status != RecogniserStatus.analyzing) ...[
-                      if (state.status == RecogniserStatus.found) ...[
-                      _buildResultButton(context, 'Save Result',
-                        screenWidth, false, 'save', state),
-                      const SizedBox(height: 20),
-                      _buildResultButton(context, 'Cancel',
-                        screenWidth, true, 'cancel', state),
-                      const SizedBox(height: 20),
-                      ] else ...[
-                        _buildPickButton(context, 'Take a photo',
-                          ImageSource.camera, screenWidth, false, 'photo'),
-                        const SizedBox(height: 20),
-                        _buildPickButton(context, 'Pick from gallery',
-                            ImageSource.gallery, screenWidth, true, 'gallery'),
-                        const SizedBox(height: 20),
-                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
-            );
-          },
-        ),
+              centerTitle: true,
+            ),
+            body: BlocBuilder<RecogniserBloc, RecogniserState>(
+              builder: (context, state) {
+                return SingleChildScrollView(
+                  child: Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 20),
+                        PhotoViewScreen(file: state.image),
+                        const SizedBox(height: 50),
+                        SizedBox(
+                          height: 150,
+                          child: SingleChildScrollView(
+                              child: _buildResultView(state, context)),
+                        ),
+                        const SizedBox(height: 20),
+                        if (state.status != RecogniserStatus.analyzing) ...[
+                          if (state.status == RecogniserStatus.found) ...[
+                          _buildResultButton(context, 'Save Result'.tr(),
+                            screenWidth, false, 'save', state),
+                          const SizedBox(height: 20),
+                          _buildResultButton(context, 'Cancel'.tr(),
+                            screenWidth, true, 'cancel', state),
+                          const SizedBox(height: 20),
+                          ] else ...[
+                            _buildPickButton(context, 'Take a photo'.tr(),
+                              ImageSource.camera, screenWidth, false, 'photo'),
+                            const SizedBox(height: 20),
+                            _buildPickButton(context, 'Pick from gallery'.tr(),
+                                ImageSource.gallery, screenWidth, true, 'gallery'),
+                            const SizedBox(height: 20),
+                          ],
+                        ],
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          if (isResultButtonPressing)
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: Container(
+                color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : primaryColor,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -124,7 +140,7 @@ class _RecogniserState extends State<Recogniser> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Analyzing...',
+            'Analyzing...'.tr(),
             style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
           ),
         ],
@@ -142,14 +158,14 @@ class _RecogniserState extends State<Recogniser> {
     };
 
     final accuracy = state.status == RecogniserStatus.found
-        ? 'Accuracy: ${(state.accuracy * 100).toStringAsFixed(2)}%'
+        ? 'Probability:'.tr() + ' ${(state.accuracy * 100).toStringAsFixed(2)}%'
         : '';
 
     List<String> splitText(String text, TextStyle style, double maxWidth) {
       final textPainter = TextPainter(
         text: TextSpan(text: text, style: style),
         maxLines: 1000,
-        textDirection: TextDirection.ltr,
+        textDirection: Directionality.of(context),
       )..layout(maxWidth: maxWidth);
 
       final words = text.split(' ');
@@ -187,7 +203,7 @@ class _RecogniserState extends State<Recogniser> {
       children: [
         for (var line in labelLines)
           Text(
-            line,
+            line.tr(),
             style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
@@ -203,41 +219,59 @@ class _RecogniserState extends State<Recogniser> {
 
   Widget _buildPickButton(BuildContext context, String title,
       ImageSource source, double width, bool isOutlined, String type) {
-    // Determine the icon based on the type
     IconData icon = type == 'photo' ? Icons.camera_alt : Icons.photo_library;
 
     return ElevatedButton(
-      onPressed: () async {
-        final picker = ImagePicker();
-        final pickedFile = await picker.pickImage(
-          source: source,
-        );
-        if (pickedFile != null) {
-          context
-              .read<RecogniserBloc>()
-              .add(PhotoPicked(File(pickedFile.path)));
-        }
-      },
+      onPressed: isPressing
+          ? null
+          : () async {
+              setState(() => isPressing = true);
+              final picker = ImagePicker();
+              final pickedFile = await picker.pickImage(
+                source: source,
+              );
+              if (pickedFile != null) {
+                context
+                    .read<RecogniserBloc>()
+                    .add(PhotoPicked(File(pickedFile.path)));
+              }
+              await Future.delayed(const Duration(milliseconds: 500));
+              if (mounted) setState(() => isPressing = false);
+            },
       style: ElevatedButton.styleFrom(
-        backgroundColor: isOutlined ? Colors.transparent : (Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor),
+        backgroundColor: isOutlined
+            ? Colors.transparent
+            : (Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : primaryColor),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(36.0),
           side: isOutlined
-              ? BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 3.0)
+              ? BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : primaryColor,
+                  width: 3.0)
               : BorderSide.none,
         ),
         minimumSize: Size(width, 60.0),
         elevation: isOutlined ? 0 : null,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center, // Center content
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             icon,
-            color: isOutlined ? (Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor) : (Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white),
-            size: 24.0, // Icon size
+            color: isOutlined
+                ? (Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : primaryColor)
+                : (Theme.of(context).brightness == Brightness.dark
+                    ? primaryColor
+                    : Colors.white),
+            size: 24.0,
           ),
-          const SizedBox(width: 10), // Space between icon and text
+          const SizedBox(width: 10),
           Text(
             title,
             style: isOutlined
@@ -253,34 +287,42 @@ class _RecogniserState extends State<Recogniser> {
     double width, bool isOutlined, String type, RecogniserState state) {
 
     return ElevatedButton(
-      onPressed: () async {
-        if (type == 'save') {
-          await _savedData(context, state, widget.userId);
-        } else if (type == 'cancel') {
-          //Refresh the page
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Recogniser(userId: widget.userId),
-            ),
-          );
-        }
-      },
+      onPressed: isResultButtonPressing
+          ? null
+          : () async {
+              setState(() => isResultButtonPressing = true);
+              if (type == 'save') {
+                await _savedData(context, state, widget.userId);
+              } else if (type == 'cancel') {
+                //Reset the state
+                context.read<RecogniserBloc>().add(RecogniserReset());
+              }
+              await Future.delayed(const Duration(milliseconds: 500));
+              if (mounted) setState(() => isResultButtonPressing = false);
+            },
       style: ElevatedButton.styleFrom(
-        backgroundColor: isOutlined ? Colors.transparent : (Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor),
+        backgroundColor: isOutlined
+            ? Colors.transparent
+            : (Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : primaryColor),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(36.0),
           side: isOutlined
-              ? BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 3.0)
+              ? BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : primaryColor,
+                  width: 3.0)
               : BorderSide.none,
         ),
         minimumSize: Size(width, 60.0),
         elevation: isOutlined ? 0 : null,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center, // Center content
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(width: 10), // Space between icon and text
+          const SizedBox(width: 10),
           Text(
             title,
             style: isOutlined
@@ -341,26 +383,31 @@ Future<void> _savedData(BuildContext context, RecogniserState state, String user
     }
     final predict = state.label;
     final image = state.image != null ? await cropAndResizeToContainer(state.image!, 350, 300) : null;
-    final title = state.image != null ? state.image!.path.split('/').last : 'Unknown';
+    String title = state.image != null ? state.image!.path.split('/').last : 'Unknown';
+    if (title.length > 15) {
+      title = title.substring(title.length - 15);
+    }
     final accuracy = state.accuracy;
     final dateTime = DateTime.now().toString();
+    final pid = state.pid;
 
     try {
       print('Connecting to MongoDB...');
-      final db = await mongo.Db.create(MONGO_URL);
-      await db.open();
+      final db = MongoService();
       print('Connected to MongoDB.');
 
-      final collection = db.collection('plants');
+      final collection = db.plantCollection;
       if (image != null) {
-        await collection.insert({
+        await collection!.insert({
           'userId': mongoUserId,
           'image': image,
           'date': dateTime,
+          'predict_id': pid,
           'predict': predict,
           'title': title,
-          'accuracy': accuracy,
+          'probability': accuracy,
         });
+        imageCountUpdateNotifier.value++;
       } else {
         print('Error: Image is null.');
       }
@@ -368,10 +415,11 @@ Future<void> _savedData(BuildContext context, RecogniserState state, String user
         context,
         MaterialPageRoute(
           builder: (context) =>
-              StoragePage(userId: userId),
+              HomePage(
+                userId: userId,
+                ),
         ),
       );
-      await db.close();
     } catch (e) {
       print('Error: $e');
     }

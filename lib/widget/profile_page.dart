@@ -1,10 +1,16 @@
+import 'dart:ui';
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
-import 'package:project_pdd/constant.dart';
+import 'package:project_pdd/widget/first_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
 import 'package:project_pdd/main.dart';
 import 'package:project_pdd/widget/storage_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, required this.userId});
@@ -14,29 +20,45 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStateMixin {
+class _ProfilePageState extends State<ProfilePage>
+    with SingleTickerProviderStateMixin {
+
   bool _showSheet = false;
   bool _isLoading = false;
+  bool _isUpdating = false;
   Map<String, dynamic>? _userData;
   final ValueNotifier<double> _sheetExtent = ValueNotifier(0.7);
+  int? galleryCount;
+
+  Future<void> clearLoginState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userId');
+  }
 
   Future<void> _fetchUserData() async {
+
     if (!mounted) return;
     setState(() {
       _isLoading = true;
     });
-    final db = await mongo.Db.create(MONGO_URL);
+    final db = MongoService();
     try {
-      await db.open();
-      final collection = db.collection('users');
-      final user = await collection.findOne(
+      final collection = db.userCollection;
+      final galleryCollection = db.plantCollection;
+      final user = await collection!.findOne(
         mongo.where.eq('_id', mongo.ObjectId.fromHexString(widget.userId)),
       );
+      final gallery = await galleryCollection!
+          .find(
+            mongo.where
+                .eq('userId', mongo.ObjectId.fromHexString(widget.userId)),
+          )
+          .toList();
       if (!mounted) return;
       setState(() {
         _userData = user;
+        galleryCount = gallery.length;
       });
-      await db.close();
     } catch (e) {
       print('Error fetching user data: $e');
     } finally {
@@ -50,6 +72,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
+    imageCountUpdateNotifier.addListener(_updateGalleryCount);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchUserData().then((_) {
         if (mounted) {
@@ -61,6 +84,23 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     });
   }
 
+  void _updateGalleryCount() {
+    final newCount = imageCountUpdateNotifier.value;
+    if (galleryCount == null || galleryCount != newCount) {
+      setState(() {
+        galleryCount = newCount;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    // Add this line to remove listener when widget disposes
+    imageCountUpdateNotifier.removeListener(_updateGalleryCount);
+    _sheetExtent.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final double bottomNavHeight = 56.0;
@@ -69,23 +109,29 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     final double showTitleExtent = 0.9; // When to start showing the title
 
     return Scaffold(
-      backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+      backgroundColor: _isLoading
+          ? Theme.of(context).brightness == Brightness.dark
+              ? primaryColor
+              : Colors.white
+          : Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : primaryColor,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: ValueListenableBuilder<double>(
           valueListenable: _sheetExtent,
           builder: (context, extent, _) {
             // Title still appears at showTitleExtent, but you can adjust if needed
-            double tTitle = ((extent - showTitleExtent) / (maxExtent - showTitleExtent)).clamp(0.0, 1.0);
+            double tTitle =
+                ((extent - showTitleExtent) / (maxExtent - showTitleExtent))
+                    .clamp(0.0, 1.0);
             return AppBar(
               backgroundColor: Colors.transparent,
+              automaticallyImplyLeading: false,
+              systemOverlayStyle: themeModeNotifier.value == ThemeMode.dark
+                  ? SystemUiOverlayStyle.dark
+                  : SystemUiOverlayStyle.light,
               elevation: 0,
-              leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.arrow_circle_left_rounded, color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white),
-              ),
               title: Transform.translate(
                 offset: Offset(0, -40 * (1 - tTitle)), // Slide from above
                 child: Opacity(
@@ -93,8 +139,9 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      '${_userData?['email'] ?? '-'}',
-                      style: mainTitleTextStyleWhite(context, fontWeight: FontWeight.bold),
+                      '${_userData?['username'] ?? '-'}',
+                      style: mainTitleTextStyleWhite(context,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -105,14 +152,15 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                     Theme.of(context).brightness == Brightness.dark
                         ? Icons.dark_mode_rounded
                         : Icons.light_mode_rounded,
-                    color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? primaryColor
+                        : Colors.white,
                   ),
                   onPressed: () {
-                    // Toggle theme
-                    themeModeNotifier.value =
-                        Theme.of(context).brightness == Brightness.dark
-                            ? ThemeMode.light
-                            : ThemeMode.dark;
+                    final isDark = Theme.of(context).brightness == Brightness.dark;
+                    final newMode = isDark ? ThemeMode.light : ThemeMode.dark;
+                    themeModeNotifier.value = newMode;
+                    saveThemeMode(newMode); // <-- save to SharedPreferences
                   },
                 ),
               ],
@@ -126,32 +174,45 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
             valueListenable: _sheetExtent,
             builder: (context, extent, _) {
               // Fade out as soon as sheet starts moving up
-              double t = ((extent - minExtent) / (maxExtent - minExtent)).clamp(0.0, 1.0);
+              double t = ((extent - minExtent) / (maxExtent - minExtent))
+                  .clamp(0.0, 1.0);
               return Center(
                 child: _isLoading
-                    ? CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white)
-                    : Opacity(
-                        opacity: 1 - t, // Fade out as soon as sheet starts to cover
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 24.0),
-                              child: Text(
-                                'User Profile',
-                                style: mainTitleTextStyleWhite(context, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            if (_userData != null)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 16.0),
-                                child: Text(
-                                  'Email: ${_userData!['email'] ?? '-'}',
-                                  style: descTextStyleWhite(context, fontWeight: FontWeight.normal),
+                    ? CircularProgressIndicator(
+                        color:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : primaryColor)
+                    : _userData == null
+                        ? Text(
+                            'User not found.'.tr(),
+                            style: descTextStyleWhite(context,
+                                fontWeight: FontWeight.normal),
+                          )
+                        : Opacity(
+                            opacity: 1 -
+                                t, // Fade out as soon as sheet starts to cover
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 24.0),
+                                  child: Text(
+                                    'User Profile'.tr(),
+                                    style: mainTitleTextStyleWhite(context,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
-                              ),
-                          ],
-                        ),
-                      ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 16.0),
+                                  child: Text(
+                                    'Email: ${_userData!['email'] ?? '-'}',
+                                    style: descTextStyleWhite(context,
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
               );
             },
           ),
@@ -165,7 +226,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                   minChildSize: minExtent,
                   maxChildSize: maxExtent,
                   builder: (context, scrollController) {
-                    return NotificationListener<DraggableScrollableNotification>(
+                    return NotificationListener<
+                        DraggableScrollableNotification>(
                       onNotification: (notification) {
                         _sheetExtent.value = notification.extent;
                         return true;
@@ -173,30 +235,384 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                          colors: Theme.of(context).brightness != Brightness.dark
-                            ? [Colors.white, Colors.white]
-                            : [
-                              Color.fromARGB(255, 11, 48, 54), // 2% blue
-                              Colors.black,
-                              ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
+                            colors: Theme.of(context).brightness !=
+                                    Brightness.dark
+                                ? [Colors.white, Colors.white]
+                                : [
+                                    Color.fromARGB(255, 11, 48, 54), // 2% blue
+                                    Colors.black,
+                                  ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
                           ),
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(36)),
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(36)),
                         ),
-                        padding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, bottomNavHeight + 16),
+                        padding: EdgeInsets.fromLTRB(
+                            24.0, 24.0, 24.0, 0),
                         child: ListView(
                           controller: scrollController,
                           children: [
-                            Icon(Icons.account_circle, size: 48, color: Colors.green),
-                            SizedBox(height: 16),
-                            Text(
-                              'Welcome, ${_userData?['username'] ?? 'User'}!',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 48,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: IconButton(
+                                        onPressed: () async {
+                                          final TextEditingController
+                                              unameController =
+                                              TextEditingController(
+                                                  text:
+                                                      _userData!['username'] ??
+                                                          '');
+                                          final newTitle =
+                                              await showDialog<String>(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              backgroundColor: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.dark
+                                                  ? primaryColor
+                                                  : Colors.white,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(36.0),
+                                              ),
+                                              title:
+                                                  Text('Edit Your Name'.tr()),
+                                              content: TextField(
+                                                controller: unameController,
+                                                decoration: InputDecoration(
+                                                    hintText:
+                                                        'Enter new name'.tr()),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
+                                                  child: Text('Cancel'.tr()),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context,
+                                                          unameController.text),
+                                                  child: Text('Save'.tr()),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                          if (newTitle != null &&
+                                              newTitle.trim().isNotEmpty) {
+                                            if (newTitle.trim().length > 20) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  backgroundColor: Colors.red,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(12.0),
+                                                      topRight:
+                                                          Radius.circular(12.0),
+                                                    ),
+                                                  ),
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
+                                                  margin: EdgeInsets.only(
+                                                    bottom:
+                                                        bottomNavHeight, // 56 (nav height) + 16 spacing
+                                                  ),
+                                                  content: Text(
+                                                      'Name must be 20 characters or less!'
+                                                          .tr()),
+                                                ),
+                                              );
+                                              return; // Stop further execution
+                                            }
+                                            setState(() => _isUpdating = true);
+                                            try {
+                                              final db = MongoService();
+                                              final collection =
+                                                  db.userCollection;
+                                              await collection!.update(
+                                                {'_id': _userData!['_id']},
+                                                {
+                                                  r'$set': {
+                                                    'username': newTitle.trim()
+                                                  }
+                                                },
+                                              );
+                                              setState(() {
+                                                _userData!['username'] =
+                                                    newTitle.trim();
+                                              });
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                    backgroundColor:
+                                                        Colors.green,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                        topLeft:
+                                                            Radius.circular(
+                                                                12.0),
+                                                        topRight:
+                                                            Radius.circular(
+                                                                12.0),
+                                                      ),
+                                                    ),
+                                                    content: Text(
+                                                        'Name updated!'.tr())),
+                                              );
+                                            } catch (e) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                    backgroundColor: Colors.red,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                        topLeft:
+                                                            Radius.circular(
+                                                                12.0),
+                                                        topRight:
+                                                            Radius.circular(
+                                                                12.0),
+                                                      ),
+                                                    ),
+                                                    behavior: SnackBarBehavior
+                                                        .floating,
+                                                    margin: EdgeInsets.only(
+                                                      bottom:
+                                                          bottomNavHeight, // 56 (nav height) + 16 spacing
+                                                    ),
+                                                    content: Text(
+                                                        'Failed to update name:'
+                                                                .tr() +
+                                                            ' $e')),
+                                              );
+                                            } finally {
+                                              setState(
+                                                  () => _isUpdating = false);
+                                            }
+                                          }
+                                        },
+                                        icon: Icon(Icons.edit,
+                                            size: 24, color: Colors.green),
+                                      )),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: Icon(Icons.account_circle,
+                                        size: 48, color: Colors.green),
+                                  ),
+                                  Align(
+                                      alignment: Alignment.centerRight,
+                                      child: IconButton(
+                                        onPressed: () {
+                                          themeModeNotifier.value =
+                                              ThemeMode.light;
+                                          saveThemeMode(ThemeMode.light);
+                                          clearLoginState().then((_) {
+                                            // Clear the userId from SharedPreferences
+                                            Navigator.pushAndRemoveUntil(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      FirstPageScreen()),
+                                              (route) =>
+                                                  false, // Remove all previous routes
+                                            );
+                                          });
+                                        },
+                                        icon: Icon(Icons.logout,
+                                            size: 24, color: Colors.red),
+                                      )),
+                                ],
+                              ),
                             ),
-                            SizedBox(height: 8),
-                            Text('User ID: ${widget.userId}'),
                             SizedBox(height: 16),
+                            Center(
+                              child: Text(
+                                'Welcome,'.tr() +
+                                    ' ${_userData?['username'] ?? 'User'}!',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Divider(),
+                            Container(
+                              padding: EdgeInsets.all(24),
+                              margin: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.grey[200]
+                                    : primaryColor,
+                                borderRadius: BorderRadius.circular(36),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.3),
+                                    blurRadius: 4,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          'Your Gallery'.tr(),
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.dark
+                                                  ? primaryColor
+                                                  : Colors.white),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text.rich(
+                                          TextSpan(
+                                            children: <TextSpan>[
+                                              TextSpan(
+                                                text: '${galleryCount ?? 0} ',
+                                                style: TextStyle(
+                                                    fontSize: 56,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              TextSpan(
+                                                text: 'images'.tr(),
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.dark
+                                                  ? primaryColor
+                                                  : Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.symmetric(vertical: 24),
+                              padding: EdgeInsets.all(0),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.grey[200]
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(24),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.08),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        await context
+                                            .setLocale(Locale('en', 'US'));
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 24),
+                                        decoration: BoxDecoration(
+                                          color: context.locale.languageCode ==
+                                                  'en'
+                                              ? Colors.green
+                                              : Theme.of(context)
+                                                  .brightness ==
+                                                  Brightness.dark
+                                                  ? Colors.grey[200]
+                                                  : primaryColor,
+                                          borderRadius: BorderRadius.horizontal(
+                                              left: Radius.circular(24)),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            'EN',
+                                            style: TextStyle(
+                                              fontSize: 28,
+                                              fontWeight: FontWeight.bold,
+                                              color:
+                                                  context.locale.languageCode ==
+                                                          'en'
+                                                      ? Colors.white
+                                                      : Colors.green,
+                                              letterSpacing: 2,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        await context
+                                            .setLocale(Locale('th', 'TH'));
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 24),
+                                        decoration: BoxDecoration(
+                                          color: context.locale.languageCode ==
+                                                  'th'
+                                              ? Colors.green
+                                              : Theme.of(context)
+                                                  .brightness ==
+                                                  Brightness.dark
+                                                  ? Colors.grey[200]
+                                                  : primaryColor,
+                                          borderRadius: BorderRadius.horizontal(
+                                              right: Radius.circular(24)),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            'TH',
+                                            style: TextStyle(
+                                              fontSize: 28,
+                                              fontWeight: FontWeight.bold,
+                                              color:
+                                                  context.locale.languageCode ==
+                                                          'th'
+                                                      ? Colors.white
+                                                      : Colors.green,
+                                              letterSpacing: 2,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
                           ],
                         ),
                       ),
@@ -205,71 +621,20 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                 ),
               ),
             ),
-          // BottomNavigationBar as top-most widget
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: BottomNavigationBar(
-              type: BottomNavigationBarType.fixed,
-              currentIndex: 2,
-              selectedItemColor: successColor,
-              unselectedItemColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-              showSelectedLabels: true,
-              showUnselectedLabels: true,
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.camera_alt,
-                    size: 24.0,
-                  ),
-                  label: 'Camera',
+          if (_isUpdating)
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: Container(
+                color:
+                    const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
+                child: Center(
+                  child: CircularProgressIndicator(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? primaryColor
+                          : Colors.white),
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.photo,
-                    size: 24.0,
-                  ),
-                  label: 'Gallery',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.person,
-                    size: 24.0,
-                  ),
-                  label: 'Profile',
-                ),
-              ],
-              onTap: (index) {
-                switch (index) {
-                  case 0:
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Recogniser(userId: widget.userId),
-                      ),
-                    );
-                    break;
-                  case 1:
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => StoragePage(userId: widget.userId),
-                      ),
-                    );
-                    break;
-                  case 2:
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProfilePage(userId: widget.userId),
-                      ),
-                    );
-                    break;
-                }
-              },
+              ),
             ),
-          ),
         ],
       ),
     );

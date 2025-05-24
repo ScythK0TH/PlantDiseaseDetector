@@ -15,6 +15,9 @@ class RecogniserBloc extends Bloc<RecogniserEvent, RecogniserState> {
 
   RecogniserBloc() : super(const RecogniserState()) {
     on<RecogniserStarted>(_onStarted);
+    on<RecogniserReset>((event, emit) {
+      emit(const RecogniserState());
+    });
     on<PhotoPicked>(_onPhotoPicked);
   }
 
@@ -41,6 +44,7 @@ class RecogniserBloc extends Bloc<RecogniserEvent, RecogniserState> {
       if (result != null) {
         emit(state.copyWith(
           status: RecogniserStatus.found,
+          pid: result.pid,
           label: result.label,
           accuracy: result.score,
         ));

@@ -1,12 +1,14 @@
 import 'dart:ui';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:bcrypt/bcrypt.dart';
-import 'package:project_pdd/constant.dart';
+import 'package:project_pdd/home.dart';
+import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/register.dart';
-import 'storage_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginApp extends StatefulWidget {
   const LoginApp({super.key});
@@ -23,8 +25,8 @@ class LoginAppState extends State<LoginApp> {
   final _passwordController = TextEditingController();
 
   final List<String> textSequence = [
-    "Welcome to our app",
-    "Let's get started!!"
+    "Welcome to our app!!".tr(),
+    "Let's get started!!".tr()
   ];
   int index = 0;
 
@@ -36,6 +38,12 @@ class LoginAppState extends State<LoginApp> {
         });
       }
     });
+  }
+
+  // Call this after successful login
+  Future<void> saveLoginState(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userId', userId);
   }
 
   Future<void> _loginUser() async {
@@ -55,24 +63,24 @@ class LoginAppState extends State<LoginApp> {
 
     try {
       print('Connecting to MongoDB...');
-      final db = await mongo.Db.create(MONGO_URL);
-      await db.open();
+      final db = MongoService();
       print('Connected to MongoDB.');
 
-      final collection = db.collection('users');
+      final collection = db.userCollection;
       print('Finding user...');
-      final user = await collection.findOne({'email': email});
+      final user = await collection!.findOne({'email': email});
 
       if (user != null) {
         final hashedPassword = user['password'];
         if (BCrypt.checkpw(password, hashedPassword)) {
           print('Login successful!');
+          await saveLoginState(user['_id'].toHexString());
 
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  StoragePage(userId: user['_id'].toHexString()),
+                  HomePage(userId: user['_id'].toHexString()),
             ),
           );
         } else {
@@ -88,7 +96,6 @@ class LoginAppState extends State<LoginApp> {
         });
       }
 
-      await db.close();
     } catch (e) {
       print('Error: $e');
     }
@@ -146,7 +153,7 @@ class LoginAppState extends State<LoginApp> {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      "Sign into your account",
+                      "Sign into your account".tr(),
                       style: descTextStyleDark(context,
                           fontWeight: FontWeight.normal),
                     ),
@@ -176,7 +183,7 @@ class LoginAppState extends State<LoginApp> {
                                   BorderRadius.all(Radius.circular(36.0))),
                           filled: true,
                           fillColor: Colors.white,
-                          hintText: "Enter your email",
+                          hintText: "Enter your email".tr(),
                           hintStyle: subDescTextStyleDark(context,
                               fontWeight: FontWeight.normal),
                         ),
@@ -203,7 +210,7 @@ class LoginAppState extends State<LoginApp> {
                               Theme.of(context).brightness == Brightness.dark
                                   ? primaryColor
                                   : Colors.white,
-                          hintText: "Enter your password",
+                          hintText: "Enter your password".tr(),
                           hintStyle: subDescTextStyleDark(context,
                               fontWeight: FontWeight.normal),
                           suffixIcon: IconButton(
@@ -225,21 +232,10 @@ class LoginAppState extends State<LoginApp> {
                       Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Text(
-                          _errorMessage!,
+                          _errorMessage!.tr(),
                           style: TextStyle(color: Colors.red),
                         ),
                       ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 12.0),
-                      child: Container(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            child: Text("Forgot password?",
-                                style: subSuccessTextStyle(
-                                    fontWeight: FontWeight.bold)),
-                            onPressed: () {},
-                          )),
-                    ),
                   ],
                 ),
               ),
@@ -263,19 +259,19 @@ class LoginAppState extends State<LoginApp> {
                       child: Container(
                           alignment: Alignment.center,
                           width: 100,
-                          child: Text("Login",
+                          child: Text("Login".tr(),
                               style: TextStyle(
                                   fontSize: 15.0, color: Colors.white)))),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Don't have an account?",
+                      Text("Don't have an account?".tr(),
                           style: subDescTextStyleDark(context,
                               fontWeight: FontWeight.normal)),
                       Container(
                           alignment: Alignment.centerRight,
                           child: TextButton(
-                            child: Text("Register now",
+                            child: Text("Register now".tr(),
                                 style: subSuccessTextStyle(
                                     fontWeight: FontWeight.bold)),
                             onPressed: () {
