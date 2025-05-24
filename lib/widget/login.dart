@@ -39,7 +39,6 @@ class LoginAppState extends State<LoginApp> {
   }
 
   Future<void> _loginUser() async {
-    // Clear any previous error messages
     setState(() {
       _errorMessage = null;
     });
@@ -78,9 +77,9 @@ class LoginAppState extends State<LoginApp> {
           );
         } else {
           print('Invalid password.');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Invalid password.')),
-          );
+          setState(() {
+            _errorMessage = "Invalid password";
+          });
         }
       } else {
         print('User not found.');
@@ -102,7 +101,9 @@ class LoginAppState extends State<LoginApp> {
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? primaryColor
+            : Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(36.0)),
       ),
       child: SingleChildScrollView(
@@ -132,8 +133,7 @@ class LoginAppState extends State<LoginApp> {
                           animatedTexts: [
                             TypewriterAnimatedText(
                               textSequence[index],
-                              textStyle: subTitleTextStyleDark(
-                                  context,
+                              textStyle: subTitleTextStyleDark(context,
                                   fontWeight: FontWeight.bold),
                               speed: Duration(milliseconds: 150),
                               cursor: '|',
@@ -147,7 +147,8 @@ class LoginAppState extends State<LoginApp> {
                     SizedBox(height: 10),
                     Text(
                       "Sign into your account",
-                      style: descTextStyleDark(context, fontWeight: FontWeight.normal),
+                      style: descTextStyleDark(context,
+                          fontWeight: FontWeight.normal),
                     ),
                   ],
                 ),
@@ -165,15 +166,18 @@ class LoginAppState extends State<LoginApp> {
                         controller: _emailController,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 2),
+                              borderSide: BorderSide(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : primaryColor,
+                                  width: 2),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(36.0))),
                           filled: true,
                           fillColor: Colors.white,
                           hintText: "Enter your email",
-                          hintStyle: subDescTextStyleDark(
-                              context,
+                          hintStyle: subDescTextStyleDark(context,
                               fontWeight: FontWeight.normal),
                         ),
                       ),
@@ -185,16 +189,22 @@ class LoginAppState extends State<LoginApp> {
                         obscureText: _isObscure,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 2),
+                            borderSide: BorderSide(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : primaryColor,
+                                width: 2),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(36.0)),
                           ),
                           filled: true,
-                          fillColor: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+                          fillColor:
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? primaryColor
+                                  : Colors.white,
                           hintText: "Enter your password",
-                          hintStyle: subDescTextStyleDark(
-                              context,
+                          hintStyle: subDescTextStyleDark(context,
                               fontWeight: FontWeight.normal),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -240,7 +250,10 @@ class LoginAppState extends State<LoginApp> {
                 children: [
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+                        backgroundColor:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : primaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(36.0),
                         ),
@@ -257,8 +270,7 @@ class LoginAppState extends State<LoginApp> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text("Don't have an account?",
-                          style: subDescTextStyleDark(
-                              context,
+                          style: subDescTextStyleDark(context,
                               fontWeight: FontWeight.normal)),
                       Container(
                           alignment: Alignment.centerRight,
