@@ -246,71 +246,107 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                         : primaryColor))
             : _plants.isEmpty
                 ? Center(child: Text('No plants found.').tr())
-                : Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 24.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(36.0)),
-                      color: Colors.transparent,
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 4.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              TextButton(
-                                onPressed: () {
-                                  setState(() => selectedButton = 'Latest');
-                                },
-                                child: Text(
-                                  'Latest'.tr(),
-                                  style: selectedButton == 'Latest'
-                                      ? successTextStyle(
-                                          fontWeight: FontWeight.bold)
-                                      : descTextStyleDark(context,
-                                          fontWeight: FontWeight.normal),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  setState(() => selectedButton = 'All');
-                                },
-                                child: Text(
-                                  'All'.tr(),
-                                  style: selectedButton == 'All'
-                                      ? successTextStyle(
-                                          fontWeight: FontWeight.bold)
-                                      : descTextStyleDark(context,
-                                          fontWeight: FontWeight.normal),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: GridView.builder(
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 8.0,
-                              mainAxisSpacing: 8.0,
-                              childAspectRatio: 0.8,
-                            ),
-                            itemCount: displayPlants.length,
-                            itemBuilder: (context, index) {
-                              final plant = displayPlants[index];
-                              return _buildPlantItems(context, plant);
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                : _buildPlantGridView(context, displayPlants)
       ),
     );
+  }
+
+  Widget _buildPlantGridView(
+    BuildContext context,
+    List<Map<String, dynamic>> displayPlants,
+  ) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    int crossAxisCount;
+    double crossAxisSpacing;
+    double mainAxisSpacing;
+    double childAspectRatio;
+
+    if (Responsive.isSmallMobile(context)) {
+      crossAxisCount = 1;
+      crossAxisSpacing = screenWidth * 0.03;
+      mainAxisSpacing = screenHeight * 0.02;
+      childAspectRatio = 0.9;
+    } else if (Responsive.isMobile(context)) {
+      crossAxisCount = 2;
+      crossAxisSpacing = screenWidth * 0.02;
+      mainAxisSpacing = screenHeight * 0.015;
+      childAspectRatio = 0.95;
+    } else {
+      crossAxisCount = 4;
+      crossAxisSpacing = screenWidth * 0.015;
+      mainAxisSpacing = screenHeight * 0.02;
+      childAspectRatio = 0.8;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: () => setState(() => selectedButton = 'Latest'),
+                  child: Text(
+                    'Latest'.tr(),
+                    style: selectedButton == 'Latest'
+                        ? successTextStyle(fontWeight: FontWeight.bold)
+                        : descTextStyleDark(context,
+                            fontWeight: FontWeight.normal),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: TextButton(
+                  onPressed: () => setState(() => selectedButton = 'All'),
+                  child: Text(
+                    'All'.tr(),
+                    style: selectedButton == 'All'
+                        ? successTextStyle(fontWeight: FontWeight.bold)
+                        : descTextStyleDark(context,
+                            fontWeight: FontWeight.normal),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: _buildGrid(
+              context,
+              displayPlants,
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: crossAxisSpacing,
+              mainAxisSpacing: mainAxisSpacing,
+              childAspectRatio: childAspectRatio,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGrid(
+      BuildContext context, List<Map<String, dynamic>> displayPlants,
+      {required int crossAxisCount,
+      required double crossAxisSpacing,
+      required double mainAxisSpacing,
+      required double childAspectRatio}) {
+    return GridView.builder(
+        shrinkWrap: false,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          crossAxisSpacing: crossAxisSpacing,
+          mainAxisSpacing: mainAxisSpacing,
+          childAspectRatio: childAspectRatio,
+        ),
+        itemCount: displayPlants.length,
+        itemBuilder: (context, index) {
+          final plant = displayPlants[index];
+          return _buildPlantItems(context, plant);
+        });
   }
 
   Widget _buildPlantItems(BuildContext context, Map<String, dynamic> plant) {
