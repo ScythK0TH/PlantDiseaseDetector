@@ -302,84 +302,80 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                             itemCount: displayPlants.length,
                             itemBuilder: (context, index) {
                               final plant = displayPlants[index];
-                              return GestureDetector(
-                                onTap: () async {
-                                  final result = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => DetailsPage(
-                                          plant: plant, userId: widget.userId),
-                                    ),
-                                  );
-                                  if (result == true) {
-                                    setState(() {
-                                      final plantId = plant['_id'];
-                                      _plants.removeWhere(
-                                          (p) => p['_id'] == plantId);
-                                      _allPlants.removeWhere(
-                                          (p) => p['_id'] == plantId);
-                                    });
-                                  }
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(36.0),
-                                    color: Colors.transparent,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                          child: _buildPlantImages(
-                                              context, plant)),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 4.0),
-                                        child: (Responsive.isSmallMobile(
-                                                    context) ||
-                                                Responsive.isMobile(context) ||
-                                                Responsive.isTablet(context))
-                                            ? Text(
-                                                plant['title'] ??
-                                                    'Unknown Plant'.tr(),
-                                                style: descTextStyleDark(
-                                                  context,
-                                                  fontWeight: FontWeight.normal,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 2,
-                                                softWrap: true,
-                                              )
-                                            : SingleChildScrollView(
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                child: Text(
-                                                  plant['title'] ??
-                                                      'Unknown Plant'.tr(),
-                                                  style: descTextStyleDark(
-                                                    context,
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                  ),
-                                                  textAlign: TextAlign.start,
-                                                  softWrap: false,
-                                                  overflow:
-                                                      TextOverflow.visible,
-                                                ),
-                                              ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
+                              return _buildPlantItems(context, plant);
                             },
                           ),
                         ),
                       ],
                     ),
                   ),
+      ),
+    );
+  }
+
+  Widget _buildPlantItems(BuildContext context, Map<String, dynamic> plant) {
+    final double titleFontSize = 18.0;
+
+    return GestureDetector(
+      onTap: () async {
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                DetailsPage(plant: plant, userId: widget.userId),
+          ),
+        );
+        if (result == true) {
+          setState(() {
+            final plantId = plant['_id'];
+            _plants.removeWhere((p) => p['_id'] == plantId);
+            _allPlants.removeWhere((p) => p['_id'] == plantId);
+          });
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(36.0),
+          color: Colors.transparent,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: _buildPlantImages(context, plant),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: (Responsive.isSmallMobile(context) ||
+                      Responsive.isMobile(context) ||
+                      Responsive.isTablet(context))
+                  ? Text(
+                      plant['title'] ?? 'Unknown Plant'.tr(),
+                      style: descTextStyleDark(
+                        context,
+                        fontWeight: FontWeight.normal,
+                      ).copyWith(fontSize: titleFontSize),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      softWrap: true,
+                    )
+                  : SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Text(
+                        plant['title'] ?? 'Unknown Plant'.tr(),
+                        style: descTextStyleDark(
+                          context,
+                          fontWeight: FontWeight.normal,
+                        ).copyWith(fontSize: titleFontSize),
+                        textAlign: TextAlign.start,
+                        softWrap: false,
+                        overflow: TextOverflow.visible,
+                      ),
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
