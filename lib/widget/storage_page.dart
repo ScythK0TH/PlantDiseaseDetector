@@ -7,12 +7,10 @@ import 'package:flutter/services.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
-import 'package:project_pdd/widget/first_page.dart';
-import 'package:project_pdd/widget/profile_page.dart';
-import 'package:project_pdd/widget/recogniser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../ui/responsive.dart';
 import 'details_page.dart';
-import 'package:project_pdd/main.dart'; 
+import 'package:project_pdd/main.dart';
 
 class StoragePage extends StatefulWidget {
   final String userId; // Pass the logged-in user's _id
@@ -41,7 +39,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
     super.didChangeDependencies();
     routeObserver.subscribe(this, ModalRoute.of(context)!);
   }
-  
+
   @override
   void didPopNext() {
     // Called when this route is popped to and the previous route is visible.
@@ -113,10 +111,12 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
         ..sort((a, b) {
           final aTime = a['date'] is DateTime
               ? a['date']
-              : DateTime.tryParse(a['date']?.toString() ?? '') ?? DateTime(1970);
+              : DateTime.tryParse(a['date']?.toString() ?? '') ??
+                  DateTime(1970);
           final bTime = b['date'] is DateTime
               ? b['date']
-              : DateTime.tryParse(b['date']?.toString() ?? '') ?? DateTime(1970);
+              : DateTime.tryParse(b['date']?.toString() ?? '') ??
+                  DateTime(1970);
           return bTime.compareTo(aTime); // Descending
         });
       if (displayPlants.length > 4) {
@@ -135,7 +135,9 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
             builder: (context) => AlertDialog(
               title: Text('Exit').tr(),
               content: Text('Are you sure you want to logout?').tr(),
-              backgroundColor: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+              backgroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? primaryColor
+                  : Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(36.0),
               ),
@@ -164,7 +166,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
           backgroundColor: Colors.transparent,
           elevation: 0,
           automaticallyImplyLeading: false,
-          systemOverlayStyle: Theme.of(context).brightness == Brightness.dark 
+          systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
               ? SystemUiOverlayStyle.light
               : SystemUiOverlayStyle.dark,
           title: Padding(
@@ -186,23 +188,33 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                 else
                   Text(
                     'Gallery'.tr(),
-                    style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
+                    style: subTitleTextStyleDark(context,
+                        fontWeight: FontWeight.bold),
                   ),
                 Spacer(),
                 if (_isSearching)
                   IconButton(
-                    icon: Icon(Icons.close, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, size: 24.0),
+                    icon: Icon(Icons.close,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : primaryColor,
+                        size: 24.0),
                     onPressed: () {
                       setState(() {
                         _isSearching = false;
                         _searchController.clear();
-                        _plants = List<Map<String, dynamic>>.from(_allPlants); // Reset to all plants
+                        _plants = List<Map<String, dynamic>>.from(
+                            _allPlants); // Reset to all plants
                       });
                     },
                   )
                 else
                   IconButton(
-                    icon: Icon(Icons.search, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, size: 24.0),
+                    icon: Icon(Icons.search,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : primaryColor,
+                        size: 24.0),
                     onPressed: () {
                       setState(() => _isSearching = true);
                     },
@@ -210,7 +222,9 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                 IconButton(
                   icon: Icon(
                     Icons.exit_to_app,
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : primaryColor,
                     size: 24.0,
                   ),
                   onPressed: () {
@@ -225,7 +239,11 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
           centerTitle: false,
         ),
         body: _isLoading
-            ? Center(child: CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor))
+            ? Center(
+                child: CircularProgressIndicator(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : primaryColor))
             : _plants.isEmpty
                 ? Center(child: Text('No plants found.').tr())
                 : Container(
@@ -250,8 +268,10 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                 child: Text(
                                   'Latest'.tr(),
                                   style: selectedButton == 'Latest'
-                                      ? successTextStyle(fontWeight: FontWeight.bold)
-                                      : descTextStyleDark(context, fontWeight: FontWeight.normal),
+                                      ? successTextStyle(
+                                          fontWeight: FontWeight.bold)
+                                      : descTextStyleDark(context,
+                                          fontWeight: FontWeight.normal),
                                 ),
                               ),
                               TextButton(
@@ -261,8 +281,10 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                 child: Text(
                                   'All'.tr(),
                                   style: selectedButton == 'All'
-                                      ? successTextStyle(fontWeight: FontWeight.bold)
-                                      : descTextStyleDark(context, fontWeight: FontWeight.normal),
+                                      ? successTextStyle(
+                                          fontWeight: FontWeight.bold)
+                                      : descTextStyleDark(context,
+                                          fontWeight: FontWeight.normal),
                                 ),
                               ),
                             ],
@@ -270,7 +292,8 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                         ),
                         Expanded(
                           child: GridView.builder(
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
                               crossAxisSpacing: 8.0,
                               mainAxisSpacing: 8.0,
@@ -284,14 +307,17 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                   final result = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => DetailsPage(plant: plant, userId: widget.userId),
+                                      builder: (context) => DetailsPage(
+                                          plant: plant, userId: widget.userId),
                                     ),
                                   );
                                   if (result == true) {
                                     setState(() {
                                       final plantId = plant['_id'];
-                                      _plants.removeWhere((p) => p['_id'] == plantId);
-                                      _allPlants.removeWhere((p) => p['_id'] == plantId);
+                                      _plants.removeWhere(
+                                          (p) => p['_id'] == plantId);
+                                      _allPlants.removeWhere(
+                                          (p) => p['_id'] == plantId);
                                     });
                                   }
                                 },
@@ -301,53 +327,49 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                                     color: Colors.transparent,
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
-                                      if (plant['decodedImage'] == null)
-                                        Container(
-                                          width: double.infinity,
-                                          height: 150.0,
-                                          decoration: BoxDecoration(
-                                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-                                            borderRadius: BorderRadius.circular(36.0),
-                                          ),
-                                          child: Center(
-                                            child: Icon(
-                                              Icons.image,
-                                              size: 50,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        )
-                                      else
-                                        Container(
-                                          width: double.infinity,
-                                          height: 150.0,
-                                          decoration: BoxDecoration(
-                                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-                                            borderRadius: BorderRadius.circular(36.0),
-                                          ),
-                                          clipBehavior: Clip.antiAlias,
-                                          child: Image.memory(
-                                            plant['decodedImage'],
-                                            fit: BoxFit.cover,
-                                            width: double.infinity,
-                                            height: 150.0,
-                                            errorBuilder: (context, error, stackTrace) {
-                                              return Icon(
-                                                Icons.error,
-                                                color: Colors.red,
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      SizedBox(height: 8.0),
-                                      Text(
-                                        plant['title'] ?? 'Unknown Plant'.tr(),
-                                        style: descTextStyleDark(context, fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center,
+                                      Expanded(
+                                          child: _buildPlantImages(
+                                              context, plant)),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 4.0),
+                                        child: (Responsive.isSmallMobile(
+                                                    context) ||
+                                                Responsive.isMobile(context) ||
+                                                Responsive.isTablet(context))
+                                            ? Text(
+                                                plant['title'] ??
+                                                    'Unknown Plant'.tr(),
+                                                style: descTextStyleDark(
+                                                  context,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 2,
+                                                softWrap: true,
+                                              )
+                                            : SingleChildScrollView(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                child: Text(
+                                                  plant['title'] ??
+                                                      'Unknown Plant'.tr(),
+                                                  style: descTextStyleDark(
+                                                    context,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                  ),
+                                                  textAlign: TextAlign.start,
+                                                  softWrap: false,
+                                                  overflow:
+                                                      TextOverflow.visible,
+                                                ),
+                                              ),
                                       ),
-                                      SizedBox(height: 4.0),
                                     ],
                                   ),
                                 ),
@@ -359,6 +381,67 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                     ),
                   ),
       ),
+    );
+  }
+
+  Widget _buildPlantImages(BuildContext context, Map<String, dynamic> plant) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    late final double iconSize;
+    late final double imageSize;
+    if (Responsive.isSmallMobile(context)) {
+      iconSize = screenWidth * 0.3;
+      imageSize = screenWidth * 0.9;
+    } else if (Responsive.isMobile(context)) {
+      iconSize = screenWidth * 0.22;
+      imageSize = screenWidth * 0.9;
+    } else if (Responsive.isTablet(context)) {
+      iconSize = screenWidth * 0.18;
+      imageSize = screenWidth * 0.7;
+    } else {
+      iconSize = screenWidth * 0.15;
+      imageSize = screenWidth * 0.7;
+    }
+
+    final bgColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : primaryColor;
+
+    final borderRadius = BorderRadius.circular(36.0);
+
+    Widget imageWidget;
+    if (plant['decodedImage'] == null) {
+      imageWidget = Center(
+        child: Icon(
+          Icons.image,
+          size: iconSize,
+          color: Colors.white,
+        ),
+      );
+    } else {
+      imageWidget = Image.memory(
+        plant['decodedImage'],
+        fit: BoxFit.cover,
+        width: imageSize, // กำหนดขนาดภาพ
+        height: imageSize, // กำหนดขนาดภาพ
+        errorBuilder: (context, error, stackTrace) {
+          return Icon(
+            Icons.error,
+            color: Colors.red,
+          );
+        },
+      );
+    }
+
+    return Container(
+      width: imageSize,
+      height: imageSize,
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: borderRadius,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: imageWidget,
     );
   }
 }
