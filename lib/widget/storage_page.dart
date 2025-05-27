@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/services/database.dart';
-import 'package:project_pdd/style.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../ui/responsive.dart';
 import 'details_page.dart';
@@ -136,9 +135,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
             builder: (context) => AlertDialog(
               title: Text('Exit').tr(),
               content: Text('Are you sure you want to logout?').tr(),
-              backgroundColor: Theme.of(context).brightness == Brightness.dark
-                  ? primaryColor
-                  : Colors.white,
+              backgroundColor: AppTheme.themedIconColor(context),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(36.0),
               ),
@@ -579,10 +576,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                       Responsive.isTablet(context))
                   ? Text(
                       plant['title'] ?? 'Unknown Plant'.tr(),
-                      style: descTextStyleDark(
-                        context,
-                        fontWeight: FontWeight.normal,
-                      ).copyWith(fontSize: titleFontSize),
+                      style: AppTheme.smallContent(context),
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
@@ -592,10 +586,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                       scrollDirection: Axis.horizontal,
                       child: Text(
                         plant['title'] ?? 'Unknown Plant'.tr(),
-                        style: descTextStyleDark(
-                          context,
-                          fontWeight: FontWeight.normal,
-                        ).copyWith(fontSize: titleFontSize),
+                        style: AppTheme.smallContent(context),
                         textAlign: TextAlign.start,
                         softWrap: false,
                         overflow: TextOverflow.visible,
