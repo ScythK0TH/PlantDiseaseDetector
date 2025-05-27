@@ -45,67 +45,58 @@ class AppTheme {
 
   //Font Setting
   static TextStyle largeTitle(
-    BuildContext context,
-  ) {
+    BuildContext context, {
+    Color? color,
+  }) {
     return GoogleFonts.inter(
-        fontSize: 28,
-        fontWeight: FontWeight.bold,
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.white
-            : dark);
+      fontSize: 28,
+      fontWeight: FontWeight.bold,
+      color: color ??
+          (Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : dark),
+    );
   }
 
   static TextStyle mediumTitle(
-    BuildContext context,
-  ) {
+    BuildContext context, {
+    Color? color,
+  }) {
     return GoogleFonts.inter(
-        fontSize: 22,
-        fontWeight: FontWeight.bold,
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.white
-            : dark);
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+      color: color ??
+          (Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : dark),
+    );
   }
 
   static TextStyle smallTitle(
-    BuildContext context,
-  ) {
+    BuildContext context, {
+    Color? color,
+  }) {
     return GoogleFonts.inter(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.white
-            : dark);
-  }
-
-  static TextStyle hightlightLarge(
-    BuildContext context,
-  ) {
-    return GoogleFonts.inter(
-        fontSize: 28, fontWeight: FontWeight.bold, color: primaryColor);
-  }
-
-  static TextStyle hightlightMedium(
-    BuildContext context,
-  ) {
-    return GoogleFonts.inter(
-        fontSize: 22, fontWeight: FontWeight.bold, color: primaryColor);
-  }
-
-  static TextStyle hightlightSmall(
-    BuildContext context,
-  ) {
-    return GoogleFonts.inter(
-        fontSize: 16, fontWeight: FontWeight.bold, color: primaryColor);
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+      color: color ??
+          (Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : dark),
+    );
   }
 
   static TextStyle content(
-    BuildContext context,
-  ) {
+    BuildContext context, {
+    Color? color,
+  }) {
     return GoogleFonts.inter(
-        fontSize: 14,
-        fontWeight: FontWeight.normal,
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.white
-            : dark);
+      fontSize: 14,
+      fontWeight: FontWeight.normal,
+      color: color ??
+          (Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : dark),
+    );
   }
 }

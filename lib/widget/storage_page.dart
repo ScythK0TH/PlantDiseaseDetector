@@ -331,6 +331,11 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
       crossAxisSpacing = screenWidth * 0.02;
       mainAxisSpacing = screenHeight * 0.015;
       childAspectRatio = 0.95;
+    } else if (Responsive.isTablet(context)) {
+      crossAxisCount = 3;
+      crossAxisSpacing = screenWidth * 0.02;
+      mainAxisSpacing = screenHeight * 0.025;
+      childAspectRatio = 0.9;
     } else {
       crossAxisCount = 4;
       crossAxisSpacing = screenWidth * 0.015;
@@ -339,37 +344,55 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Expanded(
-                child: TextButton(
-                  onPressed: () => setState(() => selectedButton = 'Latest'),
-                  child: Text(
-                    'Latest'.tr(),
-                    style: selectedButton == 'Latest'
-                        ? successTextStyle(fontWeight: FontWeight.bold)
-                        : descTextStyleDark(context,
-                            fontWeight: FontWeight.normal),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: selectedButton == 'Latest'
+                        ? AppTheme.primaryColor
+                        : AppTheme.darkInverse,
+                    borderRadius: BorderRadius.circular(36.0),
+                  ),
+                  child: TextButton(
+                    onPressed: () => setState(() => selectedButton = 'Latest'),
+                    child: Text(
+                      'Latest'.tr(),
+                      style: selectedButton == 'Latest'
+                          ? AppTheme.smallTitle(context, color: AppTheme.light)
+                          : AppTheme.smallTitle(context, color: AppTheme.dark),
+                    ),
                   ),
                 ),
               ),
+              SizedBox(width: 8.0,),
               Expanded(
-                child: TextButton(
-                  onPressed: () => setState(() => selectedButton = 'All'),
-                  child: Text(
-                    'All'.tr(),
-                    style: selectedButton == 'All'
-                        ? successTextStyle(fontWeight: FontWeight.bold)
-                        : descTextStyleDark(context,
-                            fontWeight: FontWeight.normal),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: selectedButton == 'All'
+                        ? AppTheme.primaryColor
+                        : AppTheme.darkInverse,
+                    borderRadius: BorderRadius.circular(36.0),
+                  ),
+                  child: TextButton(
+                    onPressed: () => setState(() => selectedButton = 'All'),
+                    child: Text(
+                      'All'.tr(),
+                      style: selectedButton == 'All'
+                          ? AppTheme.smallTitle(context, color: AppTheme.light)
+                          : AppTheme.smallTitle(context, color: AppTheme.dark),
+                    ),
                   ),
                 ),
               ),
             ],
+          ),
+          SizedBox(
+            height: 8.0,
           ),
           Expanded(
             child: _buildGrid(
