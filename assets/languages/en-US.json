@@ -41,6 +41,7 @@
     "Unknown Plant": "Unknown Plant",
     "Camera": "Camera",
     "Profile": "Profile",
+    "Welcome back,": "Welcome back,",
     "Details Page": "Details Page",
     "Image Details": "Image Details",
     "Unknown": "Unknown",
@@ -99,5 +100,6 @@
     "AI Page": "AI Page",
     "Assistant": "Assistant",
     "Ask me about your plant": "Ask me about your plant",
-    "Disease": "Disease"
+    "Disease": "Disease",
+    "Thinking...": "Thinking..."
 }

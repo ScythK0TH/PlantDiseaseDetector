@@ -13,7 +13,7 @@ class AppTheme {
       end: Alignment.centerRight);
 
   static const LinearGradient secondaryGradient = LinearGradient(
-      colors: [Color(0xFF6CC964), Color.fromARGB(255, 169, 216, 165)],
+      colors: [Color(0xFF6CC964), Color.fromRGBO(169, 216, 165, 1)],
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter);
 
@@ -35,6 +35,10 @@ class AppTheme {
     return Theme.of(context).brightness == Brightness.dark;
   }
 
+  static Color selectedIconColor(BuildContext context) {
+    return isDarkMode(context) ? dark : darkInverse;
+  }
+
   static Color themedIconColor(BuildContext context) {
     return isDarkMode(context) ? light : dark;
   }
@@ -48,9 +52,9 @@ class AppTheme {
     BuildContext context, {
     Color? color,
   }) {
-    return GoogleFonts.inter(
+    return GoogleFonts.kanit(
       fontSize: 28,
-      fontWeight: FontWeight.bold,
+      fontWeight: FontWeight.w500,
       color: color ??
           (Theme.of(context).brightness == Brightness.dark
               ? Colors.white
@@ -62,9 +66,9 @@ class AppTheme {
     BuildContext context, {
     Color? color,
   }) {
-    return GoogleFonts.inter(
+    return GoogleFonts.kanit(
       fontSize: 22,
-      fontWeight: FontWeight.bold,
+      fontWeight: FontWeight.w500,
       color: color ??
           (Theme.of(context).brightness == Brightness.dark
               ? Colors.white
@@ -76,9 +80,9 @@ class AppTheme {
     BuildContext context, {
     Color? color,
   }) {
-    return GoogleFonts.inter(
+    return GoogleFonts.kanit(
       fontSize: 16,
-      fontWeight: FontWeight.bold,
+      fontWeight: FontWeight.w500,
       color: color ??
           (Theme.of(context).brightness == Brightness.dark
               ? Colors.white
@@ -90,7 +94,7 @@ class AppTheme {
     BuildContext context, {
     Color? color,
   }) {
-    return GoogleFonts.inter(
+    return GoogleFonts.kanit(
       fontSize: 28,
       fontWeight: FontWeight.normal,
       color: color ??
@@ -104,7 +108,7 @@ class AppTheme {
     BuildContext context, {
     Color? color,
   }) {
-    return GoogleFonts.inter(
+    return GoogleFonts.kanit(
       fontSize: 22,
       fontWeight: FontWeight.normal,
       color: color ??
@@ -118,7 +122,7 @@ class AppTheme {
     BuildContext context, {
     Color? color,
   }) {
-    return GoogleFonts.inter(
+    return GoogleFonts.kanit(
       fontSize: 16,
       fontWeight: FontWeight.normal,
       color: color ??

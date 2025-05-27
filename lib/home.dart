@@ -16,6 +16,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late int _selectedIndex;
+  // เชื่อม MongoDB รับ UserId, Username และค่าเกี่ยวกับ UsedStorage
 
   @override
   void initState() {
@@ -32,61 +33,52 @@ class _HomePageState extends State<HomePage> {
     ];
 
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: pages,
-      ),
-      bottomNavigationBar: Theme(
-        data: Theme.of(context).copyWith(
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          splashFactory: NoSplash.splashFactory,
-        ),
-        child: Container(
-          margin: const EdgeInsets.only(top: 12, left: 20, right: 20, bottom: 12),
-          decoration: BoxDecoration(
-            gradient: AppTheme.primaryGradient, 
-            borderRadius: BorderRadius.circular(36), 
+      body: Stack(
+        children: [
+          IndexedStack(
+            index: _selectedIndex,
+            children: pages,
           ),
-          clipBehavior: Clip.antiAlias,
-          child: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            backgroundColor:
-                Colors.transparent,
-            elevation: 0,
-            currentIndex: _selectedIndex,
-            onTap: (index) {
-              setState(() => _selectedIndex = index);
-            },
-            selectedItemColor: AppTheme.light,
-            unselectedItemColor: AppTheme.dark,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.camera_alt,
-                  size: 32.0,
-                ),
-                label: '',
+          // BottomNavigationBar overlay
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              margin: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
+              decoration: BoxDecoration(
+                gradient: AppTheme.primaryGradient,
+                borderRadius: BorderRadius.circular(36),
               ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.photo,
-                  size: 32.0,
-                ),
-                label: '',
+              clipBehavior: Clip.antiAlias,
+              child: BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                currentIndex: _selectedIndex,
+                onTap: (index) {
+                  setState(() => _selectedIndex = index);
+                },
+                selectedItemColor: AppTheme.selectedIconColor(context),
+                unselectedItemColor: AppTheme.themedIconColor(context),
+                showSelectedLabels: false,
+                showUnselectedLabels: false,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.camera_alt, size: 36.0),
+                    label: '',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.photo, size: 36.0),
+                    label: '',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person, size: 36.0),
+                    label: '',
+                  ),
+                ],
               ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.person,
-                  size: 32.0,
-                ),
-                label: '',
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

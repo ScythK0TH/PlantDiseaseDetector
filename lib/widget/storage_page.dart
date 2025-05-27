@@ -7,10 +7,10 @@ import 'package:flutter/services.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/services/database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../ui/responsive.dart';
+import 'package:project_pdd/ui/responsive.dart';
 import 'details_page.dart';
 import 'package:project_pdd/main.dart';
-import '../ui/styles.dart';
+import 'package:project_pdd/ui/styles.dart';
 
 class StoragePage extends StatefulWidget {
   final String userId; // Pass the logged-in user's _id
@@ -314,7 +314,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
 
     //Mock up storage Value
     //MongoDB แก้ไขตรงนี้
-    final double usedStorage = 520;
+    final double usedStorage = 120;
     final double totalStorage = 1024;
     final String storageText =
         '${usedStorage.toStringAsFixed(2)} / ${totalStorage.toStringAsFixed(2)} MB';
@@ -325,7 +325,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
       children: [
         Text(
           storageText,
-          style: AppTheme.smallTitle(context, color: AppTheme.dark),
+          style: AppTheme.smallTitle(context),
           softWrap: true,
           overflow: TextOverflow.visible,
           maxLines: null,
@@ -339,7 +339,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(36),
               border: Border.all(
-                color: AppTheme.dark, // สีขอบ
+                color: AppTheme.themedIconColor(context),
                 width: 2, // ความหนาขอบ
               ),
             ),
@@ -348,7 +348,8 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
               child: LinearProgressIndicator(
                   value: usedStorage / totalStorage,
                   backgroundColor: Colors.transparent,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.dark),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      AppTheme.themedIconColor(context)),
                   minHeight: 18),
             ),
           ),
@@ -394,7 +395,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                gradient: AppTheme.secondaryGradient,
+                gradient: AppTheme.thirtyGradient,
                 borderRadius: BorderRadius.circular(36.0),
               ),
               child: Padding(
@@ -406,24 +407,25 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                       : CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Welcome back,',
-                      style:
-                          AppTheme.mediumContent(context, color: AppTheme.dark),
+                      'Welcome back,'.tr(),
+                      style: AppTheme.mediumContent(context),
                     ),
                     Text(
                       //MongoDB แก้ไขตรงนี้ สำหรับแสดงชื่อ User
                       'OscarPattyThun',
-                      style: AppTheme.largeTitle(context, color: AppTheme.dark),
+                      style: AppTheme.largeTitle(context),
                     ),
                     SizedBox(height: 8.0),
                     if (isSmallMobile)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          // เพื่มในอนาคต เรื่องการตรวจสอบ Internet สำหรับ Cloud Storage
                           Text(
                             'Cloud Storage',
-                            style: AppTheme.mediumTitle(context,
-                                color: AppTheme.dark),
+                            style: AppTheme.mediumTitle(
+                              context,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                           SizedBox(height: 8),
@@ -434,10 +436,12 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          // เพื่มในอนาคต เรื่องการตรวจสอบ Internet สำหรับ Cloud Storage
                           Text(
                             'Cloud Storage',
-                            style: AppTheme.mediumTitle(context,
-                                color: AppTheme.dark),
+                            style: AppTheme.mediumTitle(
+                              context,
+                            ),
                           ),
                           Spacer(),
                           storageInfoWidget,
@@ -511,7 +515,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
               mainAxisSpacing: mainAxisSpacing,
               childAspectRatio: childAspectRatio,
             ),
-          ),
+          )
         ],
       ),
     );
@@ -524,18 +528,21 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
       required double mainAxisSpacing,
       required double childAspectRatio}) {
     return GridView.builder(
-        shrinkWrap: false,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: crossAxisCount,
-          crossAxisSpacing: crossAxisSpacing,
-          mainAxisSpacing: mainAxisSpacing,
-          childAspectRatio: childAspectRatio,
-        ),
-        itemCount: displayPlants.length,
-        itemBuilder: (context, index) {
-          final plant = displayPlants[index];
-          return _buildPlantItems(context, plant);
-        });
+      shrinkWrap: false,
+      padding: const EdgeInsets.only(
+          bottom: 90), // <-- Add this line (adjust 80 as needed)
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        crossAxisSpacing: crossAxisSpacing,
+        mainAxisSpacing: mainAxisSpacing,
+        childAspectRatio: childAspectRatio,
+      ),
+      itemCount: displayPlants.length,
+      itemBuilder: (context, index) {
+        final plant = displayPlants[index];
+        return _buildPlantItems(context, plant);
+      },
+    );
   }
 
   Widget _buildPlantItems(BuildContext context, Map<String, dynamic> plant) {

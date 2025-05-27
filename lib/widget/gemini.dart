@@ -90,7 +90,7 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
       chatHistory.add({
         "role": "loading",
         "parts": [
-          {"text": "กำลังตอบ..."} // "Responding..."
+          {"text": "Thinking...".tr()} // "Responding..."
         ]
       });
       responseText = null;
@@ -164,6 +164,9 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final text = (data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? '').trim();
+
+      if (!mounted) return;
+
       setState(() {
         // Remove loading message
         chatHistory.removeWhere((msg) => msg['role'] == 'loading');

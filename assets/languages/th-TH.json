@@ -41,6 +41,7 @@
     "All": "ทั้งหมด",
     "Unknown Plant": "ไม่ทราบชื่อพืช",
     "Camera": "กล้อง",
+    "Welcome back," : "ยินดีต้อนรับกลับมา,",
     "Profile": "โปรไฟล์",
     "Details Page": "หน้ารายละเอียด",
     "Image Details": "รายละเอียดรูปภาพ",
@@ -99,5 +100,6 @@
     "AI Page": "หน้า AI",
     "Assistant": "ผู้ช่วย AI",
     "Ask me about your plant": "ถามฉันเกี่ยวกับพืชของคุณ",
-    "Disease": "โรค"
+    "Disease": "โรค",
+    "Thinking...": "กำลังหาคำตอบ..."
 }

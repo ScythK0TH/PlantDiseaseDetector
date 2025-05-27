@@ -95,7 +95,7 @@ class MainApp extends StatelessWidget {
             appBarTheme: const AppBarTheme(
               backgroundColor: primaryColor,
             ),
-            scaffoldBackgroundColor: primaryColor,
+            scaffoldBackgroundColor: const Color(0xFF0E1311),
             bottomNavigationBarTheme: const BottomNavigationBarThemeData(
               backgroundColor: primaryColor,
               unselectedIconTheme: IconThemeData(color: Colors.white),
