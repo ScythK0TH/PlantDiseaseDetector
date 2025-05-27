@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../ui/responsive.dart';
 import 'details_page.dart';
 import 'package:project_pdd/main.dart';
+import '../ui/styles.dart';
 
 class StoragePage extends StatefulWidget {
   final String userId; // Pass the logged-in user's _id
@@ -170,7 +171,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
               ? SystemUiOverlayStyle.light
               : SystemUiOverlayStyle.dark,
           title: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: Row(
               children: [
                 if (_isSearching)
@@ -188,8 +189,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                 else
                   Text(
                     'Gallery'.tr(),
-                    style: subTitleTextStyleDark(context,
-                        fontWeight: FontWeight.bold),
+                    style: AppTheme.largeTitle(context)
                   ),
                 Spacer(),
                 if (_isSearching)
