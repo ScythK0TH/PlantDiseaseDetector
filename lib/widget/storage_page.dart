@@ -300,9 +300,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
           body: _isLoading
               ? Center(
                   child: CircularProgressIndicator(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : primaryColor))
+                      color: AppTheme.themedIconColor(context)))
               : _plants.isEmpty
                   ? Center(child: Text('No plants found.').tr())
                   : _buildPlantGridView(context, displayPlants)),
@@ -629,10 +627,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
       imageSize = screenWidth * 0.7;
     }
 
-    final bgColor = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : primaryColor;
-
+    final bgColor = AppTheme.themedIconColor(context);
     final borderRadius = BorderRadius.circular(36.0);
 
     Widget imageWidget;
@@ -641,7 +636,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
         child: Icon(
           Icons.image,
           size: iconSize,
-          color: Colors.white,
+          color: AppTheme.themedIconColor(context),
         ),
       );
     } else {
@@ -653,7 +648,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
         errorBuilder: (context, error, stackTrace) {
           return Icon(
             Icons.error,
-            color: Colors.red,
+            color: AppTheme.alertColor,
           );
         },
       );

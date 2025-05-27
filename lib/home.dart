@@ -5,6 +5,8 @@ import 'package:project_pdd/widget/storage_page.dart';
 import 'package:project_pdd/widget/profile_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
 
+import 'ui/styles.dart';
+
 class HomePage extends StatefulWidget {
   final String userId;
   final int initialIndex;
@@ -32,49 +34,62 @@ class _HomePageState extends State<HomePage> {
     ];
 
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: pages,
+      body: Stack(
+        children: IndexedStack(
+          index: _selectedIndex,
+          children: pages,
+        ),
       ),
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
-          splashFactory: NoSplash.splashFactory
+          splashFactory: NoSplash.splashFactory,
         ),
-        child: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          currentIndex: _selectedIndex,
-          onTap: (index) {
-            setState(() => _selectedIndex = index);
-          },
-          selectedItemColor: successColor,
-          unselectedItemColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-          showSelectedLabels: true,
-          showUnselectedLabels: true,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.camera_alt,
-                size: 24.0,
+        child: Container(
+          margin:
+              const EdgeInsets.only(top: 12, left: 20, right: 20, bottom: 12),
+          decoration: BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+            borderRadius: BorderRadius.circular(36),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            currentIndex: _selectedIndex,
+            onTap: (index) {
+              setState(() => _selectedIndex = index);
+            },
+            selectedItemColor: AppTheme.light,
+            unselectedItemColor: AppTheme.dark,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.camera_alt,
+                  size: 36.0,
+                ),
+                label: '',
               ),
-              label: 'Camera'.tr(),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.photo,
-                size: 24.0,
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.photo,
+                  size: 36.0,
+                ),
+                label: '',
               ),
-              label: 'Gallery'.tr(),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.person,
-                size: 24.0,
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.person,
+                  size: 36.0,
+                ),
+                label: '',
               ),
-              label: 'Profile'.tr(),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
