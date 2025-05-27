@@ -539,8 +539,6 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
   }
 
   Widget _buildPlantItems(BuildContext context, Map<String, dynamic> plant) {
-    final double titleFontSize = 18.0;
-
     return GestureDetector(
       onTap: () async {
         final result = await Navigator.push(
