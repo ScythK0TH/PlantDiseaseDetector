@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTheme {
   //Global Theme Color
   static const Color primaryColor = Color(0xFF6CC964);
-  static const Color secondaryColor = Color(0xFFD9D9D9);
   static const Color alertColor = Color(0xFFE56767);
 
   //Gradient Color
@@ -25,9 +24,11 @@ class AppTheme {
 
   //Light Color (Default)
   static const Color light = Color(0xFFFFFFFF);
+  static const Color lightInverse = Color(0x1FFFFFFF);
 
   //Dark Color
   static const Color dark = Color(0xFF000000);
+  static const Color darkInverse = Color(0xFFD9D9D9);
 
   //ThemeData for Light Theme and Dark Theme
   static bool isDarkMode(BuildContext context) {
@@ -36,6 +37,10 @@ class AppTheme {
 
   static Color themedIconColor(BuildContext context) {
     return isDarkMode(context) ? light : dark;
+  }
+
+  static Color themedBgIconColor(BuildContext context) {
+    return isDarkMode(context) ? lightInverse : darkInverse;
   }
 
   //Font Setting

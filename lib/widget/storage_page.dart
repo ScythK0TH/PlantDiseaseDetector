@@ -163,91 +163,149 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
-              ? SystemUiOverlayStyle.light
-              : SystemUiOverlayStyle.dark,
-          title: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: Row(
-              children: [
-                if (_isSearching)
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            automaticallyImplyLeading: false,
+            systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
+                ? SystemUiOverlayStyle.light
+                : SystemUiOverlayStyle.dark,
+            title: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: Row(
+                children: [
                   Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      autofocus: true,
-                      decoration: InputDecoration(
-                        hintText: 'Search plants...'.tr(),
-                        border: InputBorder.none,
-                      ),
-                      onChanged: _onSearchChanged,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: _isSearching
+                          ? Container(
+                              decoration: BoxDecoration(
+                                color: AppTheme.themedBgIconColor(context),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 0.0), // ลด padding
+                              child: TextField(
+                                controller: _searchController,
+                                autofocus: true,
+                                decoration: InputDecoration(
+                                  hintText: 'Search plants...'.tr(),
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 12, horizontal: 16),
+                                  suffixIcon: _searchController.text.isNotEmpty
+                                      ? IconButton(
+                                          icon: Icon(Icons.close,
+                                              color: AppTheme.themedIconColor(
+                                                  context)),
+                                          onPressed: () {
+                                            setState(() {
+                                              _searchController.clear();
+                                              _plants = List<
+                                                      Map<String,
+                                                          dynamic>>.from(
+                                                  _allPlants);
+                                            });
+                                          },
+                                        )
+                                      : null,
+                                ),
+                                onChanged: (value) {
+                                  _onSearchChanged(value);
+                                  setState(() {});
+                                },
+                                style: TextStyle(
+                                  color: AppTheme.themedIconColor(context),
+                                ),
+                              ),
+                            )
+                          : Text(
+                              'Gallery'.tr(),
+                              style: AppTheme.largeTitle(context),
+                              textAlign: TextAlign.left,
+                            ),
                     ),
-                  )
-                else
-                  Text(
-                    'Gallery'.tr(),
-                    style: AppTheme.largeTitle(context)
                   ),
-                Spacer(),
-                if (_isSearching)
-                  IconButton(
-                    icon: Icon(Icons.close,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : primaryColor,
-                        size: 24.0),
-                    onPressed: () {
-                      setState(() {
-                        _isSearching = false;
-                        _searchController.clear();
-                        _plants = List<Map<String, dynamic>>.from(
-                            _allPlants); // Reset to all plants
-                      });
-                    },
-                  )
-                else
-                  IconButton(
-                    icon: Icon(Icons.search,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : primaryColor,
-                        size: 24.0),
-                    onPressed: () {
-                      setState(() => _isSearching = true);
-                    },
+                  if (_isSearching)
+                    SizedBox(
+                      width: 8.0,
+                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_isSearching)
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppTheme.themedBgIconColor(context),
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.arrow_back,
+                                color: AppTheme.themedIconColor(context),
+                                size: 24.0),
+                            onPressed: () {
+                              setState(() {
+                                _isSearching = false;
+                                _searchController.clear();
+                                _plants =
+                                    List<Map<String, dynamic>>.from(_allPlants);
+                              });
+                            },
+                            splashRadius: 36.0,
+                          ),
+                        )
+                      else
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppTheme.themedBgIconColor(context),
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.search,
+                                color: AppTheme.themedIconColor(context),
+                                size: 24.0),
+                            onPressed: () {
+                              setState(() => _isSearching = true);
+                            },
+                            splashRadius: 36.0,
+                          ),
+                        ),
+                      SizedBox(width: 8),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: AppTheme.themedBgIconColor(context),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.exit_to_app,
+                            color: AppTheme.themedIconColor(context),
+                            size: 24.0,
+                          ),
+                          onPressed: () {
+                            themeModeNotifier.value = ThemeMode.light;
+                            SystemNavigator.pop();
+                          },
+                          splashRadius: 36.0,
+                        ),
+                      ),
+                    ],
                   ),
-                IconButton(
-                  icon: Icon(
-                    Icons.exit_to_app,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : primaryColor,
-                    size: 24.0,
-                  ),
-                  onPressed: () {
-                    themeModeNotifier.value = ThemeMode.light;
-                    //Exit the app
-                    SystemNavigator.pop();
-                  },
-                ),
-              ],
+                ],
+              ),
             ),
+            centerTitle: false,
           ),
-          centerTitle: false,
-        ),
-        body: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : primaryColor))
-            : _plants.isEmpty
-                ? Center(child: Text('No plants found.').tr())
-                : _buildPlantGridView(context, displayPlants)
-      ),
+          body: _isLoading
+              ? Center(
+                  child: CircularProgressIndicator(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : primaryColor))
+              : _plants.isEmpty
+                  ? Center(child: Text('No plants found.').tr())
+                  : _buildPlantGridView(context, displayPlants)),
     );
   }
 
