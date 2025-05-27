@@ -8,12 +8,12 @@ class AppTheme {
 
   //Gradient Color
   static const LinearGradient primaryGradient = LinearGradient(
-      colors: [Color(0xFF6CC964), Color(0xFF89C584)],
+      colors: [Color(0xFF6CC964), Color.fromARGB(255, 146, 199, 141)],
       begin: Alignment.centerLeft,
       end: Alignment.centerRight);
 
   static const LinearGradient secondaryGradient = LinearGradient(
-      colors: [Color(0xFF6CC964), Color(0xFFCAEDC7)],
+      colors: [Color(0xFF6CC964), Color.fromARGB(255, 169, 216, 165)],
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter);
 
@@ -86,12 +86,40 @@ class AppTheme {
     );
   }
 
-  static TextStyle content(
+  static TextStyle largeContent(
     BuildContext context, {
     Color? color,
   }) {
     return GoogleFonts.inter(
-      fontSize: 14,
+      fontSize: 28,
+      fontWeight: FontWeight.normal,
+      color: color ??
+          (Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : dark),
+    );
+  }
+
+  static TextStyle mediumContent(
+    BuildContext context, {
+    Color? color,
+  }) {
+    return GoogleFonts.inter(
+      fontSize: 22,
+      fontWeight: FontWeight.normal,
+      color: color ??
+          (Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : dark),
+    );
+  }
+
+  static TextStyle smallContent(
+    BuildContext context, {
+    Color? color,
+  }) {
+    return GoogleFonts.inter(
+      fontSize: 16,
       fontWeight: FontWeight.normal,
       color: color ??
           (Theme.of(context).brightness == Brightness.dark

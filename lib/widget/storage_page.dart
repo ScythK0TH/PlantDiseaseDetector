@@ -315,6 +315,51 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
   ) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallMobile = Responsive.isSmallMobile(context);
+
+    //Mock up storage Value
+    //MongoDB แก้ไขตรงนี้
+    final double usedStorage = 520;
+    final double totalStorage = 1024;
+    final String storageText =
+        '${usedStorage.toStringAsFixed(2)} / ${totalStorage.toStringAsFixed(2)} MB';
+
+    //Storage detail
+    final storageInfoWidget = Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          storageText,
+          style: AppTheme.smallTitle(context, color: AppTheme.dark),
+          softWrap: true,
+          overflow: TextOverflow.visible,
+          maxLines: null,
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(
+          width: 120,
+          child: Container(
+            height: 18,
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(36),
+              border: Border.all(
+                color: AppTheme.dark, // สีขอบ
+                width: 2, // ความหนาขอบ
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(36),
+              child: LinearProgressIndicator(
+                  value: usedStorage / totalStorage,
+                  backgroundColor: Colors.transparent,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.dark),
+                  minHeight: 18),
+            ),
+          ),
+        ),
+      ],
+    );
 
     int crossAxisCount;
     double crossAxisSpacing;
@@ -347,14 +392,78 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         children: [
+          SizedBox(
+            height: 8.0,
+          ),
+          if (selectedButton == 'Latest' && !_isSearching)
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: AppTheme.secondaryGradient,
+                borderRadius: BorderRadius.circular(36.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: isSmallMobile
+                      ? CrossAxisAlignment.center
+                      : CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Welcome back,',
+                      style:
+                          AppTheme.mediumContent(context, color: AppTheme.dark),
+                    ),
+                    Text(
+                      //MongoDB แก้ไขตรงนี้ สำหรับแสดงชื่อ User
+                      'OscarPattyThun',
+                      style: AppTheme.largeTitle(context, color: AppTheme.dark),
+                    ),
+                    SizedBox(height: 8.0),
+                    if (isSmallMobile)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Cloud Storage',
+                            style: AppTheme.mediumTitle(context,
+                                color: AppTheme.dark),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 8),
+                          storageInfoWidget,
+                        ],
+                      )
+                    else
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Cloud Storage',
+                            style: AppTheme.mediumTitle(context,
+                                color: AppTheme.dark),
+                          ),
+                          Spacer(),
+                          storageInfoWidget,
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          SizedBox(height: 8.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
+                    gradient: selectedButton == 'Latest'
+                        ? AppTheme.primaryGradient
+                        : null,
                     color: selectedButton == 'Latest'
-                        ? AppTheme.primaryColor
+                        ? null
                         : AppTheme.darkInverse,
                     borderRadius: BorderRadius.circular(36.0),
                   ),
@@ -369,13 +478,17 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                   ),
                 ),
               ),
-              SizedBox(width: 8.0,),
+              SizedBox(
+                width: 8.0,
+              ),
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: selectedButton == 'All'
-                        ? AppTheme.primaryColor
-                        : AppTheme.darkInverse,
+                    gradient: selectedButton == 'All'
+                        ? AppTheme.primaryGradient
+                        : null,
+                    color:
+                        selectedButton == 'All' ? null : AppTheme.darkInverse,
                     borderRadius: BorderRadius.circular(36.0),
                   ),
                   child: TextButton(
