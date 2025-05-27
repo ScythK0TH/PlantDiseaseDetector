@@ -311,6 +311,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final isSmallMobile = Responsive.isSmallMobile(context);
+    final isMobile = Responsive.isSmallMobile(context);
 
     //Mock up storage Value
     //MongoDB แก้ไขตรงนี้
@@ -373,7 +374,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
       mainAxisSpacing = screenHeight * 0.015;
       childAspectRatio = 0.95;
     } else if (Responsive.isTablet(context)) {
-      crossAxisCount = 3;
+      crossAxisCount = 4;
       crossAxisSpacing = screenWidth * 0.02;
       mainAxisSpacing = screenHeight * 0.025;
       childAspectRatio = 0.9;
@@ -385,7 +386,9 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: isMobile
+          ? EdgeInsets.symmetric(horizontal: 10.0)
+          : EdgeInsets.symmetric(horizontal: 50.0),
       child: Column(
         children: [
           SizedBox(

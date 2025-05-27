@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:project_pdd/ui/responsive.dart';
 import 'package:project_pdd/widget/storage_page.dart';
 import 'package:project_pdd/widget/profile_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
 
-import 'ui/styles.dart';
+import 'package:project_pdd/ui/styles.dart';
 
 class HomePage extends StatefulWidget {
   final String userId;
@@ -26,6 +27,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isTabletOrDesktop = Responsive.isTablet(context) || Responsive.isDesktop(context);
+
     final List<Widget> pages = [
       Recogniser(userId: widget.userId),
       StoragePage(userId: widget.userId),
@@ -43,6 +46,7 @@ class _HomePageState extends State<HomePage> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
+              width: isTabletOrDesktop ? 700.0 : double.infinity,
               margin: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
               decoration: BoxDecoration(
                 gradient: AppTheme.primaryGradient,
