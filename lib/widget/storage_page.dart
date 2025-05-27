@@ -104,6 +104,36 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
+    // กำหนดค่าตัวแปร responsive ก่อน
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    int crossAxisCount;
+    double crossAxisSpacing;
+    double mainAxisSpacing;
+    double childAspectRatio;
+
+    if (Responsive.isSmallMobile(context)) {
+      crossAxisCount = 2;
+      crossAxisSpacing = screenWidth * 0.03;
+      mainAxisSpacing = screenHeight * 0.02;
+      childAspectRatio = 0.9;
+    } else if (Responsive.isMobile(context)) {
+      crossAxisCount = 2;
+      crossAxisSpacing = screenWidth * 0.02;
+      mainAxisSpacing = screenHeight * 0.015;
+      childAspectRatio = 0.95;
+    } else if (Responsive.isTablet(context)) {
+      crossAxisCount = 4;
+      crossAxisSpacing = screenWidth * 0.02;
+      mainAxisSpacing = screenHeight * 0.025;
+      childAspectRatio = 0.9;
+    } else {
+      crossAxisCount = 4;
+      crossAxisSpacing = screenWidth * 0.015;
+      mainAxisSpacing = screenHeight * 0.02;
+      childAspectRatio = 0.8;
+    }
+
     // Filter and sort plants based on selectedButton
     List<Map<String, dynamic>> displayPlants;
     if (selectedButton == 'Latest') {
@@ -119,8 +149,18 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                   DateTime(1970);
           return bTime.compareTo(aTime); // Descending
         });
-      if (displayPlants.length > 4) {
-        displayPlants = displayPlants.take(4).toList();
+
+      // กำหนดจำนวนภาพล่าสุดตาม crossAxisCount
+      int latestCount;
+      if (crossAxisCount == 2) {
+        latestCount = 4;
+      } else if (crossAxisCount == 4) {
+        latestCount = 8;
+      } else {
+        latestCount = 4; // fallback
+      }
+      if (displayPlants.length > latestCount) {
+        displayPlants = displayPlants.take(latestCount).toList();
       }
     } else {
       displayPlants = _plants;
@@ -300,17 +340,28 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                       color: AppTheme.themedIconColor(context)))
               : _plants.isEmpty
                   ? Center(child: Text('No plants found.').tr())
-                  : _buildPlantGridView(context, displayPlants)),
+                  : _buildPlantGridView(
+                      context,
+                      displayPlants,
+                      crossAxisCount: crossAxisCount,
+                      crossAxisSpacing: crossAxisSpacing,
+                      mainAxisSpacing: mainAxisSpacing,
+                      childAspectRatio: childAspectRatio,
+                    )),
     );
   }
 
   Widget _buildPlantGridView(
     BuildContext context,
-    List<Map<String, dynamic>> displayPlants,
-  ) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    List<Map<String, dynamic>> displayPlants, {
+    required int crossAxisCount,
+    required double crossAxisSpacing,
+    required double mainAxisSpacing,
+    required double childAspectRatio,
+  }) {
     final isSmallMobile = Responsive.isSmallMobile(context);
+    final isTabletOrDesktop =
+        Responsive.isTablet(context) || Responsive.isDesktop(context);
 
     //Mock up storage Value
     //MongoDB แก้ไขตรงนี้
@@ -357,35 +408,12 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
       ],
     );
 
-    int crossAxisCount;
-    double crossAxisSpacing;
-    double mainAxisSpacing;
-    double childAspectRatio;
-
-    if (Responsive.isSmallMobile(context)) {
-      crossAxisCount = 1;
-      crossAxisSpacing = screenWidth * 0.03;
-      mainAxisSpacing = screenHeight * 0.02;
-      childAspectRatio = 0.9;
-    } else if (Responsive.isMobile(context)) {
-      crossAxisCount = 2;
-      crossAxisSpacing = screenWidth * 0.02;
-      mainAxisSpacing = screenHeight * 0.015;
-      childAspectRatio = 0.95;
-    } else if (Responsive.isTablet(context)) {
-      crossAxisCount = 3;
-      crossAxisSpacing = screenWidth * 0.02;
-      mainAxisSpacing = screenHeight * 0.025;
-      childAspectRatio = 0.9;
-    } else {
-      crossAxisCount = 4;
-      crossAxisSpacing = screenWidth * 0.015;
-      mainAxisSpacing = screenHeight * 0.02;
-      childAspectRatio = 0.8;
-    }
-
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: isTabletOrDesktop
+          ? const EdgeInsets.symmetric(
+              horizontal: 100.0) // Desktop: padding มากขึ้น
+          : const EdgeInsets.symmetric(
+              horizontal: 20.0), // Mobile/Tablet: padding ปกติ
       child: Column(
         children: [
           SizedBox(
@@ -394,60 +422,68 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
           if (selectedButton == 'Latest' && !_isSearching)
             Container(
               width: double.infinity,
+              constraints: BoxConstraints(
+                minHeight: isSmallMobile
+                    ? 120.00
+                    : 240.00, // Set a default minHeight value
+              ),
               decoration: BoxDecoration(
                 gradient: AppTheme.thirtyGradient,
                 borderRadius: BorderRadius.circular(36.0),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: isSmallMobile
-                      ? CrossAxisAlignment.center
-                      : CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Welcome back,'.tr(),
-                      style: AppTheme.mediumContent(context),
-                    ),
-                    Text(
-                      //MongoDB แก้ไขตรงนี้ สำหรับแสดงชื่อ User
-                      'OscarPattyThun',
-                      style: AppTheme.largeTitle(context),
-                    ),
-                    SizedBox(height: 8.0),
-                    if (isSmallMobile)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // เพื่มในอนาคต เรื่องการตรวจสอบ Internet สำหรับ Cloud Storage
-                          Text(
-                            'Cloud Storage',
-                            style: AppTheme.mediumTitle(
-                              context,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 8),
-                          storageInfoWidget,
-                        ],
-                      )
-                    else
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // เพื่มในอนาคต เรื่องการตรวจสอบ Internet สำหรับ Cloud Storage
-                          Text(
-                            'Cloud Storage',
-                            style: AppTheme.mediumTitle(
-                              context,
-                            ),
-                          ),
-                          Spacer(),
-                          storageInfoWidget,
-                        ],
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0, vertical: 16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: isSmallMobile
+                        ? CrossAxisAlignment.center
+                        : CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Welcome back,'.tr(),
+                        style: AppTheme.mediumContent(context),
                       ),
-                  ],
+                      Text(
+                        //MongoDB แก้ไขตรงนี้ สำหรับแสดงชื่อ User
+                        'OscarPattyThun',
+                        style: AppTheme.largeTitle(context),
+                      ),
+                      SizedBox(height: 8.0),
+                      if (isSmallMobile)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // เพื่มในอนาคต เรื่องการตรวจสอบ Internet สำหรับ Cloud Storage
+                            Text(
+                              'Cloud Storage',
+                              style: AppTheme.mediumTitle(
+                                context,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 8),
+                            storageInfoWidget,
+                          ],
+                        )
+                      else
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // เพื่มในอนาคต เรื่องการตรวจสอบ Internet สำหรับ Cloud Storage
+                            Text(
+                              'Cloud Storage',
+                              style: AppTheme.mediumTitle(
+                                context,
+                              ),
+                            ),
+                            Spacer(),
+                            storageInfoWidget,
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -471,7 +507,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                     child: Text(
                       'Latest'.tr(),
                       style: selectedButton == 'Latest'
-                          ? AppTheme.smallTitle(context, color: AppTheme.light)
+                          ? AppTheme.smallTitle(context)
                           : AppTheme.smallTitle(context, color: AppTheme.dark),
                     ),
                   ),
@@ -495,7 +531,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                     child: Text(
                       'All'.tr(),
                       style: selectedButton == 'All'
-                          ? AppTheme.smallTitle(context, color: AppTheme.light)
+                          ? AppTheme.smallTitle(context)
                           : AppTheme.smallTitle(context, color: AppTheme.dark),
                     ),
                   ),
@@ -529,8 +565,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
       required double childAspectRatio}) {
     return GridView.builder(
       shrinkWrap: false,
-      padding: const EdgeInsets.only(
-          bottom: 90), // <-- Add this line (adjust 80 as needed)
+      padding: const EdgeInsets.only(bottom: 90),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
         crossAxisSpacing: crossAxisSpacing,
@@ -584,7 +619,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                       style: AppTheme.smallContent(context),
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
+                      maxLines: 1,
                       softWrap: true,
                     )
                   : SingleChildScrollView(

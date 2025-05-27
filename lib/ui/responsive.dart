@@ -19,9 +19,9 @@ class Responsive extends StatelessWidget {
     this.desktop,
   });
 
-  static const int smallMobileMax = 419;
-  static const int mobileMax = 767;
-  static const int tabletMax = 1099;
+  static const int smallMobileMax = 399;
+  static const int mobileMax = 799;
+  static const int tabletMax = 1199;
 
   static bool isSmallMobile(BuildContext context) =>
       MediaQuery.of(context).size.width <= smallMobileMax;

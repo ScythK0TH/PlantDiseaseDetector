@@ -36,7 +36,7 @@ class AppTheme {
   }
 
   static Color selectedIconColor(BuildContext context) {
-    return isDarkMode(context) ? dark : darkInverse;
+    return isDarkMode(context) ? dark : light;
   }
 
   static Color themedIconColor(BuildContext context) {
