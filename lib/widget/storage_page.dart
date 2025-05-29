@@ -184,7 +184,8 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
               actions: [
                 Container(
                   decoration: BoxDecoration(
-                    color: AppTheme.themedBgIconColor(context), // หรือ gradient ที่ต้องการสำหรับ Cancel
+                    color: AppTheme.themedBgIconColor(
+                        context), // หรือ gradient ที่ต้องการสำหรับ Cancel
                     borderRadius: BorderRadius.circular(36),
                   ),
                   child: TextButton(
@@ -199,8 +200,8 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                     onPressed: () => Navigator.of(context).pop(false),
                     child: Text(
                       'Cancel',
-                      style:
-                          AppTheme.smallContent(context, color: AppTheme.themedIconColor(context)),
+                      style: AppTheme.smallContent(context,
+                          color: AppTheme.themedIconColor(context)),
                     ).tr(),
                   ),
                 ),
@@ -243,9 +244,11 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
             elevation: 0,
             surfaceTintColor: Colors.transparent,
             automaticallyImplyLeading: false,
-            systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
-                ? SystemUiOverlayStyle.light
-                : SystemUiOverlayStyle.dark,
+            systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: AppTheme.isDarkMode(context)
+                    ? Brightness.light
+                    : Brightness.dark),
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: Row(
@@ -378,7 +381,10 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                   child: CircularProgressIndicator(
                       color: AppTheme.themedIconColor(context)))
               : _plants.isEmpty
-                  ? Center(child: Text('No plants found.', style: AppTheme.mediumContent(context)).tr())
+                  ? Center(
+                      child: Text('No plants found.',
+                              style: AppTheme.mediumContent(context))
+                          .tr())
                   : _buildPlantGridView(
                       context,
                       displayPlants,
@@ -497,7 +503,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                           children: [
                             // เพื่มในอนาคต เรื่องการตรวจสอบ Internet สำหรับ Cloud Storage
                             Text(
-                              'Cloud Storage',
+                              'Cloud Storage'.tr(),
                               style: AppTheme.mediumTitle(
                                 context,
                               ),

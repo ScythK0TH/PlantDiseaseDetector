@@ -46,13 +46,14 @@ class _HomePageState extends State<HomePage> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              width: isMobile ? double.infinity : 600,
+              constraints: const BoxConstraints(
+                maxWidth: 600,
+              ),
               margin: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
               decoration: BoxDecoration(
                 gradient: AppTheme.primaryGradient,
                 borderRadius: BorderRadius.circular(36),
               ),
-              clipBehavior: Clip.antiAlias,
               child: BottomNavigationBar(
                 type: BottomNavigationBarType.fixed,
                 backgroundColor: Colors.transparent,
@@ -65,7 +66,7 @@ class _HomePageState extends State<HomePage> {
                 unselectedItemColor: AppTheme.themedIconColor(context),
                 showSelectedLabels: false,
                 showUnselectedLabels: false,
-                items: [
+                items: const [
                   BottomNavigationBarItem(
                     icon: Icon(Icons.camera_alt, size: 36.0),
                     label: '',
