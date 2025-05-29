@@ -93,11 +93,11 @@ class MainApp extends StatelessWidget {
               ),
             ),
             appBarTheme: const AppBarTheme(
-              backgroundColor: primaryColor,
+              backgroundColor: Color(0xFF0E1311),
             ),
-            scaffoldBackgroundColor: const Color(0xFF0E1311),
+            scaffoldBackgroundColor: Color(0xFF0E1311),
             bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-              backgroundColor: primaryColor,
+              backgroundColor: Color(0xFF0E1311),
               unselectedIconTheme: IconThemeData(color: Colors.white),
             ),
           ),

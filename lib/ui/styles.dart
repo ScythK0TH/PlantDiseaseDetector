@@ -13,21 +13,21 @@ class AppTheme {
       end: Alignment.centerRight);
 
   static const LinearGradient secondaryGradient = LinearGradient(
-      colors: [Color(0xFF6CC964), Color.fromRGBO(169, 216, 165, 1)],
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter);
-
-  static const LinearGradient thirtyGradient = LinearGradient(
       colors: [Color(0xFF6CC964), Color(0xFF89C584)],
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter);
+
+  static const LinearGradient alertGradient = LinearGradient(
+      colors: [Color(0xFFE56767), Color.fromARGB(255, 179, 114, 114)],
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight);
 
   //Light Color (Default)
   static const Color light = Color(0xFFFFFFFF);
   static const Color lightInverse = Color(0x1FFFFFFF);
 
   //Dark Color
-  static const Color dark = Color(0xFF000000);
+  static const Color dark = Color(0xFF0E1311);
   static const Color darkInverse = Color(0xFFD9D9D9);
 
   //ThemeData for Light Theme and Dark Theme
@@ -41,6 +41,10 @@ class AppTheme {
 
   static Color themedIconColor(BuildContext context) {
     return isDarkMode(context) ? light : dark;
+  }
+
+  static Color themedBgColor(BuildContext context) {
+    return isDarkMode(context) ? dark : light;
   }
 
   static Color themedBgIconColor(BuildContext context) {

@@ -173,23 +173,61 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
           final shouldExit = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-              title: Text('Exit').tr(),
-              content: Text('Are you sure you want to logout?').tr(),
-              backgroundColor: AppTheme.themedIconColor(context),
+              title: Text('Exit', style: AppTheme.mediumTitle(context)).tr(),
+              content: Text('Are you sure you want to logout?',
+                      style: AppTheme.smallContent(context))
+                  .tr(),
+              backgroundColor: AppTheme.themedBgColor(context),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(36.0),
               ),
               actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text('Cancel').tr(),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.themedBgIconColor(context), // หรือ gradient ที่ต้องการสำหรับ Cancel
+                    borderRadius: BorderRadius.circular(36),
+                  ),
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(36),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: Text(
+                      'Cancel',
+                      style:
+                          AppTheme.smallContent(context, color: AppTheme.themedIconColor(context)),
+                    ).tr(),
+                  ),
                 ),
-                TextButton(
-                  onPressed: () {
-                    clearLoginState();
-                    SystemNavigator.pop();
-                  },
-                  child: Text('Logout').tr(),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: AppTheme.alertGradient,
+                    borderRadius: BorderRadius.circular(36),
+                  ),
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(36),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12), // ปรับขนาดปุ่ม
+                    ),
+                    onPressed: () {
+                      clearLoginState();
+                      SystemNavigator.pop();
+                    },
+                    child: Text(
+                      'Logout',
+                      style:
+                          AppTheme.smallContent(context, color: Colors.white),
+                    ).tr(),
+                  ),
                 ),
               ],
             ),
@@ -203,6 +241,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
+            surfaceTintColor: Colors.transparent,
             automaticallyImplyLeading: false,
             systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
                 ? SystemUiOverlayStyle.light
@@ -339,7 +378,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                   child: CircularProgressIndicator(
                       color: AppTheme.themedIconColor(context)))
               : _plants.isEmpty
-                  ? Center(child: Text('No plants found.').tr())
+                  ? Center(child: Text('No plants found.', style: AppTheme.mediumContent(context)).tr())
                   : _buildPlantGridView(
                       context,
                       displayPlants,
@@ -360,6 +399,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
     required double childAspectRatio,
   }) {
     final isSmallMobile = Responsive.isSmallMobile(context);
+    final isMobile = Responsive.isMobile(context);
     final isTabletOrDesktop =
         Responsive.isTablet(context) || Responsive.isDesktop(context);
 
@@ -428,7 +468,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                     : 240.00, // Set a default minHeight value
               ),
               decoration: BoxDecoration(
-                gradient: AppTheme.thirtyGradient,
+                gradient: AppTheme.secondaryGradient,
                 borderRadius: BorderRadius.circular(36.0),
               ),
               child: Center(
@@ -437,7 +477,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                       horizontal: 24.0, vertical: 16.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: isSmallMobile
+                    crossAxisAlignment: isMobile || isSmallMobile
                         ? CrossAxisAlignment.center
                         : CrossAxisAlignment.start,
                     children: [
@@ -451,7 +491,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                         style: AppTheme.largeTitle(context),
                       ),
                       SizedBox(height: 8.0),
-                      if (isSmallMobile)
+                      if (isMobile || isSmallMobile)
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
