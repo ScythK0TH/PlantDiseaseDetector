@@ -234,18 +234,12 @@ class _DetailsPageState extends State<DetailsPage> {
               centerTitle: false,
             ),
             body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 96),
+                padding: const EdgeInsets.only(bottom: 96.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 20),
-                    Center(
-                      child: Text('${plant['title'] ?? 'Unknown'}',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
-                    ),
                     SizedBox(height: 20),
                     SizedBox(
                       height: 300,
@@ -253,10 +247,7 @@ class _DetailsPageState extends State<DetailsPage> {
                       child: plant['decodedImage'] != null
                           ? Container(
                               decoration: BoxDecoration(
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : primaryColor,
+                                color: AppTheme.themedBgIconColor(context),
                                 borderRadius: BorderRadius.circular(36),
                               ),
                               clipBehavior: Clip.antiAlias,
@@ -270,51 +261,119 @@ class _DetailsPageState extends State<DetailsPage> {
                             )
                           : Container(
                               decoration: BoxDecoration(
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : primaryColor,
+                                color: AppTheme.themedBgIconColor(context),
                                 borderRadius: BorderRadius.circular(36),
                               ),
                               child: Center(
                                 child: Icon(
                                   Icons.image,
                                   size: 50,
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.white
-                                      : primaryColor,
+                                  color: AppTheme.themedIconColor(context),
                                 ),
                               ),
                             ),
                     ),
                     SizedBox(height: 20),
-                    Text(
-                      'Date'.tr() +
-                          ': ' +
-                          (plant['date'] != null
-                              ? DateFormat('yyyy-MM-dd HH:mm:ss').format(
-                                  DateTime.tryParse(plant['date']) ??
-                                      DateTime.now())
-                              : 'Unknown'),
-                      style: TextStyle(fontSize: 18),
+                    Center(
+                      child: Text(
+                        '${plant['title'] ?? 'Unknown'}',
+                        style: AppTheme.mediumTitle(context),
+                      ),
                     ),
-                    SizedBox(height: 10),
-                    Text(
-                        'Predict'.tr() +
-                            ': ' +
-                            '${plant['predict'] ?? 'Unknown'}'.tr(),
-                        style: TextStyle(fontSize: 18)),
-                    SizedBox(height: 10),
-                    Text(
-                        'Treatment'.tr() +
-                            ': ${(plant['treatment']) ?? 'Unknown'}',
-                        style: TextStyle(fontSize: 18)),
-                    SizedBox(height: 10),
-                    Text(
-                        'Prevention'.tr() +
-                            ': ${(plant['prevention']) ?? 'Unknown'}',
-                        style: TextStyle(fontSize: 18)),
+                    SizedBox(height: 20),
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppTheme.themedBgIconColor(context),
+                        borderRadius: BorderRadius.circular(36),
+                      ),
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Date
+                          Row(
+                            children: [
+                              Text(
+                                'Date'.tr(),
+                                style: AppTheme.smallTitle(context),
+                              ),
+                              SizedBox(width: 8),
+                              Expanded(child: Divider(thickness: 1)),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                left: 4, top: 2, bottom: 8),
+                            child: Text(
+                              (plant['date'] != null
+                                  ? DateFormat('yyyy-MM-dd HH:mm:ss').format(
+                                      DateTime.tryParse(plant['date']) ??
+                                          DateTime.now())
+                                  : 'Unknown'),
+                              style: AppTheme.smallContent(context),
+                            ),
+                          ),
+                          // Predict
+                          Row(
+                            children: [
+                              Text(
+                                'Predict'.tr(),
+                                style: AppTheme.smallTitle(context),
+                              ),
+                              SizedBox(width: 8),
+                              Expanded(child: Divider(thickness: 1)),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                left: 4, top: 2, bottom: 8),
+                            child: Text(
+                              '${plant['predict'] ?? 'Unknown'}'.tr(),
+                              style: AppTheme.smallContent(context),
+                            ),
+                          ),
+                          // Treatment
+                          Row(
+                            children: [
+                              Text(
+                                'Treatment'.tr(),
+                                style: AppTheme.smallTitle(context),
+                              ),
+                              SizedBox(width: 8),
+                              Expanded(child: Divider(thickness: 1)),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                left: 4, top: 2, bottom: 8),
+                            child: Text(
+                              '${plant['treatment'] ?? 'Unknown'}',
+                              style: AppTheme.smallContent(context),
+                            ),
+                          ),
+                          // Prevention
+                          Row(
+                            children: [
+                              Text(
+                                'Prevention'.tr(),
+                                style: AppTheme.smallTitle(context),
+                              ),
+                              SizedBox(width: 8),
+                              Expanded(child: Divider(thickness: 1)),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                left: 4, top: 2, bottom: 0),
+                            child: Text(
+                              '${plant['prevention'] ?? 'Unknown'}',
+                              style: AppTheme.smallContent(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
