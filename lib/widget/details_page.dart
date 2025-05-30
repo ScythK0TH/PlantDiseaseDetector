@@ -235,146 +235,149 @@ class _DetailsPageState extends State<DetailsPage> {
             ),
             body: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 160.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 20),
-                    SizedBox(
-                      height: 300,
-                      width: double.infinity,
-                      child: plant['decodedImage'] != null
-                          ? Container(
-                              decoration: BoxDecoration(
-                                color: AppTheme.themedBgIconColor(context),
-                                borderRadius: BorderRadius.circular(36),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Image.memory(
-                                plant['decodedImage'],
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
-                                alignment: Alignment.center,
-                              ),
-                            )
-                          : Container(
-                              decoration: BoxDecoration(
-                                color: AppTheme.themedBgIconColor(context),
-                                borderRadius: BorderRadius.circular(36),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.image,
-                                  size: 50,
-                                  color: AppTheme.themedIconColor(context),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(36.0),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 96.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 20),
+                      SizedBox(
+                        height: 300,
+                        width: double.infinity,
+                        child: plant['decodedImage'] != null
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  color: AppTheme.themedBgIconColor(context),
+                                  borderRadius: BorderRadius.circular(36),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: Image.memory(
+                                  plant['decodedImage'],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  alignment: Alignment.center,
+                                ),
+                              )
+                            : Container(
+                                decoration: BoxDecoration(
+                                  color: AppTheme.themedBgIconColor(context),
+                                  borderRadius: BorderRadius.circular(36),
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.image,
+                                    size: 50,
+                                    color: AppTheme.themedIconColor(context),
+                                  ),
                                 ),
                               ),
-                            ),
-                    ),
-                    SizedBox(height: 20),
-                    Center(
-                      child: Text(
-                        '${plant['title'] ?? 'Unknown'}',
-                        style: AppTheme.mediumTitle(context),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: AppTheme.themedBgIconColor(context),
-                        borderRadius: BorderRadius.circular(36),
+                      SizedBox(height: 20),
+                      Center(
+                        child: Text(
+                          '${plant['title'] ?? 'Unknown'}',
+                          style: AppTheme.mediumTitle(context),
+                        ),
                       ),
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Date
-                          Row(
-                            children: [
-                              Text(
-                                'Date'.tr(),
-                                style: AppTheme.smallTitle(context),
-                              ),
-                              SizedBox(width: 8),
-                              Expanded(child: Divider(thickness: 1)),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 4, top: 2, bottom: 8),
-                            child: Text(
-                              (plant['date'] != null
-                                  ? DateFormat('yyyy-MM-dd HH:mm:ss').format(
-                                      DateTime.tryParse(plant['date']) ??
-                                          DateTime.now())
-                                  : 'Unknown'),
-                              style: AppTheme.smallContent(context),
+                      SizedBox(height: 20),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: AppTheme.themedBgIconColor(context),
+                          borderRadius: BorderRadius.circular(36),
+                        ),
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Date
+                            Row(
+                              children: [
+                                Text(
+                                  'Date'.tr(),
+                                  style: AppTheme.smallTitle(context),
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(child: Divider(thickness: 1)),
+                              ],
                             ),
-                          ),
-                          // Predict
-                          Row(
-                            children: [
-                              Text(
-                                'Predict'.tr(),
-                                style: AppTheme.smallTitle(context),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 4, top: 2, bottom: 8),
+                              child: Text(
+                                (plant['date'] != null
+                                    ? DateFormat('yyyy-MM-dd HH:mm:ss').format(
+                                        DateTime.tryParse(plant['date']) ??
+                                            DateTime.now())
+                                    : 'Unknown'),
+                                style: AppTheme.smallContent(context),
                               ),
-                              SizedBox(width: 8),
-                              Expanded(child: Divider(thickness: 1)),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 4, top: 2, bottom: 8),
-                            child: Text(
-                              '${plant['predict'] ?? 'Unknown'}'.tr(),
-                              style: AppTheme.smallContent(context),
                             ),
-                          ),
-                          // Treatment
-                          Row(
-                            children: [
-                              Text(
-                                'Treatment'.tr(),
-                                style: AppTheme.smallTitle(context),
+                            // Predict
+                            Row(
+                              children: [
+                                Text(
+                                  'Predict'.tr(),
+                                  style: AppTheme.smallTitle(context),
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(child: Divider(thickness: 1)),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 4, top: 2, bottom: 8),
+                              child: Text(
+                                '${plant['predict'] ?? 'Unknown'}'.tr(),
+                                style: AppTheme.smallContent(context),
                               ),
-                              SizedBox(width: 8),
-                              Expanded(child: Divider(thickness: 1)),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 4, top: 2, bottom: 8),
-                            child: Text(
-                              '${plant['treatment'] ?? 'Unknown'}',
-                              style: AppTheme.smallContent(context),
                             ),
-                          ),
-                          // Prevention
-                          Row(
-                            children: [
-                              Text(
-                                'Prevention'.tr(),
-                                style: AppTheme.smallTitle(context),
+                            // Treatment
+                            Row(
+                              children: [
+                                Text(
+                                  'Treatment'.tr(),
+                                  style: AppTheme.smallTitle(context),
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(child: Divider(thickness: 1)),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 4, top: 2, bottom: 8),
+                              child: Text(
+                                '${plant['treatment'] ?? 'Unknown'}',
+                                style: AppTheme.smallContent(context),
                               ),
-                              SizedBox(width: 8),
-                              Expanded(child: Divider(thickness: 1)),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 4, top: 2, bottom: 0),
-                            child: Text(
-                              '${plant['prevention'] ?? 'Unknown'}',
-                              style: AppTheme.smallContent(context),
                             ),
-                          ),
-                        ],
+                            // Prevention
+                            Row(
+                              children: [
+                                Text(
+                                  'Prevention'.tr(),
+                                  style: AppTheme.smallTitle(context),
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(child: Divider(thickness: 1)),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 4, top: 2, bottom: 0),
+                              child: Text(
+                                '${plant['prevention'] ?? 'Unknown'}',
+                                style: AppTheme.smallContent(context),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
