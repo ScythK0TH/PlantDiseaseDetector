@@ -137,27 +137,65 @@ class _DetailsPageState extends State<DetailsPage> {
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   backgroundColor:
-                                      Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? primaryColor
-                                          : Colors.white,
+                                      AppTheme.themedBgColor(context),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(36.0),
                                   ),
-                                  title: Text('Delete?'.tr()),
+                                  title: Text('Delete?'.tr(),
+                                      style: AppTheme.mediumTitle(context)),
                                   content: Text(
                                       'Are you sure you want to delete this photo?'
-                                          .tr()),
+                                          .tr(),
+                                      style: AppTheme.smallContent(context)),
                                   actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, false),
-                                      child: Text('Cancel'.tr()),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.themedBgIconColor(
+                                            context), // หรือ gradient ที่ต้องการสำหรับ Cancel
+                                        borderRadius: BorderRadius.circular(36),
+                                      ),
+                                      child: TextButton(
+                                        style: TextButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(36),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 24, vertical: 12),
+                                        ),
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                        child: Text('Cancel'.tr(),
+                                            style: AppTheme.smallContent(
+                                                context,
+                                                color: AppTheme.themedIconColor(
+                                                    context))),
+                                      ),
                                     ),
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, true),
-                                      child: Text('Delete'.tr()),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        gradient: AppTheme.alertGradient,
+                                        borderRadius: BorderRadius.circular(36),
+                                      ),
+                                      child: TextButton(
+                                        style: TextButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(36),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 24,
+                                              vertical: 12), // ปรับขนาดปุ่ม
+                                        ),
+                                        onPressed: () =>
+                                            Navigator.pop(context, true),
+                                        child: Text('Delete'.tr(),
+                                            style: AppTheme.smallContent(
+                                                context,
+                                                color: Colors.white)),
+                                      ),
                                     ),
                                   ],
                                 ),
