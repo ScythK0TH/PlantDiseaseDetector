@@ -4,14 +4,12 @@ import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:project_pdd/home.dart';
 import 'package:project_pdd/main.dart';
 import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/widget/gemini.dart';
-import 'package:project_pdd/widget/profile_page.dart';
-import 'package:project_pdd/widget/recogniser.dart';
+import 'package:project_pdd/ui/styles.dart';
 
 class DetailsPage extends StatefulWidget {
   final Map<String, dynamic> plant;
@@ -36,10 +34,8 @@ class _DetailsPageState extends State<DetailsPage> {
       print('Fetching plants for user: ${userId}...');
 
       try {
-        final result = await collection!.remove({
-          '_id': plantId,
-          'userId': mongo.ObjectId.fromHexString(userId)
-        });
+        final result = await collection!.remove(
+            {'_id': plantId, 'userId': mongo.ObjectId.fromHexString(userId)});
         if (result['n'] > 0) {
           setState(() {
             _isDeleted = true;
@@ -72,19 +68,20 @@ class _DetailsPageState extends State<DetailsPage> {
     if (locale == 'th') {
       detfname = 'details_th.json';
     }
-    await rootBundle.loadString('assets/my_model/details/$detfname').then((String jsonString) {
-        final List<dynamic> details = json.decode(jsonString);
-        for (var detail in details) {
-          if (detail['id'] == plant['predict_id']) {
-            setState(() {
-              plant['treatment'] = detail['treatment'];
-              plant['prevention'] = detail['prevention'];
-            });
-            break; // Exit the loop once the matching detail is found
-          }
+    await rootBundle
+        .loadString('assets/my_model/details/$detfname')
+        .then((String jsonString) {
+      final List<dynamic> details = json.decode(jsonString);
+      for (var detail in details) {
+        if (detail['id'] == plant['predict_id']) {
+          setState(() {
+            plant['treatment'] = detail['treatment'];
+            plant['prevention'] = detail['prevention'];
+          });
+          break; // Exit the loop once the matching detail is found
         }
       }
-    );
+    });
   }
 
   @override
@@ -100,80 +97,103 @@ class _DetailsPageState extends State<DetailsPage> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
+              surfaceTintColor: Colors.transparent,
               automaticallyImplyLeading: false,
-              systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
-                  ? SystemUiOverlayStyle.light
-                  : SystemUiOverlayStyle.dark,
+              systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: AppTheme.isDarkMode(context)
+                    ? Brightness.light
+                    : Brightness.dark,
+              ),
               title: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Stack(alignment: Alignment.center, children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.arrow_circle_left_rounded,
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-                          size: 24.0,
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: Row(
+                  children: [
+                    // Title ชิดซ้าย
+                    Expanded(
+                      child: Text(
+                        'Image Details'.tr(),
+                        style: AppTheme.largeTitle(context),
+                        textAlign: TextAlign.left,
                       ),
                     ),
-                    Center(
-                      child: Text('Image Details'.tr(),
-                          style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold)),
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.delete,
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-                          size: 24.0,
-                        ),
-                        onPressed: () async {
-                          final confirm = await showDialog<bool>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              backgroundColor: Theme.of(context)
-                                                            .brightness ==
-                                                        Brightness.dark
-                                                    ? primaryColor
-                                                    : Colors.white,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(36.0),
-                                                ),
-                              title: Text('Delete?'.tr()),
-                              content: Text('Are you sure you want to delete this photo?'.tr()),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, false),
-                                  child: Text('Cancel'.tr()),
-                                ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  child: Text('Delete'.tr()),
-                                ),
-                              ],
+                    // ปุ่มฟังก์ชันทางขวา
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: AppTheme.alertGradient,
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.delete,
+                              color: AppTheme.light,
+                              size: 24.0,
                             ),
-                          );
-                          if (confirm != true) return;
-      
-                          setState(() => _isUpdating = true);
-                          await deleteFunction(plant["_id"], userId);
-                          if (!mounted) return;
-                          Navigator.pop(context, _isDeleted);
-                        },
-                      ),
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  backgroundColor:
+                                      Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? primaryColor
+                                          : Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(36.0),
+                                  ),
+                                  title: Text('Delete?'.tr()),
+                                  content: Text(
+                                      'Are you sure you want to delete this photo?'
+                                          .tr()),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, false),
+                                      child: Text('Cancel'.tr()),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, true),
+                                      child: Text('Delete'.tr()),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirm != true) return;
+
+                              setState(() => _isUpdating = true);
+                              await deleteFunction(plant["_id"], userId);
+                              if (!mounted) return;
+                              Navigator.pop(context, _isDeleted);
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppTheme.themedBgIconColor(context),
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: AppTheme.themedIconColor(context),
+                              size: 24.0,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                  ]),
+                  ],
                 ),
               ),
-              centerTitle: true,
+              centerTitle: false,
             ),
             body: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
@@ -185,7 +205,8 @@ class _DetailsPageState extends State<DetailsPage> {
                     SizedBox(height: 20),
                     Center(
                       child: Text('${plant['title'] ?? 'Unknown'}',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
                     ),
                     SizedBox(height: 20),
                     SizedBox(
@@ -194,7 +215,10 @@ class _DetailsPageState extends State<DetailsPage> {
                       child: plant['decodedImage'] != null
                           ? Container(
                               decoration: BoxDecoration(
-                                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : primaryColor,
                                 borderRadius: BorderRadius.circular(36),
                               ),
                               clipBehavior: Clip.antiAlias,
@@ -208,14 +232,20 @@ class _DetailsPageState extends State<DetailsPage> {
                             )
                           : Container(
                               decoration: BoxDecoration(
-                                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : primaryColor,
                                 borderRadius: BorderRadius.circular(36),
                               ),
                               child: Center(
                                 child: Icon(
                                   Icons.image,
                                   size: 50,
-                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : primaryColor,
                                 ),
                               ),
                             ),
@@ -223,46 +253,63 @@ class _DetailsPageState extends State<DetailsPage> {
                     SizedBox(height: 20),
                     Text(
                       'Date'.tr() +
-                        ': ' +
-                        (plant['date'] != null
-                          ? DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.tryParse(plant['date']) ?? DateTime.now())
-                          : 'Unknown'),
+                          ': ' +
+                          (plant['date'] != null
+                              ? DateFormat('yyyy-MM-dd HH:mm:ss').format(
+                                  DateTime.tryParse(plant['date']) ??
+                                      DateTime.now())
+                              : 'Unknown'),
                       style: TextStyle(fontSize: 18),
                     ),
                     SizedBox(height: 10),
-                    Text('Predict'.tr() + ': ' + '${plant['predict'] ?? 'Unknown'}'.tr(),
+                    Text(
+                        'Predict'.tr() +
+                            ': ' +
+                            '${plant['predict'] ?? 'Unknown'}'.tr(),
                         style: TextStyle(fontSize: 18)),
                     SizedBox(height: 10),
-                    Text('Treatment'.tr() + ': ${(plant['treatment']) ?? 'Unknown'}',
+                    Text(
+                        'Treatment'.tr() +
+                            ': ${(plant['treatment']) ?? 'Unknown'}',
                         style: TextStyle(fontSize: 18)),
                     SizedBox(height: 10),
-                    Text('Prevention'.tr() + ': ${(plant['prevention']) ?? 'Unknown'}',
+                    Text(
+                        'Prevention'.tr() +
+                            ': ${(plant['prevention']) ?? 'Unknown'}',
                         style: TextStyle(fontSize: 18)),
                   ],
                 ),
               ),
             ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
             floatingActionButton: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   FloatingActionButton.extended(
-                      heroTag: 'assistance_fab',
-                      backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-                      foregroundColor: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
-                      icon: const Icon(Icons.support_agent),
-                      label: const Text('Assistance').tr(),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => GeminiChatPage(plant: plant, userId: userId),
-                          ),
-                        );
-                      },
-                    ),
+                    heroTag: 'assistance_fab',
+                    backgroundColor:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : primaryColor,
+                    foregroundColor:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? primaryColor
+                            : Colors.white,
+                    icon: const Icon(Icons.support_agent),
+                    label: const Text('Assistance').tr(),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              GeminiChatPage(plant: plant, userId: userId),
+                        ),
+                      );
+                    },
+                  ),
                   FloatingActionButton(
                     heroTag: 'edit_fab',
                     onPressed: () async {
@@ -271,16 +318,18 @@ class _DetailsPageState extends State<DetailsPage> {
                       final newTitle = await showDialog<String>(
                         context: context,
                         builder: (context) => AlertDialog(
-                          backgroundColor: Theme.of(context).brightness == Brightness.dark
-                            ? primaryColor
-                            : Colors.white,
+                          backgroundColor:
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? primaryColor
+                                  : Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(36.0),
                           ),
                           title: Text('Edit Title'.tr()),
                           content: TextField(
                             controller: titleController,
-                            decoration: InputDecoration(hintText: 'Enter new title'.tr()),
+                            decoration: InputDecoration(
+                                hintText: 'Enter new title'.tr()),
                           ),
                           actions: [
                             TextButton(
@@ -288,7 +337,8 @@ class _DetailsPageState extends State<DetailsPage> {
                               child: Text('Cancel'.tr()),
                             ),
                             TextButton(
-                              onPressed: () => Navigator.pop(context, titleController.text),
+                              onPressed: () =>
+                                  Navigator.pop(context, titleController.text),
                               child: Text('Save'.tr()),
                             ),
                           ],
@@ -305,7 +355,8 @@ class _DetailsPageState extends State<DetailsPage> {
                                   topRight: Radius.circular(12.0),
                                 ),
                               ),
-                              content: Text('Title must be 15 characters or less!'.tr()),
+                              content: Text(
+                                  'Title must be 15 characters or less!'.tr()),
                             ),
                           );
                           return; // Stop further execution
@@ -316,43 +367,51 @@ class _DetailsPageState extends State<DetailsPage> {
                           final collection = db.plantCollection;
                           await collection!.update(
                             {'_id': plant['_id']},
-                            {r'$set': {'title': newTitle.trim()}},
+                            {
+                              r'$set': {'title': newTitle.trim()}
+                            },
                           );
                           setState(() {
                             plant['title'] = newTitle.trim();
                           });
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              backgroundColor: Colors.green,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(12.0),
-                                  topRight: Radius.circular(12.0),
+                                backgroundColor: Colors.green,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(12.0),
+                                    topRight: Radius.circular(12.0),
+                                  ),
                                 ),
-                              ),
-                              content: Text('Title updated!'.tr())
-                            ),
+                                content: Text('Title updated!'.tr())),
                           );
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              backgroundColor: Colors.red,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(12.0),
-                                  topRight: Radius.circular(12.0),
+                                backgroundColor: Colors.red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(12.0),
+                                    topRight: Radius.circular(12.0),
+                                  ),
                                 ),
-                              ),
-                              content: Text('Failed to update title:'.tr() + ' $e')
-                            ),
+                                content: Text(
+                                    'Failed to update title:'.tr() + ' $e')),
                           );
                         } finally {
                           setState(() => _isUpdating = false);
                         }
                       }
                     },
-                    backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
-                    child: Icon(Icons.edit, color: (Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white), size: 24),
+                    backgroundColor:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : primaryColor,
+                    child: Icon(Icons.edit,
+                        color: (Theme.of(context).brightness == Brightness.dark
+                            ? primaryColor
+                            : Colors.white),
+                        size: 24),
                   ),
                 ],
               ),
@@ -362,9 +421,13 @@ class _DetailsPageState extends State<DetailsPage> {
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
               child: Container(
-                color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
+                color:
+                    const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
                 child: Center(
-            child: CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor),
+                  child: CircularProgressIndicator(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : primaryColor),
                 ),
               ),
             ),
