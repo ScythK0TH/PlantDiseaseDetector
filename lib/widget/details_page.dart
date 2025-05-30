@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:project_pdd/main.dart';
 import 'package:project_pdd/services/database.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'package:project_pdd/ui/responsive.dart';
 import 'package:project_pdd/widget/gemini.dart';
 import 'package:project_pdd/ui/styles.dart';
 
@@ -87,6 +88,8 @@ class _DetailsPageState extends State<DetailsPage> {
   Widget build(BuildContext context) {
     final plant = widget.plant;
     final userId = widget.userId;
+    final isTabletOrDesktop =
+        Responsive.isTablet(context) || Responsive.isDesktop(context);
 
     return PopScope(
       canPop: !_isUpdating,
@@ -227,7 +230,8 @@ class _DetailsPageState extends State<DetailsPage> {
                               if (messenger.mounted) {
                                 messenger.hideCurrentSnackBar();
                                 // Wait a bit for the SnackBar to disappear
-                                await Future.delayed(const Duration(milliseconds: 200));
+                                await Future.delayed(
+                                    const Duration(milliseconds: 200));
                               }
                               Navigator.pop(context);
                             },
@@ -241,7 +245,10 @@ class _DetailsPageState extends State<DetailsPage> {
               centerTitle: false,
             ),
             body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: isTabletOrDesktop
+                  ? const EdgeInsets.symmetric(
+                      horizontal: 100.0) // Desktop: padding มากขึ้น
+                  : const EdgeInsets.symmetric(horizontal: 20.0),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(36.0),
                 child: SingleChildScrollView(
@@ -250,37 +257,39 @@ class _DetailsPageState extends State<DetailsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 20),
-                      SizedBox(
-                        height: 300,
-                        width: double.infinity,
-                        child: plant['decodedImage'] != null
-                            ? Container(
-                                decoration: BoxDecoration(
-                                  color: AppTheme.themedBgIconColor(context),
-                                  borderRadius: BorderRadius.circular(36),
-                                ),
-                                clipBehavior: Clip.antiAlias,
-                                child: Image.memory(
-                                  plant['decodedImage'],
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  alignment: Alignment.center,
-                                ),
-                              )
-                            : Container(
-                                decoration: BoxDecoration(
-                                  color: AppTheme.themedBgIconColor(context),
-                                  borderRadius: BorderRadius.circular(36),
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    Icons.image,
-                                    size: 50,
-                                    color: AppTheme.themedIconColor(context),
+                      Center(
+                        child: SizedBox(
+                          width: isTabletOrDesktop ? 400 : 300,
+                          height: isTabletOrDesktop ? 400 : 300,
+                          child: plant['decodedImage'] != null
+                              ? Container(
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.themedBgIconColor(context),
+                                    borderRadius: BorderRadius.circular(36),
+                                  ),
+                                  clipBehavior: Clip.antiAlias,
+                                  child: Image.memory(
+                                    plant['decodedImage'],
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    alignment: Alignment.center,
+                                  ),
+                                )
+                              : Container(
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.themedBgIconColor(context),
+                                    borderRadius: BorderRadius.circular(36),
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.image,
+                                      size: 50,
+                                      color: AppTheme.themedIconColor(context),
+                                    ),
                                   ),
                                 ),
-                              ),
+                        ),
                       ),
                       SizedBox(height: 20),
                       Center(
@@ -391,150 +400,113 @@ class _DetailsPageState extends State<DetailsPage> {
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
             floatingActionButton: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Expanded(
-                    flex: 2,
-                    child: SizedBox(
-                      height: 56, // ความสูงมาตรฐานของ FAB
-                      child: FloatingActionButton(
-                        heroTag: 'edit_fab',
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(36), // ขอบมน 36
-                        ),
-                        onPressed: () async {
-                          final TextEditingController titleController =
-                              TextEditingController(text: plant['title'] ?? '');
-                          final newTitle = await showDialog<String>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              backgroundColor: AppTheme.themedBgColor(context),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(36.0),
+              padding: isTabletOrDesktop
+                  ? const EdgeInsets.symmetric(horizontal: 100.0)
+                  : const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: isTabletOrDesktop ? 600 : double.infinity, // จำกัดความกว้างสูงสุด 600
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      flex: 3,
+                      child: SizedBox(
+                        height: 56,
+                        child: FloatingActionButton(
+                          heroTag: 'edit_fab',
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(36),
+                          ),
+                          onPressed: () async {
+                            final TextEditingController titleController =
+                                TextEditingController(text: plant['title'] ?? '');
+                            final newTitle = await showDialog<String>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                backgroundColor: AppTheme.themedBgColor(context),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(36.0),
+                                ),
+                                title: Text('Edit Title'.tr(),
+                                    style: AppTheme.mediumTitle(context)),
+                                content: TextField(
+                                  controller: titleController,
+                                  decoration: InputDecoration(
+                                    hintText: 'Enter new title'.tr(),
+                                    hintStyle: AppTheme.smallContent(context),
+                                    border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(36), // ขอบมน 36
+                                      borderSide: BorderSide(
+                                          color: AppTheme.themedBgIconColor(
+                                              context)),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(36), // ขอบมน 36
+                                      borderSide: BorderSide(
+                                          color: AppTheme.themedBgIconColor(
+                                              context)),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(36), // ขอบมน 36
+                                      borderSide: BorderSide(
+                                          color: AppTheme.primaryColor),
+                                    ),
+                                  ),
+                                ),
+                                actions: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.themedBgIconColor(
+                                          context), // หรือ gradient ที่ต้องการสำหรับ Cancel
+                                      borderRadius: BorderRadius.circular(36),
+                                    ),
+                                    child: TextButton(
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: Colors.transparent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(36),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 24, vertical: 12),
+                                      ),
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text('Cancel'.tr(),
+                                          style: AppTheme.smallContent(context)),
+                                    ),
+                                  ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      gradient: AppTheme
+                                          .primaryGradient, // หรือ gradient ที่ต้องการสำหรับ Cancel
+                                      borderRadius: BorderRadius.circular(36),
+                                    ),
+                                    child: TextButton(
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: Colors.transparent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(36),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 24, vertical: 12),
+                                      ),
+                                      onPressed: () => Navigator.pop(
+                                          context, titleController.text),
+                                      child: Text('Save'.tr(),
+                                          style: AppTheme.smallContent(context)),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              title: Text('Edit Title'.tr(),
-                                  style: AppTheme.mediumTitle(context)),
-                              content: TextField(
-                                controller: titleController,
-                                decoration: InputDecoration(
-                                  hintText: 'Enter new title'.tr(),
-                                  hintStyle: AppTheme.smallContent(context),
-                                  border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(36), // ขอบมน 36
-                                    borderSide: BorderSide(
-                                        color: AppTheme.themedBgIconColor(
-                                            context)),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(36), // ขอบมน 36
-                                    borderSide: BorderSide(
-                                        color: AppTheme.themedBgIconColor(
-                                            context)),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(36), // ขอบมน 36
-                                    borderSide: BorderSide(
-                                        color: AppTheme.primaryColor),
-                                  ),
-                                ),
-                              ),
-                              actions: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: AppTheme.themedBgIconColor(
-                                        context), // หรือ gradient ที่ต้องการสำหรับ Cancel
-                                    borderRadius: BorderRadius.circular(36),
-                                  ),
-                                  child: TextButton(
-                                    style: TextButton.styleFrom(
-                                      backgroundColor: Colors.transparent,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(36),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 24, vertical: 12),
-                                    ),
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text('Cancel'.tr(),
-                                        style: AppTheme.smallContent(context)),
-                                  ),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    gradient: AppTheme
-                                        .primaryGradient, // หรือ gradient ที่ต้องการสำหรับ Cancel
-                                    borderRadius: BorderRadius.circular(36),
-                                  ),
-                                  child: TextButton(
-                                    style: TextButton.styleFrom(
-                                      backgroundColor: Colors.transparent,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(36),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 24, vertical: 12),
-                                    ),
-                                    onPressed: () => Navigator.pop(
-                                        context, titleController.text),
-                                    child: Text('Save'.tr(),
-                                        style: AppTheme.smallContent(context)),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                          if (newTitle != null && newTitle.trim().isNotEmpty) {
-                            if (newTitle.trim().length > 15) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  backgroundColor: AppTheme.alertColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(36.0),
-                                      topRight: Radius.circular(36.0),
-                                    ),
-                                  ),
-                                  content: Text(
-                                    'Title must be 15 characters or less!'.tr(),
-                                    style: AppTheme.smallContent(context),
-                                  ),
-                                ),
-                              );
-                              return; // Stop further execution
-                            }
-                            setState(() => _isUpdating = true);
-                            try {
-                              final db = MongoService();
-                              final collection = db.plantCollection;
-                              await collection!.update(
-                                {'_id': plant['_id']},
-                                {
-                                  r'$set': {'title': newTitle.trim()}
-                                },
-                              );
-                              setState(() {
-                                plant['title'] = newTitle.trim();
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    backgroundColor: AppTheme.primaryColor,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(36.0),
-                                        topRight: Radius.circular(36.0),
-                                      ),
-                                    ),
-                                    content: Text('Title updated!'.tr(),
-                                        style: AppTheme.smallContent(context))),
-                              );
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                            );
+                            if (newTitle != null && newTitle.trim().isNotEmpty) {
+                              if (newTitle.trim().length > 15) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
                                     backgroundColor: AppTheme.alertColor,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.only(
@@ -543,62 +515,105 @@ class _DetailsPageState extends State<DetailsPage> {
                                       ),
                                     ),
                                     content: Text(
-                                      'Failed to update title:'.tr() + ' $e',
+                                      'Title must be 15 characters or less!'.tr(),
                                       style: AppTheme.smallContent(context),
-                                    )),
-                              );
-                            } finally {
-                              setState(() => _isUpdating = false);
+                                    ),
+                                  ),
+                                );
+                                return; // Stop further execution
+                              }
+                              setState(() => _isUpdating = true);
+                              try {
+                                final db = MongoService();
+                                final collection = db.plantCollection;
+                                await collection!.update(
+                                  {'_id': plant['_id']},
+                                  {
+                                    r'$set': {'title': newTitle.trim()}
+                                  },
+                                );
+                                setState(() {
+                                  plant['title'] = newTitle.trim();
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      backgroundColor: AppTheme.primaryColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(36.0),
+                                          topRight: Radius.circular(36.0),
+                                        ),
+                                      ),
+                                      content: Text('Title updated!'.tr(),
+                                          style: AppTheme.smallContent(context))),
+                                );
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      backgroundColor: AppTheme.alertColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(36.0),
+                                          topRight: Radius.circular(36.0),
+                                        ),
+                                      ),
+                                      content: Text(
+                                        'Failed to update title:'.tr() + ' $e',
+                                        style: AppTheme.smallContent(context),
+                                      )),
+                                );
+                              } finally {
+                                setState(() => _isUpdating = false);
+                              }
                             }
-                          }
-                        },
-                        backgroundColor: AppTheme.themedIconColor(context),
-                        child: Icon(Icons.edit,
-                            color: AppTheme.themedBgColor(context), size: 24),
+                          },
+                          backgroundColor: AppTheme.themedIconColor(context),
+                          child: Icon(Icons.edit,
+                              color: AppTheme.themedBgColor(context), size: 24),
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    flex: 8,
-                    child: SizedBox(
-                      height: 56,
-                      child: Container(
+                    SizedBox(width: 8),
+                    Expanded(
+                      flex: 7,
+                      child: SizedBox(
                         height: 56,
-                        decoration: BoxDecoration(
-                          gradient: AppTheme.primaryGradient,
-                          borderRadius: BorderRadius.circular(36),
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
+                        child: Container(
+                          height: 56,
+                          decoration: BoxDecoration(
+                            gradient: AppTheme.primaryGradient,
                             borderRadius: BorderRadius.circular(36),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => GeminiChatPage(
-                                      plant: plant, userId: userId),
-                                ),
-                              );
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.auto_awesome,
-                                    color: AppTheme.themedIconColor(context),
-                                    size: 24),
-                                SizedBox(width: 8),
-                                Text('Assistance'.tr(),
-                                    style: AppTheme.smallTitle(context)),
-                              ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(36),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        GeminiChatPage(plant: plant, userId: userId),
+                                  ),
+                                );
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.auto_awesome,
+                                      color: AppTheme.themedIconColor(context), size: 24),
+                                  SizedBox(width: 8),
+                                  Text('Assistance'.tr(),
+                                      style: AppTheme.smallTitle(context)),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
