@@ -93,6 +93,14 @@ class _DetailsPageState extends State<DetailsPage> {
 
     return PopScope(
       canPop: !_isUpdating,
+      onPopInvoked: (didPop) async {
+        // ปิด SnackBar ก่อนเสมอเมื่อมีการ pop (กด back ทุกกรณี)
+        final messenger = ScaffoldMessenger.of(context);
+        if (messenger.mounted) {
+          messenger.hideCurrentSnackBar();
+          await Future.delayed(const Duration(milliseconds: 200));
+        }
+      },
       child: Stack(
         children: [
           Scaffold(
@@ -226,10 +234,8 @@ class _DetailsPageState extends State<DetailsPage> {
                             ),
                             onPressed: () async {
                               final messenger = ScaffoldMessenger.of(context);
-                              // Hide any currently displayed SnackBar
                               if (messenger.mounted) {
                                 messenger.hideCurrentSnackBar();
-                                // Wait a bit for the SnackBar to disappear
                                 await Future.delayed(
                                     const Duration(milliseconds: 200));
                               }
@@ -405,7 +411,9 @@ class _DetailsPageState extends State<DetailsPage> {
                   : const EdgeInsets.symmetric(horizontal: 20.0),
               child: Container(
                 constraints: BoxConstraints(
-                  maxWidth: isTabletOrDesktop ? 600 : double.infinity, // จำกัดความกว้างสูงสุด 600
+                  maxWidth: isTabletOrDesktop
+                      ? 600
+                      : double.infinity, // จำกัดความกว้างสูงสุด 600
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -421,11 +429,13 @@ class _DetailsPageState extends State<DetailsPage> {
                           ),
                           onPressed: () async {
                             final TextEditingController titleController =
-                                TextEditingController(text: plant['title'] ?? '');
+                                TextEditingController(
+                                    text: plant['title'] ?? '');
                             final newTitle = await showDialog<String>(
                               context: context,
                               builder: (context) => AlertDialog(
-                                backgroundColor: AppTheme.themedBgColor(context),
+                                backgroundColor:
+                                    AppTheme.themedBgColor(context),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(36.0),
                                 ),
@@ -469,14 +479,16 @@ class _DetailsPageState extends State<DetailsPage> {
                                       style: TextButton.styleFrom(
                                         backgroundColor: Colors.transparent,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(36),
+                                          borderRadius:
+                                              BorderRadius.circular(36),
                                         ),
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 24, vertical: 12),
                                       ),
                                       onPressed: () => Navigator.pop(context),
                                       child: Text('Cancel'.tr(),
-                                          style: AppTheme.smallContent(context)),
+                                          style:
+                                              AppTheme.smallContent(context)),
                                     ),
                                   ),
                                   Container(
@@ -489,7 +501,8 @@ class _DetailsPageState extends State<DetailsPage> {
                                       style: TextButton.styleFrom(
                                         backgroundColor: Colors.transparent,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(36),
+                                          borderRadius:
+                                              BorderRadius.circular(36),
                                         ),
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 24, vertical: 12),
@@ -497,13 +510,15 @@ class _DetailsPageState extends State<DetailsPage> {
                                       onPressed: () => Navigator.pop(
                                           context, titleController.text),
                                       child: Text('Save'.tr(),
-                                          style: AppTheme.smallContent(context)),
+                                          style:
+                                              AppTheme.smallContent(context)),
                                     ),
                                   ),
                                 ],
                               ),
                             );
-                            if (newTitle != null && newTitle.trim().isNotEmpty) {
+                            if (newTitle != null &&
+                                newTitle.trim().isNotEmpty) {
                               if (newTitle.trim().length > 15) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -515,7 +530,8 @@ class _DetailsPageState extends State<DetailsPage> {
                                       ),
                                     ),
                                     content: Text(
-                                      'Title must be 15 characters or less!'.tr(),
+                                      'Title must be 15 characters or less!'
+                                          .tr(),
                                       style: AppTheme.smallContent(context),
                                     ),
                                   ),
@@ -545,7 +561,8 @@ class _DetailsPageState extends State<DetailsPage> {
                                         ),
                                       ),
                                       content: Text('Title updated!'.tr(),
-                                          style: AppTheme.smallContent(context))),
+                                          style:
+                                              AppTheme.smallContent(context))),
                                 );
                               } catch (e) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -588,12 +605,19 @@ class _DetailsPageState extends State<DetailsPage> {
                             color: Colors.transparent,
                             child: InkWell(
                               borderRadius: BorderRadius.circular(36),
-                              onTap: () {
+                              onTap: () async {
+                                final messenger = ScaffoldMessenger.of(context);
+                                if (messenger.mounted) {
+                                  messenger.hideCurrentSnackBar();
+                                  await Future.delayed(
+                                      const Duration(milliseconds: 200));
+                                }
+                                ;
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        GeminiChatPage(plant: plant, userId: userId),
+                                    builder: (context) => GeminiChatPage(
+                                        plant: plant, userId: userId),
                                   ),
                                 );
                               },
@@ -601,7 +625,8 @@ class _DetailsPageState extends State<DetailsPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.auto_awesome,
-                                      color: AppTheme.themedIconColor(context), size: 24),
+                                      color: AppTheme.themedIconColor(context),
+                                      size: 24),
                                   SizedBox(width: 8),
                                   Text('Assistance'.tr(),
                                       style: AppTheme.smallTitle(context)),
