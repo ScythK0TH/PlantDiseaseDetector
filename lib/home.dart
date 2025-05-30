@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:project_pdd/ui/responsive.dart';
+import 'package:flutter/services.dart';
 import 'package:project_pdd/widget/storage_page.dart';
 import 'package:project_pdd/widget/profile_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
@@ -27,7 +27,16 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = Responsive.isMobile(context);
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        systemNavigationBarColor: Theme.of(context).scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness:
+            AppTheme.isDarkMode(context) ? Brightness.light : Brightness.dark,
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness:
+            AppTheme.isDarkMode(context) ? Brightness.light : Brightness.dark,
+      ),
+    );
 
     final List<Widget> pages = [
       Recogniser(userId: widget.userId),
@@ -38,48 +47,60 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Stack(
         children: [
-          IndexedStack(
-            index: _selectedIndex,
-            children: pages,
+          SafeArea(
+            top: true,
+            left: true,
+            right: true,
+            bottom: true,
+            child: IndexedStack(
+              index: _selectedIndex,
+              children: pages,
+            ),
           ),
-          // BottomNavigationBar overlay
           Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
-              constraints: const BoxConstraints(
-                maxWidth: 600,
-              ),
-              margin: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
-              decoration: BoxDecoration(
-                gradient: AppTheme.primaryGradient,
+            child: SafeArea(
+              minimum: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
+              top: false,
+              left: false,
+              right: false,
+              child: ClipRRect(
                 borderRadius: BorderRadius.circular(36),
-              ),
-              child: BottomNavigationBar(
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                currentIndex: _selectedIndex,
-                onTap: (index) {
-                  setState(() => _selectedIndex = index);
-                },
-                selectedItemColor: AppTheme.selectedIconColor(context),
-                unselectedItemColor: AppTheme.themedIconColor(context),
-                showSelectedLabels: false,
-                showUnselectedLabels: false,
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.camera_alt, size: 36.0),
-                    label: '',
+                child: Container(
+                  constraints: const BoxConstraints(
+                    maxWidth: 600,
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.photo, size: 36.0),
-                    label: '',
+                  decoration: BoxDecoration(
+                    gradient: AppTheme.primaryGradient,
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.person, size: 36.0),
-                    label: '',
+                  child: BottomNavigationBar(
+                    type: BottomNavigationBarType.fixed,
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    currentIndex: _selectedIndex,
+                    onTap: (index) {
+                      setState(() => _selectedIndex = index);
+                    },
+                    selectedItemColor: AppTheme.selectedIconColor(context),
+                    unselectedItemColor: AppTheme.themedIconColor(context),
+                    showSelectedLabels: false,
+                    showUnselectedLabels: false,
+                    items: const [
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.camera_alt, size: 28.0),
+                        label: '',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.photo, size: 28.0),
+                        label: '',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.person, size: 28.0),
+                        label: '',
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),

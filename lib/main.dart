@@ -4,17 +4,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_pdd/home.dart';
 import 'package:project_pdd/services/database.dart';
-import 'package:project_pdd/style.dart';
+import 'package:project_pdd/ui/styles.dart';
 import 'package:flutter/services.dart';
 import 'package:project_pdd/widget/first_page.dart';
-import 'package:project_pdd/widget/gemini.dart';
-import 'package:project_pdd/widget/recogniser.dart';
-import 'package:project_pdd/widget/storage_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final themeModeNotifier = ValueNotifier<ThemeMode>(ThemeMode.light);
 final imageCountUpdateNotifier = ValueNotifier<int>(0);
-final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
 
 Future<String?> getSavedUserId() async {
   final prefs = await SharedPreferences.getInstance();
@@ -41,25 +39,27 @@ void main() async {
 
   // Connect MongoDB once, globally
   await MongoService().connect();
-  
+
   // Set the preferred orientations to portrait mode only
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
   await dotenv.load(fileName: "assets/.env");
   runApp(EasyLocalization(
-    supportedLocales: const [Locale('en', 'US'), Locale('th', 'TH')],
-    path: 'assets/languages',
-    fallbackLocale: const Locale('en', 'US'),
-    startLocale: const Locale('th', 'TH'),
-    child: MainApp(userId: userId, initialThemeMode: themeMode)));
+      supportedLocales: const [Locale('en', 'US'), Locale('th', 'TH')],
+      path: 'assets/languages',
+      fallbackLocale: const Locale('en', 'US'),
+      startLocale: const Locale('th', 'TH'),
+      child: MainApp(userId: userId, initialThemeMode: themeMode)));
 }
 
 class MainApp extends StatelessWidget {
   final String? userId;
   final ThemeMode initialThemeMode;
-  const MainApp({super.key, required this.userId, required this.initialThemeMode});
+  const MainApp(
+      {super.key, required this.userId, required this.initialThemeMode});
 
   @override
   Widget build(BuildContext context) {
@@ -75,11 +75,11 @@ class MainApp extends StatelessWidget {
             brightness: Brightness.light,
             textTheme: GoogleFonts.promptTextTheme(),
             appBarTheme: const AppBarTheme(
-              backgroundColor: Colors.white,
+              backgroundColor: AppTheme.light,
             ),
-            scaffoldBackgroundColor: Colors.white,
+            scaffoldBackgroundColor: AppTheme.light,
             bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-              backgroundColor: Colors.white,
+              backgroundColor: AppTheme.light,
             ),
           ),
           themeMode: mode,
@@ -87,23 +87,21 @@ class MainApp extends StatelessWidget {
             brightness: Brightness.dark,
             textTheme: GoogleFonts.promptTextTheme(
               TextTheme(
-                bodySmall: const TextStyle(color: Colors.white),
-                bodyMedium: const TextStyle(color: Colors.white),
-                bodyLarge: const TextStyle(color: Colors.white),
+                bodySmall: const TextStyle(color: AppTheme.light),
+                bodyMedium: const TextStyle(color: AppTheme.light),
+                bodyLarge: const TextStyle(color: AppTheme.light),
               ),
             ),
             appBarTheme: const AppBarTheme(
-              backgroundColor: Color(0xFF0E1311),
+              backgroundColor: AppTheme.dark,
             ),
-            scaffoldBackgroundColor: Color(0xFF0E1311),
+            scaffoldBackgroundColor: AppTheme.dark,
             bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-              backgroundColor: Color(0xFF0E1311),
-              unselectedIconTheme: IconThemeData(color: Colors.white),
+              backgroundColor: AppTheme.dark,
+              unselectedIconTheme: IconThemeData(color: AppTheme.light),
             ),
           ),
-          home: userId == null
-              ? FirstPageScreen()
-              : HomePage(userId: userId!),
+          home: userId == null ? FirstPageScreen() : HomePage(userId: userId!),
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,
