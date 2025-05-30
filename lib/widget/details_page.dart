@@ -234,9 +234,9 @@ class _DetailsPageState extends State<DetailsPage> {
               centerTitle: false,
             ),
             body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 96.0),
+                padding: const EdgeInsets.only(bottom: 160.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -381,134 +381,154 @@ class _DetailsPageState extends State<DetailsPage> {
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
             floatingActionButton: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  FloatingActionButton.extended(
-                    heroTag: 'assistance_fab',
-                    backgroundColor:
-                        Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : primaryColor,
-                    foregroundColor:
-                        Theme.of(context).brightness == Brightness.dark
-                            ? primaryColor
-                            : Colors.white,
-                    icon: const Icon(Icons.support_agent),
-                    label: const Text('Assistance').tr(),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              GeminiChatPage(plant: plant, userId: userId),
+                  Expanded(
+                    flex: 2,
+                    child: SizedBox(
+                      height: 56, // ความสูงมาตรฐานของ FAB
+                      child: FloatingActionButton(
+                        heroTag: 'edit_fab',
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(36), // ขอบมน 36
                         ),
-                      );
-                    },
-                  ),
-                  FloatingActionButton(
-                    heroTag: 'edit_fab',
-                    onPressed: () async {
-                      final TextEditingController titleController =
-                          TextEditingController(text: plant['title'] ?? '');
-                      final newTitle = await showDialog<String>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          backgroundColor:
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? primaryColor
-                                  : Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(36.0),
-                          ),
-                          title: Text('Edit Title'.tr()),
-                          content: TextField(
-                            controller: titleController,
-                            decoration: InputDecoration(
-                                hintText: 'Enter new title'.tr()),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: Text('Cancel'.tr()),
-                            ),
-                            TextButton(
-                              onPressed: () =>
-                                  Navigator.pop(context, titleController.text),
-                              child: Text('Save'.tr()),
-                            ),
-                          ],
-                        ),
-                      );
-                      if (newTitle != null && newTitle.trim().isNotEmpty) {
-                        if (newTitle.trim().length > 15) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              backgroundColor: Colors.red,
+                        onPressed: () async {
+                          final TextEditingController titleController =
+                              TextEditingController(text: plant['title'] ?? '');
+                          final newTitle = await showDialog<String>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              backgroundColor:
+                                  Theme.of(context).brightness == Brightness.dark
+                                      ? primaryColor
+                                      : Colors.white,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(12.0),
-                                  topRight: Radius.circular(12.0),
-                                ),
+                                borderRadius: BorderRadius.circular(36.0),
                               ),
-                              content: Text(
-                                  'Title must be 15 characters or less!'.tr()),
+                              title: Text('Edit Title'.tr()),
+                              content: TextField(
+                                controller: titleController,
+                                decoration: InputDecoration(
+                                    hintText: 'Enter new title'.tr()),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text('Cancel'.tr()),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, titleController.text),
+                                  child: Text('Save'.tr()),
+                                ),
+                              ],
                             ),
                           );
-                          return; // Stop further execution
-                        }
-                        setState(() => _isUpdating = true);
-                        try {
-                          final db = MongoService();
-                          final collection = db.plantCollection;
-                          await collection!.update(
-                            {'_id': plant['_id']},
-                            {
-                              r'$set': {'title': newTitle.trim()}
+                          if (newTitle != null && newTitle.trim().isNotEmpty) {
+                            if (newTitle.trim().length > 15) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: Colors.red,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(12.0),
+                                      topRight: Radius.circular(12.0),
+                                    ),
+                                  ),
+                                  content: Text(
+                                      'Title must be 15 characters or less!'.tr()),
+                                ),
+                              );
+                              return; // Stop further execution
+                            }
+                            setState(() => _isUpdating = true);
+                            try {
+                              final db = MongoService();
+                              final collection = db.plantCollection;
+                              await collection!.update(
+                                {'_id': plant['_id']},
+                                {
+                                  r'$set': {'title': newTitle.trim()}
+                                },
+                              );
+                              setState(() {
+                                plant['title'] = newTitle.trim();
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    backgroundColor: Colors.green,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(12.0),
+                                        topRight: Radius.circular(12.0),
+                                      ),
+                                    ),
+                                    content: Text('Title updated!'.tr())),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    backgroundColor: Colors.red,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(12.0),
+                                        topRight: Radius.circular(12.0),
+                                      ),
+                                    ),
+                                    content: Text(
+                                        'Failed to update title:'.tr() + ' $e')),
+                              );
+                            } finally {
+                              setState(() => _isUpdating = false);
+                            }
+                          }
+                        },
+                        backgroundColor:
+                            AppTheme.themedIconColor(context),
+                        child: Icon(Icons.edit,
+                            color: AppTheme.themedBgColor(context),
+                            size: 24),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    flex: 8,
+                    child: SizedBox(
+                      height: 56,
+                      child: Container(
+                        height: 56,
+                        decoration: BoxDecoration(
+                          gradient: AppTheme.primaryGradient,
+                          borderRadius: BorderRadius.circular(36),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(36),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => GeminiChatPage(plant: plant, userId: userId),
+                                ),
+                              );
                             },
-                          );
-                          setState(() {
-                            plant['title'] = newTitle.trim();
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                backgroundColor: Colors.green,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(12.0),
-                                    topRight: Radius.circular(12.0),
-                                  ),
-                                ),
-                                content: Text('Title updated!'.tr())),
-                          );
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                backgroundColor: Colors.red,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(12.0),
-                                    topRight: Radius.circular(12.0),
-                                  ),
-                                ),
-                                content: Text(
-                                    'Failed to update title:'.tr() + ' $e')),
-                          );
-                        } finally {
-                          setState(() => _isUpdating = false);
-                        }
-                      }
-                    },
-                    backgroundColor:
-                        Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : primaryColor,
-                    child: Icon(Icons.edit,
-                        color: (Theme.of(context).brightness == Brightness.dark
-                            ? primaryColor
-                            : Colors.white),
-                        size: 24),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.auto_awesome, color: AppTheme.themedIconColor(context), size: 24),
+                                SizedBox(width: 8),
+                                Text('Assistance'.tr(),
+                                    style: AppTheme.smallTitle(context)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
