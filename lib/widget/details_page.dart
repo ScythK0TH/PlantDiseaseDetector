@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_pdd/main.dart';
 import 'package:project_pdd/services/database.dart';
-import 'package:project_pdd/style.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/widget/gemini.dart';
 import 'package:project_pdd/ui/styles.dart';
@@ -133,6 +132,7 @@ class _DetailsPageState extends State<DetailsPage> {
                               size: 24.0,
                             ),
                             onPressed: () async {
+                              ScaffoldMessenger.of(context).clearSnackBars();
                               final confirm = await showDialog<bool>(
                                 context: context,
                                 builder: (context) => AlertDialog(
@@ -221,7 +221,14 @@ class _DetailsPageState extends State<DetailsPage> {
                               color: AppTheme.themedIconColor(context),
                               size: 24.0,
                             ),
-                            onPressed: () {
+                            onPressed: () async {
+                              final messenger = ScaffoldMessenger.of(context);
+                              // Hide any currently displayed SnackBar
+                              if (messenger.mounted) {
+                                messenger.hideCurrentSnackBar();
+                                // Wait a bit for the SnackBar to disappear
+                                await Future.delayed(const Duration(milliseconds: 200));
+                              }
                               Navigator.pop(context);
                             },
                           ),
@@ -403,28 +410,80 @@ class _DetailsPageState extends State<DetailsPage> {
                           final newTitle = await showDialog<String>(
                             context: context,
                             builder: (context) => AlertDialog(
-                              backgroundColor:
-                                  Theme.of(context).brightness == Brightness.dark
-                                      ? primaryColor
-                                      : Colors.white,
+                              backgroundColor: AppTheme.themedBgColor(context),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(36.0),
                               ),
-                              title: Text('Edit Title'.tr()),
+                              title: Text('Edit Title'.tr(),
+                                  style: AppTheme.mediumTitle(context)),
                               content: TextField(
                                 controller: titleController,
                                 decoration: InputDecoration(
-                                    hintText: 'Enter new title'.tr()),
+                                  hintText: 'Enter new title'.tr(),
+                                  hintStyle: AppTheme.smallContent(context),
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(36), // ขอบมน 36
+                                    borderSide: BorderSide(
+                                        color: AppTheme.themedBgIconColor(
+                                            context)),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(36), // ขอบมน 36
+                                    borderSide: BorderSide(
+                                        color: AppTheme.themedBgIconColor(
+                                            context)),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(36), // ขอบมน 36
+                                    borderSide: BorderSide(
+                                        color: AppTheme.primaryColor),
+                                  ),
+                                ),
                               ),
                               actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text('Cancel'.tr()),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.themedBgIconColor(
+                                        context), // หรือ gradient ที่ต้องการสำหรับ Cancel
+                                    borderRadius: BorderRadius.circular(36),
+                                  ),
+                                  child: TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(36),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 24, vertical: 12),
+                                    ),
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text('Cancel'.tr(),
+                                        style: AppTheme.smallContent(context)),
+                                  ),
                                 ),
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(context, titleController.text),
-                                  child: Text('Save'.tr()),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    gradient: AppTheme
+                                        .primaryGradient, // หรือ gradient ที่ต้องการสำหรับ Cancel
+                                    borderRadius: BorderRadius.circular(36),
+                                  ),
+                                  child: TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(36),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 24, vertical: 12),
+                                    ),
+                                    onPressed: () => Navigator.pop(
+                                        context, titleController.text),
+                                    child: Text('Save'.tr(),
+                                        style: AppTheme.smallContent(context)),
+                                  ),
                                 ),
                               ],
                             ),
@@ -433,15 +492,17 @@ class _DetailsPageState extends State<DetailsPage> {
                             if (newTitle.trim().length > 15) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  backgroundColor: Colors.red,
+                                  backgroundColor: AppTheme.alertColor,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(12.0),
-                                      topRight: Radius.circular(12.0),
+                                      topLeft: Radius.circular(36.0),
+                                      topRight: Radius.circular(36.0),
                                     ),
                                   ),
                                   content: Text(
-                                      'Title must be 15 characters or less!'.tr()),
+                                    'Title must be 15 characters or less!'.tr(),
+                                    style: AppTheme.smallContent(context),
+                                  ),
                                 ),
                               );
                               return; // Stop further execution
@@ -461,38 +522,39 @@ class _DetailsPageState extends State<DetailsPage> {
                               });
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                    backgroundColor: Colors.green,
+                                    backgroundColor: AppTheme.primaryColor,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(12.0),
-                                        topRight: Radius.circular(12.0),
+                                        topLeft: Radius.circular(36.0),
+                                        topRight: Radius.circular(36.0),
                                       ),
                                     ),
-                                    content: Text('Title updated!'.tr())),
+                                    content: Text('Title updated!'.tr(),
+                                        style: AppTheme.smallContent(context))),
                               );
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                    backgroundColor: Colors.red,
+                                    backgroundColor: AppTheme.alertColor,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(12.0),
-                                        topRight: Radius.circular(12.0),
+                                        topLeft: Radius.circular(36.0),
+                                        topRight: Radius.circular(36.0),
                                       ),
                                     ),
                                     content: Text(
-                                        'Failed to update title:'.tr() + ' $e')),
+                                      'Failed to update title:'.tr() + ' $e',
+                                      style: AppTheme.smallContent(context),
+                                    )),
                               );
                             } finally {
                               setState(() => _isUpdating = false);
                             }
                           }
                         },
-                        backgroundColor:
-                            AppTheme.themedIconColor(context),
+                        backgroundColor: AppTheme.themedIconColor(context),
                         child: Icon(Icons.edit,
-                            color: AppTheme.themedBgColor(context),
-                            size: 24),
+                            color: AppTheme.themedBgColor(context), size: 24),
                       ),
                     ),
                   ),
@@ -515,14 +577,17 @@ class _DetailsPageState extends State<DetailsPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => GeminiChatPage(plant: plant, userId: userId),
+                                  builder: (context) => GeminiChatPage(
+                                      plant: plant, userId: userId),
                                 ),
                               );
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.auto_awesome, color: AppTheme.themedIconColor(context), size: 24),
+                                Icon(Icons.auto_awesome,
+                                    color: AppTheme.themedIconColor(context),
+                                    size: 24),
                                 SizedBox(width: 8),
                                 Text('Assistance'.tr(),
                                     style: AppTheme.smallTitle(context)),
@@ -545,9 +610,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
                 child: Center(
                   child: CircularProgressIndicator(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : primaryColor),
+                      color: AppTheme.themedIconColor(context)),
                 ),
               ),
             ),
