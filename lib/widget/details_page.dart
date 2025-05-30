@@ -252,7 +252,7 @@ class _DetailsPageState extends State<DetailsPage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(36.0),
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.only(bottom: 96.0),
+                  padding: const EdgeInsets.only(bottom: 160.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
