@@ -478,7 +478,7 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
                   alignment: Alignment.bottomCenter,
                   child: SafeArea(
                     minimum:
-                        const EdgeInsets.only(left: 20, right: 20, bottom: 12),
+                        const EdgeInsets.only(bottom: 12),
                     top: false,
                     left: false,
                     right: false,
