@@ -84,29 +84,80 @@ class _RecogniserState extends State<Recogniser> {
                                   color: AppTheme.light,
                                   size: 24.0,
                                 ),
-                                tooltip: 'Emergency Stop',
                                 onPressed: () async {
                                   final confirm = await showDialog<bool>(
                                     context: context,
                                     builder: (context) => AlertDialog(
-                                      title: Text('ยืนยันการหยุดฉุกเฉิน'),
+                                      backgroundColor:
+                                          AppTheme.themedBgColor(context),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(36.0),
+                                      ),
+                                      title: Text('Confirm emergency stop',
+                                          style: AppTheme.mediumTitle(context)),
                                       content: Text(
-                                          'คุณแน่ใจหรือไม่ที่จะหยุดการทำงานฉุกเฉิน?'),
+                                        'Are you sure you want to stop the emergency operation?',
+                                        style: AppTheme.smallContent(context),
+                                      ),
                                       actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(false),
-                                          child: Text('ยกเลิก'),
-                                        ),
-                                        ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.red,
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: AppTheme.themedBgIconColor(
+                                                context), // หรือ gradient ที่ต้องการสำหรับ Cancel
+                                            borderRadius:
+                                                BorderRadius.circular(36),
                                           ),
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(true),
-                                          child: Text('ยืนยัน',
-                                              style: TextStyle(
-                                                  color: Colors.white)),
+                                          child: TextButton(
+                                            style: TextButton.styleFrom(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(36),
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 24,
+                                                      vertical: 12),
+                                            ),
+                                            onPressed: () =>
+                                                Navigator.pop(context, false),
+                                            child: Text('Cancel'.tr(),
+                                                style: AppTheme.smallContent(
+                                                    context,
+                                                    color: AppTheme
+                                                        .themedIconColor(
+                                                            context))),
+                                          ),
+                                        ),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            gradient: AppTheme
+                                                .alertGradient, // หรือ gradient ที่ต้องการสำหรับ Cancel
+                                            borderRadius:
+                                                BorderRadius.circular(36),
+                                          ),
+                                          child: TextButton(
+                                            style: TextButton.styleFrom(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(36),
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 24,
+                                                      vertical: 12),
+                                            ),
+                                            onPressed: () =>
+                                                Navigator.pop(context, true),
+                                            child: Text('Confirm'.tr(),
+                                                style: AppTheme.smallContent(
+                                                    context,
+                                                    color: AppTheme.light)),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -219,7 +270,7 @@ class _RecogniserState extends State<Recogniser> {
                                             'Comming Soon',
                                             'Coming Soon',
                                             onTap: () {
-                                              setState(() => selectedModel = 1);
+                                              // Placeholder for future model
                                             },
                                             selected: selectedModel == 1,
                                           ),
@@ -244,32 +295,103 @@ class _RecogniserState extends State<Recogniser> {
                                 children: [
                                   if (state.status ==
                                       RecogniserStatus.found) ...[
-                                    _buildResultButton(
-                                        context,
-                                        'Save Result'.tr(),
-                                        screenWidth,
-                                        false,
-                                        'save',
-                                        state),
-                                    const SizedBox(height: 20),
-                                    _buildResultButton(context, 'Cancel'.tr(),
-                                        screenWidth, true, 'cancel', state),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          flex: 3,
+                                          child: _buildResultButton(
+                                              context,
+                                              null,
+                                              screenWidth,
+                                              false,
+                                              'cancel',
+                                              state),
+                                        ),
+                                        const SizedBox(
+                                          width: 8.0,
+                                        ),
+                                        Expanded(
+                                          flex: 7,
+                                          child: _buildResultButton(
+                                              context,
+                                              'Save Result'.tr(),
+                                              screenWidth,
+                                              true,
+                                              'save',
+                                              state),
+                                        ),
+                                      ],
+                                    ),
                                   ] else ...[
-                                    _buildPickButton(
-                                        context,
-                                        'Take a photo'.tr(),
-                                        ImageSource.camera,
-                                        screenWidth,
-                                        false,
-                                        'photo'),
-                                    const SizedBox(height: 20),
-                                    _buildPickButton(
-                                        context,
-                                        'Pick from gallery'.tr(),
-                                        ImageSource.gallery,
-                                        screenWidth,
-                                        true,
-                                        'gallery'),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          flex: 3,
+                                          child: _buildPickButton(
+                                            context,
+                                            null,
+                                            ImageSource.gallery,
+                                            double.infinity,
+                                            false,
+                                            'gallery',
+                                            isPressing,
+                                            () async {
+                                              setState(() => isPressing = true);
+                                              final picker = ImagePicker();
+                                              final pickedFile =
+                                                  await picker.pickImage(
+                                                      source:
+                                                          ImageSource.gallery);
+                                              if (pickedFile != null) {
+                                                context
+                                                    .read<RecogniserBloc>()
+                                                    .add(PhotoPicked(
+                                                        File(pickedFile.path)));
+                                              }
+                                              await Future.delayed(
+                                                  const Duration(
+                                                      milliseconds: 500));
+                                              if (mounted)
+                                                setState(
+                                                    () => isPressing = false);
+                                            },
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8.0),
+                                        Expanded(
+                                          flex: 7,
+                                          child: _buildPickButton(
+                                            context,
+                                            'Take a photo'.tr(),
+                                            ImageSource.camera,
+                                            double.infinity,
+                                            true,
+                                            'photo',
+                                            isPressing,
+                                            () async {
+                                              setState(() => isPressing = true);
+                                              final picker = ImagePicker();
+                                              final pickedFile =
+                                                  await picker.pickImage(
+                                                      source:
+                                                          ImageSource.camera);
+                                              if (pickedFile != null) {
+                                                context
+                                                    .read<RecogniserBloc>()
+                                                    .add(PhotoPicked(
+                                                        File(pickedFile.path)));
+                                              }
+                                              await Future.delayed(
+                                                  const Duration(
+                                                      milliseconds: 500));
+                                              if (mounted)
+                                                setState(
+                                                    () => isPressing = false);
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    )
                                   ],
                                 ],
                               ),
@@ -395,118 +517,158 @@ class _RecogniserState extends State<Recogniser> {
     );
   }
 
-  Widget _buildPickButton(BuildContext context, String title,
-      ImageSource source, double width, bool isOutlined, String type) {
+  Widget _buildPickButton(
+    BuildContext context,
+    String? title,
+    ImageSource source,
+    double width,
+    bool isPrimary,
+    String type,
+    bool isPressing,
+    VoidCallback onPressed,
+  ) {
     IconData icon = type == 'photo' ? Icons.camera_alt : Icons.photo_library;
 
-    return ElevatedButton(
-      onPressed: isPressing
-          ? null
-          : () async {
-              setState(() => isPressing = true);
-              final picker = ImagePicker();
-              final pickedFile = await picker.pickImage(
-                source: source,
-              );
-              if (pickedFile != null) {
-                context
-                    .read<RecogniserBloc>()
-                    .add(PhotoPicked(File(pickedFile.path)));
-              }
-              await Future.delayed(const Duration(milliseconds: 500));
-              if (mounted) setState(() => isPressing = false);
-            },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isOutlined
-            ? Colors.transparent
-            : (Theme.of(context).brightness == Brightness.dark
-                ? Colors.white
-                : primaryColor),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(36.0),
-          side: isOutlined
-              ? BorderSide(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : primaryColor,
-                  width: 3.0)
-              : BorderSide.none,
-        ),
-        minimumSize: Size(width, 60.0),
-        elevation: isOutlined ? 0 : null,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: isOutlined
-                ? (Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : primaryColor)
-                : (Theme.of(context).brightness == Brightness.dark
-                    ? primaryColor
-                    : Colors.white),
-            size: 24.0,
-          ),
-          const SizedBox(width: 10),
-          Text(
-            title,
-            style: isOutlined
-                ? descTextStyleDark(context, fontWeight: FontWeight.normal)
-                : descTextStyleWhite(context, fontWeight: FontWeight.normal),
-          ),
-        ],
+    return SizedBox(
+      width: width,
+      height: 56,
+      child: Container(
+        decoration: isPrimary
+            ? BoxDecoration(
+                gradient: AppTheme.primaryGradient,
+                borderRadius: BorderRadius.circular(36.0),
+              )
+            : null,
+        child: (title == null || title.isEmpty)
+            ? FloatingActionButton(
+                heroTag: type,
+                backgroundColor: isPrimary
+                    ? Colors.transparent
+                    : AppTheme.themedIconColor(context),
+                elevation: 0,
+                highlightElevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(36.0),
+                ),
+                onPressed: isPressing ? null : onPressed,
+                child: Icon(
+                  icon,
+                  color: isPrimary
+                      ? AppTheme.themedIconColor(context)
+                      : AppTheme.selectedIconColor(context),
+                  size: 24.0,
+                ),
+              )
+            : FloatingActionButton.extended(
+                heroTag: type,
+                backgroundColor: isPrimary
+                    ? Colors.transparent
+                    : AppTheme.themedIconColor(context),
+                elevation: 0,
+                highlightElevation: 0,
+                hoverElevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(36.0),
+                ),
+                onPressed: isPressing ? null : onPressed,
+                icon: Icon(
+                  icon,
+                  color: isPrimary
+                      ? AppTheme.themedIconColor(context)
+                      : AppTheme.selectedIconColor(context),
+                  size: 24.0,
+                ),
+                label: Text(title, style: AppTheme.smallTitle(context)),
+              ),
       ),
     );
   }
 
-  Widget _buildResultButton(BuildContext context, String title, double width,
-      bool isOutlined, String type, RecogniserState state) {
-    return ElevatedButton(
-      onPressed: isResultButtonPressing
-          ? null
-          : () async {
-              setState(() => isResultButtonPressing = true);
-              if (type == 'save') {
-                await _savedData(context, state, widget.userId);
-              } else if (type == 'cancel') {
-                //Reset the state
-                context.read<RecogniserBloc>().add(RecogniserReset());
-              }
-              await Future.delayed(const Duration(milliseconds: 500));
-              if (mounted) setState(() => isResultButtonPressing = false);
-            },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isOutlined
-            ? Colors.transparent
-            : (Theme.of(context).brightness == Brightness.dark
-                ? Colors.white
-                : primaryColor),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(36.0),
-          side: isOutlined
-              ? BorderSide(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : primaryColor,
-                  width: 3.0)
-              : BorderSide.none,
-        ),
-        minimumSize: Size(width, 60.0),
-        elevation: isOutlined ? 0 : null,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const SizedBox(width: 10),
-          Text(
-            title,
-            style: isOutlined
-                ? descTextStyleDark(context, fontWeight: FontWeight.normal)
-                : descTextStyleWhite(context, fontWeight: FontWeight.normal),
+  Widget _buildResultButton(
+    BuildContext context,
+    String? title,
+    double width,
+    bool isPrimary,
+    String type,
+    RecogniserState state,
+  ) {
+    IconData icon;
+    switch (type) {
+      case 'save':
+        icon = Icons.save;
+        break;
+      case 'cancel':
+        icon = Icons.refresh;
+        break;
+      default:
+        icon = Icons.check;
+    }
+
+    return SizedBox(
+      width: width,
+      height: 56,
+      child: Container(
+        decoration: isPrimary
+            ? BoxDecoration(
+                gradient: AppTheme.primaryGradient,
+                borderRadius: BorderRadius.circular(36.0),
+              )
+            : BoxDecoration(
+                color: AppTheme.themedIconColor(context),
+                borderRadius: BorderRadius.circular(36.0),
+              ),
+        child: ElevatedButton(
+          onPressed: isResultButtonPressing
+              ? null
+              : () async {
+                  setState(() => isResultButtonPressing = true);
+                  if (type == 'save') {
+                    await _savedData(context, state, widget.userId);
+                  } else if (type == 'cancel') {
+                    context.read<RecogniserBloc>().add(RecogniserReset());
+                  }
+                  await Future.delayed(const Duration(milliseconds: 500));
+                  if (mounted) setState(() => isResultButtonPressing = false);
+                },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(36.0),
+              side: isPrimary
+                  ? BorderSide.none
+                  : BorderSide(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : primaryColor,
+                      width: isPrimary ? 0 : 3.0,
+                    ),
+            ),
+            minimumSize: Size(width, 56.0),
+            padding: EdgeInsets.zero,
           ),
-        ],
+          child: Center(
+            child: (title == null || title.isEmpty)
+                ? Icon(
+                    icon,
+                    color: isPrimary
+                        ? Colors.white
+                        : descTextStyleWhite(context,
+                                fontWeight: FontWeight.normal)
+                            .color,
+                    size: 28,
+                  )
+                : Text(
+                    title,
+                    style: isPrimary
+                        ? descTextStyleWhite(context,
+                            fontWeight: FontWeight.normal)
+                        : descTextStyleWhite(context,
+                            fontWeight: FontWeight.normal),
+                  ),
+          ),
+        ),
       ),
     );
   }
