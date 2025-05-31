@@ -42,209 +42,263 @@ class _RecogniserState extends State<Recogniser> {
 
     return BlocProvider(
       create: (_) => RecogniserBloc()..add(RecogniserStarted()),
-      child: Stack(
-        children: [
-          Scaffold(
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              surfaceTintColor: Colors.transparent,
-              automaticallyImplyLeading: false,
-              systemOverlayStyle: SystemUiOverlayStyle(
-                statusBarColor: Colors.transparent,
-                statusBarIconBrightness: AppTheme.isDarkMode(context)
-                    ? Brightness.light
-                    : Brightness.dark,
-              ),
-              title: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Plant Analyzer'.tr(),
-                          style: AppTheme.largeTitle(context),
-                          textAlign: TextAlign.left,
-                        ),
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: AppTheme.themedBgIconColor(context),
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            child: IconButton(
-                              icon: Icon(Icons.close,
-                                  color: AppTheme.themedIconColor(context)),
-                              tooltip: 'Close',
-                              onPressed: widget.onClose, // เรียก callback
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
+      child: Builder(
+        builder: (context) => Stack(
+          children: [
+            Scaffold(
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                surfaceTintColor: Colors.transparent,
+                automaticallyImplyLeading: false,
+                systemOverlayStyle: SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  statusBarIconBrightness: AppTheme.isDarkMode(context)
+                      ? Brightness.light
+                      : Brightness.dark,
                 ),
-              ),
-            ),
-            body: BlocBuilder<RecogniserBloc, RecogniserState>(
-              builder: (context, state) {
-                return SingleChildScrollView(
-                  child: Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                title: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Row(
                       children: [
-                        const SizedBox(height: 8.0),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(36.0),
+                        Expanded(
+                          child: Text(
+                            'Plant Analyzer'.tr(),
+                            style: AppTheme.largeTitle(context),
+                            textAlign: TextAlign.left,
                           ),
-                          child: PhotoViewScreen(file: state.image),
                         ),
-                        const SizedBox(height: 8.0),
-                        Text(
-                          'Top result'.tr(),
-                          style: AppTheme.mediumTitle(context),
-                          textAlign: TextAlign.start,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                        const SizedBox(height: 8.0),
-                        // ส่วนแสดงผลลัพธ์
-                        Container(
-                          padding: state.image == null
-                              ? const EdgeInsets.all(0.0)
-                              : const EdgeInsets.all(12.0),
-                          width:
-                              isSmallMobile || isMobile ? double.infinity : 600,
-                          height: isSmallMobile || isMobile ? 250 : 300,
-                          decoration: BoxDecoration(
-                            color: state.image == null
-                                ? Colors.transparent 
-                                : null,
-                            gradient: state.image == null
-                                ? null
-                                : (state.status == RecogniserStatus.found
-                                    ? AppTheme.primaryGradient
-                                    : AppTheme.alertGradient),
-                            borderRadius: BorderRadius.circular(36.0),
-                          ),
-                          child: state.image == null
-                              ? Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Expanded(
-                                            child: _buildModelSelector(
-                                              context,
-                                              'MobileNetV3 Small',
-                                              'Minimalistic Modify',
-                                              onTap: () {
-                                                setState(
-                                                    () => selectedModel = 0);
-                                              },
-                                              selected: selectedModel == 0,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 16),
-                                          Expanded(
-                                            child: _buildModelSelector(
-                                              context,
-                                              'Comming Soon',
-                                              'Coming Soon',
-                                              onTap: () {
-                                                setState(
-                                                    () => selectedModel = 1);
-                                              },
-                                              selected: selectedModel == 1,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : SizedBox(
-                                  child: Center(
-                                    child: SingleChildScrollView(
-                                      child: _buildResultView(state, context),
-                                    ),
-                                  ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: AppTheme.alertGradient,
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.warning_amber_outlined,
+                                  color: AppTheme.light,
+                                  size: 24.0,
                                 ),
-                        ),
-                        const SizedBox(height: 20),
-                        // ส่วนปุ่มต่างๆ
-                        if (state.status != RecogniserStatus.analyzing) ...[
-                          Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Column(
-                              children: [
-                                if (state.status == RecogniserStatus.found) ...[
-                                  _buildResultButton(
-                                      context,
-                                      'Save Result'.tr(),
-                                      screenWidth,
-                                      false,
-                                      'save',
-                                      state),
-                                  const SizedBox(height: 20),
-                                  _buildResultButton(context, 'Cancel'.tr(),
-                                      screenWidth, true, 'cancel', state),
-                                ] else ...[
-                                  _buildPickButton(
-                                      context,
-                                      'Take a photo'.tr(),
-                                      ImageSource.camera,
-                                      screenWidth,
-                                      false,
-                                      'photo'),
-                                  const SizedBox(height: 20),
-                                  _buildPickButton(
-                                      context,
-                                      'Pick from gallery'.tr(),
-                                      ImageSource.gallery,
-                                      screenWidth,
-                                      true,
-                                      'gallery'),
-                                ],
-                              ],
+                                tooltip: 'Emergency Stop',
+                                onPressed: () async {
+                                  final confirm = await showDialog<bool>(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: Text('ยืนยันการหยุดฉุกเฉิน'),
+                                      content: Text(
+                                          'คุณแน่ใจหรือไม่ที่จะหยุดการทำงานฉุกเฉิน?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(false),
+                                          child: Text('ยกเลิก'),
+                                        ),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                          ),
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(true),
+                                          child: Text('ยืนยัน',
+                                              style: TextStyle(
+                                                  color: Colors.white)),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                  if (confirm == true) {
+                                    // ใส่โค้ดหยุดการทำงานฉุกเฉินที่นี่
+                                    // เช่น รีเซ็ตทุกอย่างหรือออกจากหน้า
+                                    setState(() {
+                                      selectedModel = 0;
+                                    });
+                                    context
+                                        .read<RecogniserBloc>()
+                                        .add(RecogniserReset());
+                                    // หรือเพิ่มโค้ดอื่นๆ ตามต้องการ
+                                  }
+                                },
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 8),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: AppTheme.themedBgIconColor(context),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              child: IconButton(
+                                icon: Icon(Icons.close,
+                                    color: AppTheme.themedIconColor(context),
+                                    size: 24.0),
+                                onPressed: widget.onClose, // เรียก callback
+                              ),
+                            ),
+                          ],
+                        )
                       ],
                     ),
                   ),
-                );
-              },
+                ),
+              ),
+              body: BlocBuilder<RecogniserBloc, RecogniserState>(
+                builder: (context, state) {
+                  return SingleChildScrollView(
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 8.0),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(36.0),
+                            ),
+                            child: PhotoViewScreen(file: state.image),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            state.image == null
+                                ? 'Select a model'.tr()
+                                : 'Top result'.tr(),
+                            style: AppTheme.mediumTitle(context),
+                            textAlign: TextAlign.start,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
+                          const SizedBox(height: 8.0),
+                          // ส่วนแสดงผลลัพธ์
+                          Container(
+                            padding: state.image == null
+                                ? const EdgeInsets.all(0.0)
+                                : const EdgeInsets.all(12.0),
+                            width: isSmallMobile || isMobile
+                                ? double.infinity
+                                : 600,
+                            height: isSmallMobile || isMobile ? 250 : 300,
+                            decoration: BoxDecoration(
+                              color: state.image == null
+                                  ? Colors.transparent
+                                  : null,
+                              gradient: state.image == null
+                                  ? null
+                                  : (state.status == RecogniserStatus.found
+                                      ? AppTheme.primaryGradient
+                                      : AppTheme.alertGradient),
+                              borderRadius: BorderRadius.circular(36.0),
+                            ),
+                            child: state.image == null
+                                ? SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(
+                                          height: 90,
+                                          child: _buildModelSelector(
+                                            context,
+                                            'MobileNetV3 Small',
+                                            'Minimalistic Modify',
+                                            onTap: () {
+                                              setState(() => selectedModel = 0);
+                                            },
+                                            selected: selectedModel == 0,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8.0),
+                                        SizedBox(
+                                          height: 90,
+                                          child: _buildModelSelector(
+                                            context,
+                                            'Comming Soon',
+                                            'Coming Soon',
+                                            onTap: () {
+                                              setState(() => selectedModel = 1);
+                                            },
+                                            selected: selectedModel == 1,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : SizedBox(
+                                    child: Center(
+                                      child: SingleChildScrollView(
+                                        child: _buildResultView(state, context),
+                                      ),
+                                    ),
+                                  ),
+                          ),
+                          const SizedBox(height: 8.0),
+                          // ส่วนปุ่มต่างๆ
+                          if (state.status != RecogniserStatus.analyzing) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Column(
+                                children: [
+                                  if (state.status ==
+                                      RecogniserStatus.found) ...[
+                                    _buildResultButton(
+                                        context,
+                                        'Save Result'.tr(),
+                                        screenWidth,
+                                        false,
+                                        'save',
+                                        state),
+                                    const SizedBox(height: 20),
+                                    _buildResultButton(context, 'Cancel'.tr(),
+                                        screenWidth, true, 'cancel', state),
+                                  ] else ...[
+                                    _buildPickButton(
+                                        context,
+                                        'Take a photo'.tr(),
+                                        ImageSource.camera,
+                                        screenWidth,
+                                        false,
+                                        'photo'),
+                                    const SizedBox(height: 20),
+                                    _buildPickButton(
+                                        context,
+                                        'Pick from gallery'.tr(),
+                                        ImageSource.gallery,
+                                        screenWidth,
+                                        true,
+                                        'gallery'),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-          if (isResultButtonPressing)
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-              child: Container(
-                color:
-                    const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : primaryColor,
+            if (isResultButtonPressing)
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                child: Container(
+                  color:
+                      const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : primaryColor,
+                    ),
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -468,8 +522,7 @@ class _RecogniserState extends State<Recogniser> {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        height: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
         decoration: BoxDecoration(
           gradient: selected ? AppTheme.primaryGradient : null,
           color: selected ? null : Colors.transparent,
