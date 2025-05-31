@@ -363,7 +363,7 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
         bottom: true,
         child: Padding(
           padding: const EdgeInsets.only(
-              top: 8.0, left: 20.0, right: 20.0, bottom: 20.0),
+              top: 8.0, left: 20.0, right: 20.0),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
             child: Column(
@@ -474,12 +474,14 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
                   ),
                 ),
                 SizedBox(height: 16.0),
-                SafeArea(
-                  minimum: const EdgeInsets.only(left: 0, right: 0, bottom: 0),
-                  top: false,
-                  left: false,
-                  right: false,
-                  child: Center(
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SafeArea(
+                    minimum:
+                        const EdgeInsets.only(left: 20, right: 20, bottom: 12),
+                    top: false,
+                    left: false,
+                    right: false,
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 600),
                       child: ClipRRect(
@@ -527,6 +529,8 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
                                             widget.plant['_id'].toString(),
                                       );
                                       _controller.clear();
+                                      // Scroll ลงล่างสุดทันทีหลัง user ส่งข้อความ
+                                      _scrollToBottom();
                                     }
                                   },
                                 ),
