@@ -16,12 +16,12 @@ import 'package:project_pdd/main.dart';
 import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/widget/photo_view.dart';
-import 'package:project_pdd/widget/profile_page.dart';
-import 'package:project_pdd/widget/storage_page.dart';
 
 class Recogniser extends StatefulWidget {
   final String userId; // Pass the logged-in user's _id
-  const Recogniser({required this.userId, super.key});
+  final VoidCallback?
+      onClose; // พิเศษสำหรับ Recogniser ที่ไม่ต้องการ BottomNavigationBar
+  const Recogniser({required this.userId, this.onClose, super.key});
 
   @override
   State<Recogniser> createState() => _RecogniserState();
@@ -44,9 +44,10 @@ class _RecogniserState extends State<Recogniser> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               automaticallyImplyLeading: false,
-              systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
-                  ? SystemUiOverlayStyle.light
-                  : SystemUiOverlayStyle.dark,
+              systemOverlayStyle:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? SystemUiOverlayStyle.light
+                      : SystemUiOverlayStyle.dark,
               title: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: SizedBox(
@@ -57,7 +58,8 @@ class _RecogniserState extends State<Recogniser> {
                       Center(
                         child: Text(
                           'Plant Analyzer'.tr(),
-                          style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
+                          style: subTitleTextStyleDark(context,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -65,6 +67,12 @@ class _RecogniserState extends State<Recogniser> {
                 ),
               ),
               centerTitle: true,
+              leading: IconButton(
+                icon:
+                    Icon(Icons.close, color: Theme.of(context).iconTheme.color),
+                tooltip: 'Close',
+                onPressed: widget.onClose, // เรียก callback
+              ),
             ),
             body: BlocBuilder<RecogniserBloc, RecogniserState>(
               builder: (context, state) {
@@ -86,18 +94,28 @@ class _RecogniserState extends State<Recogniser> {
                         const SizedBox(height: 20),
                         if (state.status != RecogniserStatus.analyzing) ...[
                           if (state.status == RecogniserStatus.found) ...[
-                          _buildResultButton(context, 'Save Result'.tr(),
-                            screenWidth, false, 'save', state),
-                          const SizedBox(height: 20),
-                          _buildResultButton(context, 'Cancel'.tr(),
-                            screenWidth, true, 'cancel', state),
-                          const SizedBox(height: 20),
-                          ] else ...[
-                            _buildPickButton(context, 'Take a photo'.tr(),
-                              ImageSource.camera, screenWidth, false, 'photo'),
+                            _buildResultButton(context, 'Save Result'.tr(),
+                                screenWidth, false, 'save', state),
                             const SizedBox(height: 20),
-                            _buildPickButton(context, 'Pick from gallery'.tr(),
-                                ImageSource.gallery, screenWidth, true, 'gallery'),
+                            _buildResultButton(context, 'Cancel'.tr(),
+                                screenWidth, true, 'cancel', state),
+                            const SizedBox(height: 20),
+                          ] else ...[
+                            _buildPickButton(
+                                context,
+                                'Take a photo'.tr(),
+                                ImageSource.camera,
+                                screenWidth,
+                                false,
+                                'photo'),
+                            const SizedBox(height: 20),
+                            _buildPickButton(
+                                context,
+                                'Pick from gallery'.tr(),
+                                ImageSource.gallery,
+                                screenWidth,
+                                true,
+                                'gallery'),
                             const SizedBox(height: 20),
                           ],
                         ],
@@ -112,7 +130,8 @@ class _RecogniserState extends State<Recogniser> {
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
               child: Container(
-                color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
+                color:
+                    const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
                 child: Center(
                   child: CircularProgressIndicator(
                     color: Theme.of(context).brightness == Brightness.dark
@@ -135,7 +154,9 @@ class _RecogniserState extends State<Recogniser> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
-            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Color(0xFF151C21),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Color(0xFF151C21),
             strokeWidth: 3,
           ),
           const SizedBox(height: 12),
@@ -194,8 +215,8 @@ class _RecogniserState extends State<Recogniser> {
 
     final maxWidth = MediaQuery.of(context).size.width * 0.8;
 
-    List<String> labelLines = splitText(
-        label, subTitleTextStyleDark(context, fontWeight: FontWeight.bold), maxWidth);
+    List<String> labelLines = splitText(label,
+        subTitleTextStyleDark(context, fontWeight: FontWeight.bold), maxWidth);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -283,9 +304,8 @@ class _RecogniserState extends State<Recogniser> {
     );
   }
 
-  Widget _buildResultButton(BuildContext context, String title,
-    double width, bool isOutlined, String type, RecogniserState state) {
-
+  Widget _buildResultButton(BuildContext context, String title, double width,
+      bool isOutlined, String type, RecogniserState state) {
     return ElevatedButton(
       onPressed: isResultButtonPressing
           ? null
@@ -335,7 +355,8 @@ class _RecogniserState extends State<Recogniser> {
   }
 }
 
-Future<String> cropAndResizeToContainer(File file, double containerWidth, double containerHeight) async {
+Future<String> cropAndResizeToContainer(
+    File file, double containerWidth, double containerHeight) async {
   final originalBytes = await file.readAsBytes();
   final image = img.decodeImage(originalBytes);
   if (image == null) throw Exception('Failed to decode image');
@@ -360,67 +381,73 @@ Future<String> cropAndResizeToContainer(File file, double containerWidth, double
     offsetY = ((image.height - cropHeight) / 2).toInt();
   }
 
-  final cropped = img.copyCrop(image, x: offsetX, y: offsetY, width: cropWidth, height: cropHeight);
+  final cropped = img.copyCrop(image,
+      x: offsetX, y: offsetY, width: cropWidth, height: cropHeight);
 
   // Resize to container size (optional, or set a fixed size)
-  final resized = img.copyResize(cropped, width: containerWidth.toInt(), height: containerHeight.toInt());
+  final resized = img.copyResize(cropped,
+      width: containerWidth.toInt(), height: containerHeight.toInt());
 
   return base64Encode(img.encodeJpg(resized, quality: 80));
 }
 
-Future<void> _savedData(BuildContext context, RecogniserState state, String userId) async {
-    if (userId.isEmpty) {
-      print('Error: userId is empty.');
-      return;
-    }
-
-    mongo.ObjectId mongoUserId;
-    try {
-      mongoUserId = mongo.ObjectId.fromHexString(userId); // Convert userId to ObjectId
-    } catch (e) {
-      print('Error: Invalid userId format. ' + e.toString());
-      return;
-    }
-    final predict = state.label;
-    final image = state.image != null ? await cropAndResizeToContainer(state.image!, 350, 300) : null;
-    String title = state.image != null ? state.image!.path.split('/').last : 'Unknown';
-    if (title.length > 15) {
-      title = title.substring(title.length - 15);
-    }
-    final accuracy = state.accuracy;
-    final dateTime = DateTime.now().toString();
-    final pid = state.pid;
-
-    try {
-      print('Connecting to MongoDB...');
-      final db = MongoService();
-      print('Connected to MongoDB.');
-
-      final collection = db.plantCollection;
-      if (image != null) {
-        await collection!.insert({
-          'userId': mongoUserId,
-          'image': image,
-          'date': dateTime,
-          'predict_id': pid,
-          'predict': predict,
-          'title': title,
-          'probability': accuracy,
-        });
-        imageCountUpdateNotifier.value++;
-      } else {
-        print('Error: Image is null.');
-      }
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              HomePage(
-                userId: userId,
-                ),
-        ),
-      );
-    } catch (e) {
-      print('Error: $e');
-    }
+Future<void> _savedData(
+    BuildContext context, RecogniserState state, String userId) async {
+  if (userId.isEmpty) {
+    print('Error: userId is empty.');
+    return;
   }
+
+  mongo.ObjectId mongoUserId;
+  try {
+    mongoUserId =
+        mongo.ObjectId.fromHexString(userId); // Convert userId to ObjectId
+  } catch (e) {
+    print('Error: Invalid userId format. ' + e.toString());
+    return;
+  }
+  final predict = state.label;
+  final image = state.image != null
+      ? await cropAndResizeToContainer(state.image!, 350, 300)
+      : null;
+  String title =
+      state.image != null ? state.image!.path.split('/').last : 'Unknown';
+  if (title.length > 15) {
+    title = title.substring(title.length - 15);
+  }
+  final accuracy = state.accuracy;
+  final dateTime = DateTime.now().toString();
+  final pid = state.pid;
+
+  try {
+    print('Connecting to MongoDB...');
+    final db = MongoService();
+    print('Connected to MongoDB.');
+
+    final collection = db.plantCollection;
+    if (image != null) {
+      await collection!.insert({
+        'userId': mongoUserId,
+        'image': image,
+        'date': dateTime,
+        'predict_id': pid,
+        'predict': predict,
+        'title': title,
+        'probability': accuracy,
+      });
+      imageCountUpdateNotifier.value++;
+    } else {
+      print('Error: Image is null.');
+    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomePage(
+          userId: userId,
+        ),
+      ),
+    );
+  } catch (e) {
+    print('Error: $e');
+  }
+}

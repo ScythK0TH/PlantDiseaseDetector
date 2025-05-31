@@ -39,7 +39,12 @@ class _HomePageState extends State<HomePage> {
     );
 
     final List<Widget> pages = [
-      Recogniser(userId: widget.userId),
+      Recogniser(
+        userId: widget.userId,
+        onClose: () {
+          setState(() => _selectedIndex = 1);
+        },
+      ), // พิเศษสำหรับ Recogniser ที่ไม่ต้องการ BottomNavigationBar
       StoragePage(userId: widget.userId),
       ProfilePage(userId: widget.userId),
     ];
@@ -57,53 +62,54 @@ class _HomePageState extends State<HomePage> {
               children: pages,
             ),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SafeArea(
-              minimum: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
-              top: false,
-              left: false,
-              right: false,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(36),
-                child: Container(
-                  constraints: const BoxConstraints(
-                    maxWidth: 600,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: AppTheme.primaryGradient,
-                  ),
-                  child: BottomNavigationBar(
-                    type: BottomNavigationBarType.fixed,
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    currentIndex: _selectedIndex,
-                    onTap: (index) {
-                      setState(() => _selectedIndex = index);
-                    },
-                    selectedItemColor: AppTheme.selectedIconColor(context),
-                    unselectedItemColor: AppTheme.themedIconColor(context),
-                    showSelectedLabels: false,
-                    showUnselectedLabels: false,
-                    items: const [
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.camera_alt, size: 28.0),
-                        label: '',
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.photo, size: 28.0),
-                        label: '',
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.person, size: 28.0),
-                        label: '',
-                      ),
-                    ],
+          if (_selectedIndex != 0)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                minimum: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
+                top: false,
+                left: false,
+                right: false,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(36),
+                  child: Container(
+                    constraints: const BoxConstraints(
+                      maxWidth: 600,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.primaryGradient,
+                    ),
+                    child: BottomNavigationBar(
+                      type: BottomNavigationBarType.fixed,
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      currentIndex: _selectedIndex,
+                      onTap: (index) {
+                        setState(() => _selectedIndex = index);
+                      },
+                      selectedItemColor: AppTheme.selectedIconColor(context),
+                      unselectedItemColor: AppTheme.themedIconColor(context),
+                      showSelectedLabels: false,
+                      showUnselectedLabels: false,
+                      items: const [
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.camera_alt, size: 28.0),
+                          label: '',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.photo, size: 28.0),
+                          label: '',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.person, size: 28.0),
+                          label: '',
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
