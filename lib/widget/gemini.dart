@@ -356,156 +356,190 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 8.0, left: 20.0, right: 20.0, bottom: 20.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  itemCount: chatHistory.length,
-                  itemBuilder: (context, index) {
-                    final msg = chatHistory[index];
-                    final isUser = msg['role'] == 'user';
-                    final isGemini = msg['role'] == 'model';
-                    final isLoadingMsg = msg['role'] == 'loading';
-                    final text = msg['parts'][0]['text'] ?? '';
-                    return Align(
-                      alignment:
-                          isUser ? Alignment.centerRight : Alignment.centerLeft,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (isGemini || isLoadingMsg) ...[
-                            Container(
-                              margin: const EdgeInsets.symmetric(vertical: 4),
-                              decoration: BoxDecoration(
-                                gradient: AppTheme.primaryGradient,
-                                shape: BoxShape.circle,
-                              ),
-                              child: CircleAvatar(
-                                backgroundColor: Colors.transparent,
-                                child: Icon(Icons.auto_awesome,
-                                    color: AppTheme.themedIconColor(context),
-                                    size: 16),
-                                radius: 16,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                          ],
-                          Flexible(
+      body: SafeArea(
+        top: true,
+        left: true,
+        right: true,
+        bottom: true,
+        child: Padding(
+          padding: const EdgeInsets.only(
+              top: 8.0, left: 20.0, right: 20.0, bottom: 20.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Expanded(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 600),
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: chatHistory.length,
+                        itemBuilder: (context, index) {
+                          final msg = chatHistory[index];
+                          final isUser = msg['role'] == 'user';
+                          final isGemini = msg['role'] == 'model';
+                          final isLoadingMsg = msg['role'] == 'loading';
+                          final text = msg['parts'][0]['text'] ?? '';
+                          return Align(
+                            alignment: isUser
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
                             child: Container(
+                              // ไม่ต้องใช้ Row ครอบ
                               margin: const EdgeInsets.symmetric(vertical: 4),
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: isUser
-                                    ? null
-                                    : AppTheme.themedBgIconColor(context),
-                                gradient:
-                                    isUser ? AppTheme.secondaryGradient : null,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: isUser
-                                      ? const Radius.circular(24)
-                                      : const Radius.circular(0),
-                                  topRight: isUser
-                                      ? const Radius.circular(0)
-                                      : const Radius.circular(24),
-                                  bottomLeft: const Radius.circular(24),
-                                  bottomRight: const Radius.circular(24),
-                                ),
-                              ),
-                              child: isLoadingMsg
-                                  ? Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        SizedBox(
-                                          width: 18,
-                                          height: 18,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: AppTheme.primaryColor,
-                                          ),
-                                        ),
-                                        SizedBox(width: 8),
-                                        Text(text),
-                                      ],
-                                    )
-                                  : RichText(
-                                      text: TextSpan(
-                                        style: DefaultTextStyle.of(context).style,
-                                        children: parseBoldAndLinkText(text),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (isGemini || isLoadingMsg) ...[
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 4),
+                                      decoration: BoxDecoration(
+                                        gradient: AppTheme.primaryGradient,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: CircleAvatar(
+                                        backgroundColor: Colors.transparent,
+                                        child: Icon(Icons.auto_awesome,
+                                            color: AppTheme.themedIconColor(
+                                                context),
+                                            size: 16),
+                                        radius: 16,
                                       ),
                                     ),
+                                    SizedBox(width: 8),
+                                  ],
+                                  Flexible(
+                                    child: Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: isUser
+                                            ? null
+                                            : AppTheme.themedBgIconColor(
+                                                context),
+                                        gradient: isUser
+                                            ? AppTheme.secondaryGradient
+                                            : null,
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: isUser
+                                              ? const Radius.circular(24)
+                                              : const Radius.circular(0),
+                                          topRight: isUser
+                                              ? const Radius.circular(0)
+                                              : const Radius.circular(24),
+                                          bottomLeft: const Radius.circular(24),
+                                          bottomRight:
+                                              const Radius.circular(24),
+                                        ),
+                                      ),
+                                      child: isLoadingMsg
+                                          ? Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                SizedBox(
+                                                  width: 18,
+                                                  height: 18,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                    color:
+                                                        AppTheme.primaryColor,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 8),
+                                                Text(text),
+                                              ],
+                                            )
+                                          : RichText(
+                                              text: TextSpan(
+                                                style:
+                                                    DefaultTextStyle.of(context)
+                                                        .style,
+                                                children:
+                                                    parseBoldAndLinkText(text),
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.only(
-          left: 12,
-          right: 12,
-          bottom: MediaQuery.of(context).viewInsets.bottom > 0
-              ? MediaQuery.of(context).viewInsets.bottom + 12
-              : 48,
-          top: 0,
-        ),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 4,
-                offset: Offset(0, -2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  decoration: InputDecoration(
-                    hintText: 'Ask me about your plant'.tr(),
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(vertical: 8),
+                    ),
                   ),
-                  minLines: 1,
-                  maxLines: 4,
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.send),
-                color: Theme.of(context).brightness == Brightness.light
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.white,
-                onPressed: () {
-                  final text = _controller.text.trim();
-                  if (text.isNotEmpty) {
-                    getGeminiResponse(text,
-                        withImageAndPredict: false,
-                        cacheUserId: widget.userId,
-                        cachePlantId: widget.plant['_id'].toString());
-                    _controller.clear();
-                  }
-                },
-              ),
-            ],
+                SizedBox(height: 16.0),
+                SafeArea(
+                  minimum: const EdgeInsets.only(left: 0, right: 0, bottom: 0),
+                  top: false,
+                  left: false,
+                  right: false,
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 600),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(36),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: AppTheme.themedBgIconColor(context),
+                            borderRadius: BorderRadius.circular(36),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _controller,
+                                  decoration: InputDecoration(
+                                    hintText: 'Ask me about your plant'.tr(),
+                                    border: InputBorder.none,
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.symmetric(
+                                        vertical: 4.0, horizontal: 8.0),
+                                  ),
+                                  minLines: 1,
+                                  maxLines: 4,
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: AppTheme.primaryGradient,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  icon: const Icon(Icons.send),
+                                  color: Colors
+                                      .white, // สีไอคอนให้ตัดกับพื้นหลัง gradient
+                                  onPressed: () {
+                                    final text = _controller.text.trim();
+                                    if (text.isNotEmpty) {
+                                      getGeminiResponse(
+                                        text,
+                                        withImageAndPredict: false,
+                                        cacheUserId: widget.userId,
+                                        cachePlantId:
+                                            widget.plant['_id'].toString(),
+                                      );
+                                      _controller.clear();
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
