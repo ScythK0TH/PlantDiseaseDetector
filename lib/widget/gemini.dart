@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart';
 import 'package:project_pdd/services/database.dart';
+import 'package:project_pdd/ui/styles.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -30,7 +32,8 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
 
   final ScrollController _scrollController = ScrollController();
 
-  Future<void> saveCache(String userId, String plantId, List<Map<String, dynamic>> chatHistory) async {
+  Future<void> saveCache(String userId, String plantId,
+      List<Map<String, dynamic>> chatHistory) async {
     final db = MongoService();
     final col = db.assistantCollection;
     await col!.updateOne(
@@ -42,7 +45,8 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
     );
   }
 
-  Future<List<Map<String, dynamic>>?> fetchCache(String userId, String plantId) async {
+  Future<List<Map<String, dynamic>>?> fetchCache(
+      String userId, String plantId) async {
     final db = MongoService();
     final col = db.assistantCollection;
     final doc = await col!.findOne({'userId': userId, 'plantId': plantId});
@@ -64,7 +68,12 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
     if (cachedHistory != null && cachedHistory.isNotEmpty) {
       setState(() {
         chatHistory = cachedHistory;
-        responseText = chatHistory.lastWhere((msg) => msg['role'] == 'model', orElse: () => {'parts': [{'text': ''}]} )['parts'][0]['text'];
+        responseText = chatHistory.lastWhere((msg) => msg['role'] == 'model',
+            orElse: () => {
+                  'parts': [
+                    {'text': ''}
+                  ]
+                })['parts'][0]['text'];
       });
     } else {
       final initialPrompt = "Disease".tr() + " ${widget.plant['predict']}";
@@ -78,7 +87,10 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
     }
   }
 
-  Future<void> getGeminiResponse(String userPrompt, {bool withImageAndPredict = false, String? cacheUserId, String? cachePlantId}) async {
+  Future<void> getGeminiResponse(String userPrompt,
+      {bool withImageAndPredict = false,
+      String? cacheUserId,
+      String? cachePlantId}) async {
     // Add user message to history
     setState(() {
       chatHistory.add({
@@ -131,7 +143,8 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
         "role": "user",
         "parts": [
           {
-            "text": "ข้อมูลการทำนาย: ${widget.plant['predict'] ?? 'ไม่มีข้อมูล'}"
+            "text":
+                "ข้อมูลการทำนาย: ${widget.plant['predict'] ?? 'ไม่มีข้อมูล'}"
           },
           if (widget.plant['image'] != null)
             {
@@ -146,9 +159,8 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
     } else {
       // Add all previous messages, but filter out 'loading'
       // This will prevent "role": "loading" from being sent to Gemini, and the error will be resolved.
-      contents.addAll(
-        chatHistory.where((msg) => msg['role'] == 'user' || msg['role'] == 'model')
-      );
+      contents.addAll(chatHistory
+          .where((msg) => msg['role'] == 'user' || msg['role'] == 'model'));
     }
 
     final response = await http.post(
@@ -163,7 +175,9 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      final text = (data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? '').trim();
+      final text =
+          (data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? '')
+              .trim();
 
       if (!mounted) return;
 
@@ -186,7 +200,8 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
     } else {
       setState(() {
         chatHistory.removeWhere((msg) => msg['role'] == 'loading');
-        responseText = "เกิดข้อผิดพลาด: ${response.statusCode}\n${response.body}";
+        responseText =
+            "เกิดข้อผิดพลาด: ${response.statusCode}\n${response.body}";
       });
       log('Gemini API error: ${response.statusCode} - ${response.body}');
     }
@@ -278,23 +293,69 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
     language = context.locale.languageCode;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Assistant'.tr()),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
-            onPressed: () async {
-              chatHistory.clear();
-              final initialPrompt = "Disease".tr() + " ${widget.plant['predict']}";
-              await getGeminiResponse(
-                initialPrompt,
-                withImageAndPredict: true,
-                cacheUserId: widget.userId,
-                cachePlantId: widget.plant['_id'].toString(),
-              );
-            },
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness:
+              AppTheme.isDarkMode(context) ? Brightness.light : Brightness.dark,
+        ),
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: Row(
+            children: [
+              Expanded(
+                  child: Text('Assistant'.tr(),
+                      style: AppTheme.largeTitle(context),
+                      textAlign: TextAlign.left)),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppTheme.themedBgIconColor(context),
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.refresh),
+                      tooltip: 'Refresh',
+                      onPressed: () async {
+                        chatHistory.clear();
+                        final initialPrompt =
+                            "Disease".tr() + " ${widget.plant['predict']}";
+                        await getGeminiResponse(
+                          initialPrompt,
+                          withImageAndPredict: true,
+                          cacheUserId: widget.userId,
+                          cachePlantId: widget.plant['_id'].toString(),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppTheme.themedBgIconColor(context),
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: AppTheme.themedIconColor(context),
+                        size: 24.0,
+                      ),
+                      onPressed: () async {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                ],
+              )
+            ],
           ),
-        ],
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -311,15 +372,17 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
                   final isLoadingMsg = msg['role'] == 'loading';
                   final text = msg['parts'][0]['text'] ?? '';
                   return Align(
-                    alignment: isUser
-                        ? Alignment.centerRight
-                        : Alignment.centerLeft,
+                    alignment:
+                        isUser ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
                       margin: const EdgeInsets.symmetric(vertical: 4),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: isUser
-                            ? Theme.of(context).colorScheme.primary.withAlpha(50)
+                            ? Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withAlpha(50)
                             : Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -330,7 +393,8 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
                                 SizedBox(
                                   width: 18,
                                   height: 18,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2),
                                 ),
                                 SizedBox(width: 8),
                                 Text(text),
@@ -395,7 +459,7 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
                 onPressed: () {
                   final text = _controller.text.trim();
                   if (text.isNotEmpty) {
-                    getGeminiResponse(text, 
+                    getGeminiResponse(text,
                         withImageAndPredict: false,
                         cacheUserId: widget.userId,
                         cachePlantId: widget.plant['_id'].toString());
