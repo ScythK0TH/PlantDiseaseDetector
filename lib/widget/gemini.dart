@@ -255,7 +255,6 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
             text: url,
             style: const TextStyle(
               color: Colors.blue,
-              decoration: TextDecoration.underline,
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () async {
@@ -358,60 +357,99 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: chatHistory.length,
-                itemBuilder: (context, index) {
-                  final msg = chatHistory[index];
-                  final isUser = msg['role'] == 'user';
-                  final isLoadingMsg = msg['role'] == 'loading';
-                  final text = msg['parts'][0]['text'] ?? '';
-                  return Align(
-                    alignment:
-                        isUser ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: isUser
-                            ? Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withAlpha(50)
-                            : Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: isLoadingMsg
-                          ? Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child:
-                                      CircularProgressIndicator(strokeWidth: 2),
-                                ),
-                                SizedBox(width: 8),
-                                Text(text),
-                              ],
-                            )
-                          : RichText(
-                              text: TextSpan(
-                                style: DefaultTextStyle.of(context).style,
-                                children: parseBoldAndLinkText(text),
+        padding: const EdgeInsets.only(top: 8.0, left: 20.0, right: 20.0, bottom: 20.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: chatHistory.length,
+                  itemBuilder: (context, index) {
+                    final msg = chatHistory[index];
+                    final isUser = msg['role'] == 'user';
+                    final isGemini = msg['role'] == 'model';
+                    final isLoadingMsg = msg['role'] == 'loading';
+                    final text = msg['parts'][0]['text'] ?? '';
+                    return Align(
+                      alignment:
+                          isUser ? Alignment.centerRight : Alignment.centerLeft,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (isGemini || isLoadingMsg) ...[
+                            Container(
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              decoration: BoxDecoration(
+                                gradient: AppTheme.primaryGradient,
+                                shape: BoxShape.circle,
+                              ),
+                              child: CircleAvatar(
+                                backgroundColor: Colors.transparent,
+                                child: Icon(Icons.auto_awesome,
+                                    color: AppTheme.themedIconColor(context),
+                                    size: 16),
+                                radius: 16,
                               ),
                             ),
-                    ),
-                  );
-                },
+                            SizedBox(width: 8),
+                          ],
+                          Flexible(
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: isUser
+                                    ? null
+                                    : AppTheme.themedBgIconColor(context),
+                                gradient:
+                                    isUser ? AppTheme.secondaryGradient : null,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: isUser
+                                      ? const Radius.circular(24)
+                                      : const Radius.circular(0),
+                                  topRight: isUser
+                                      ? const Radius.circular(0)
+                                      : const Radius.circular(24),
+                                  bottomLeft: const Radius.circular(24),
+                                  bottomRight: const Radius.circular(24),
+                                ),
+                              ),
+                              child: isLoadingMsg
+                                  ? Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: AppTheme.primaryColor,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(text),
+                                      ],
+                                    )
+                                  : RichText(
+                                      text: TextSpan(
+                                        style: DefaultTextStyle.of(context).style,
+                                        children: parseBoldAndLinkText(text),
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: Padding(
