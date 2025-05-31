@@ -15,6 +15,7 @@ import 'package:project_pdd/home.dart';
 import 'package:project_pdd/main.dart';
 import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
+import 'package:project_pdd/ui/styles.dart';
 import 'package:project_pdd/widget/photo_view.dart';
 
 class Recogniser extends StatefulWidget {
@@ -43,35 +44,47 @@ class _RecogniserState extends State<Recogniser> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
+              surfaceTintColor: Colors.transparent,
               automaticallyImplyLeading: false,
-              systemOverlayStyle:
-                  Theme.of(context).brightness == Brightness.dark
-                      ? SystemUiOverlayStyle.light
-                      : SystemUiOverlayStyle.dark,
+              systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: AppTheme.isDarkMode(context)
+                    ? Brightness.light
+                    : Brightness.dark,
+              ),
               title: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Stack(
-                    alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  child: Row(
                     children: [
-                      Center(
+                      Expanded(
                         child: Text(
                           'Plant Analyzer'.tr(),
-                          style: subTitleTextStyleDark(context,
-                              fontWeight: FontWeight.bold),
+                          style: AppTheme.largeTitle(context),
+                          textAlign: TextAlign.left,
                         ),
                       ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: AppTheme.themedBgIconColor(context),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.close,
+                                  color: AppTheme.themedIconColor(context)),
+                              tooltip: 'Close',
+                              onPressed: widget.onClose, // เรียก callback
+                            ),
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),
-              ),
-              centerTitle: true,
-              leading: IconButton(
-                icon:
-                    Icon(Icons.close, color: Theme.of(context).iconTheme.color),
-                tooltip: 'Close',
-                onPressed: widget.onClose, // เรียก callback
               ),
             ),
             body: BlocBuilder<RecogniserBloc, RecogniserState>(
