@@ -17,6 +17,7 @@ import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/style.dart';
 import 'package:project_pdd/ui/styles.dart';
 import 'package:project_pdd/widget/photo_view.dart';
+import 'package:project_pdd/ui/responsive.dart';
 
 class Recogniser extends StatefulWidget {
   final String userId; // Pass the logged-in user's _id
@@ -31,10 +32,13 @@ class Recogniser extends StatefulWidget {
 class _RecogniserState extends State<Recogniser> {
   bool isPressing = false;
   bool isResultButtonPressing = false;
+  int selectedModel = 0;
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    final isSmallMobile = Responsive.isSmallMobile(context);
+    final isMobile = Responsive.isMobile(context);
 
     return BlocProvider(
       create: (_) => RecogniserBloc()..add(RecogniserStarted()),
@@ -92,45 +96,131 @@ class _RecogniserState extends State<Recogniser> {
                 return SingleChildScrollView(
                   child: Container(
                     alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(height: 20),
-                        PhotoViewScreen(file: state.image),
-                        const SizedBox(height: 50),
-                        SizedBox(
-                          height: 150,
-                          child: SingleChildScrollView(
-                              child: _buildResultView(state, context)),
+                        const SizedBox(height: 8.0),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(36.0),
+                          ),
+                          child: PhotoViewScreen(file: state.image),
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          'Top result'.tr(),
+                          style: AppTheme.mediumTitle(context),
+                          textAlign: TextAlign.start,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                        const SizedBox(height: 8.0),
+                        // ส่วนแสดงผลลัพธ์
+                        Container(
+                          padding: state.image == null
+                              ? const EdgeInsets.all(0.0)
+                              : const EdgeInsets.all(12.0),
+                          width:
+                              isSmallMobile || isMobile ? double.infinity : 600,
+                          height: isSmallMobile || isMobile ? 250 : 300,
+                          decoration: BoxDecoration(
+                            color: state.image == null
+                                ? Colors.transparent 
+                                : null,
+                            gradient: state.image == null
+                                ? null
+                                : (state.status == RecogniserStatus.found
+                                    ? AppTheme.primaryGradient
+                                    : AppTheme.alertGradient),
+                            borderRadius: BorderRadius.circular(36.0),
+                          ),
+                          child: state.image == null
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Expanded(
+                                            child: _buildModelSelector(
+                                              context,
+                                              'MobileNetV3 Small',
+                                              'Minimalistic Modify',
+                                              onTap: () {
+                                                setState(
+                                                    () => selectedModel = 0);
+                                              },
+                                              selected: selectedModel == 0,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Expanded(
+                                            child: _buildModelSelector(
+                                              context,
+                                              'Comming Soon',
+                                              'Coming Soon',
+                                              onTap: () {
+                                                setState(
+                                                    () => selectedModel = 1);
+                                              },
+                                              selected: selectedModel == 1,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : SizedBox(
+                                  child: Center(
+                                    child: SingleChildScrollView(
+                                      child: _buildResultView(state, context),
+                                    ),
+                                  ),
+                                ),
                         ),
                         const SizedBox(height: 20),
+                        // ส่วนปุ่มต่างๆ
                         if (state.status != RecogniserStatus.analyzing) ...[
-                          if (state.status == RecogniserStatus.found) ...[
-                            _buildResultButton(context, 'Save Result'.tr(),
-                                screenWidth, false, 'save', state),
-                            const SizedBox(height: 20),
-                            _buildResultButton(context, 'Cancel'.tr(),
-                                screenWidth, true, 'cancel', state),
-                            const SizedBox(height: 20),
-                          ] else ...[
-                            _buildPickButton(
-                                context,
-                                'Take a photo'.tr(),
-                                ImageSource.camera,
-                                screenWidth,
-                                false,
-                                'photo'),
-                            const SizedBox(height: 20),
-                            _buildPickButton(
-                                context,
-                                'Pick from gallery'.tr(),
-                                ImageSource.gallery,
-                                screenWidth,
-                                true,
-                                'gallery'),
-                            const SizedBox(height: 20),
-                          ],
+                          Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Column(
+                              children: [
+                                if (state.status == RecogniserStatus.found) ...[
+                                  _buildResultButton(
+                                      context,
+                                      'Save Result'.tr(),
+                                      screenWidth,
+                                      false,
+                                      'save',
+                                      state),
+                                  const SizedBox(height: 20),
+                                  _buildResultButton(context, 'Cancel'.tr(),
+                                      screenWidth, true, 'cancel', state),
+                                ] else ...[
+                                  _buildPickButton(
+                                      context,
+                                      'Take a photo'.tr(),
+                                      ImageSource.camera,
+                                      screenWidth,
+                                      false,
+                                      'photo'),
+                                  const SizedBox(height: 20),
+                                  _buildPickButton(
+                                      context,
+                                      'Pick from gallery'.tr(),
+                                      ImageSource.gallery,
+                                      screenWidth,
+                                      true,
+                                      'gallery'),
+                                ],
+                              ],
+                            ),
+                          ),
                         ],
                       ],
                     ),
@@ -363,6 +453,58 @@ class _RecogniserState extends State<Recogniser> {
                 : descTextStyleWhite(context, fontWeight: FontWeight.normal),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildModelSelector(
+    BuildContext context,
+    String modelName,
+    String description, {
+    VoidCallback? onTap,
+    bool selected = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+        decoration: BoxDecoration(
+          gradient: selected ? AppTheme.primaryGradient : null,
+          color: selected ? null : Colors.transparent,
+          borderRadius: BorderRadius.circular(36),
+          border: selected
+              ? null
+              : Border.all(
+                  color: AppTheme.primaryColor,
+                  width: 2,
+                ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Flexible(
+              child: Text(
+                modelName,
+                style: AppTheme.mediumTitle(context),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                textAlign: TextAlign.start,
+              ),
+            ),
+            Flexible(
+              child: Text(
+                description.tr(),
+                style: AppTheme.smallContent(context),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                textAlign: TextAlign.start,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

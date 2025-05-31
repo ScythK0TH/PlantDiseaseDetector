@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:project_pdd/style.dart';
+import 'package:project_pdd/ui/responsive.dart';
+import 'package:project_pdd/ui/styles.dart';
 
 class PhotoViewScreen extends StatelessWidget {
   final File? file;
@@ -9,14 +10,14 @@ class PhotoViewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
+    final isSmallMobile = Responsive.isSmallMobile(context);
+    final isMobile = Responsive.isMobile(context);
 
     return Container(
-      width: screenWidth * 1.8,
-      height: 300,
+      width: isSmallMobile || isMobile ? double.infinity : 500,
+      height: isSmallMobile || isMobile ? 400 : 500,
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor,
+        color: AppTheme.themedBgIconColor(context),
         borderRadius: BorderRadius.circular(36),
       ),
       clipBehavior: Clip.antiAlias,
@@ -37,12 +38,12 @@ class PhotoViewScreen extends StatelessWidget {
             Icon(
               Icons.image,
               size: 50,
-              color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+              color: AppTheme.themedIconColor(context),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 8.0),
             Text(
               'Please pick a photo'.tr(),
-              style: descTextStyleWhite(context, fontWeight: FontWeight.bold),
+              style: AppTheme.mediumTitle(context),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
