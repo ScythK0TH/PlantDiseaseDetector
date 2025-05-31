@@ -199,6 +199,7 @@ class _RecogniserState extends State<Recogniser> {
               body: BlocBuilder<RecogniserBloc, RecogniserState>(
                 builder: (context, state) {
                   return SingleChildScrollView(
+                    padding: const EdgeInsets.only(bottom: 100.0),
                     child: Container(
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -287,121 +288,117 @@ class _RecogniserState extends State<Recogniser> {
                                   ),
                           ),
                           const SizedBox(height: 8.0),
-                          // ส่วนปุ่มต่างๆ
-                          if (state.status != RecogniserStatus.analyzing) ...[
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              child: Column(
-                                children: [
-                                  if (state.status ==
-                                      RecogniserStatus.found) ...[
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 3,
-                                          child: _buildResultButton(
-                                              context,
-                                              null,
-                                              screenWidth,
-                                              false,
-                                              'cancel',
-                                              state),
-                                        ),
-                                        const SizedBox(
-                                          width: 8.0,
-                                        ),
-                                        Expanded(
-                                          flex: 7,
-                                          child: _buildResultButton(
-                                              context,
-                                              'Save Result'.tr(),
-                                              screenWidth,
-                                              true,
-                                              'save',
-                                              state),
-                                        ),
-                                      ],
-                                    ),
-                                  ] else ...[
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 3,
-                                          child: _buildPickButton(
-                                            context,
-                                            null,
-                                            ImageSource.gallery,
-                                            double.infinity,
-                                            false,
-                                            'gallery',
-                                            isPressing,
-                                            () async {
-                                              setState(() => isPressing = true);
-                                              final picker = ImagePicker();
-                                              final pickedFile =
-                                                  await picker.pickImage(
-                                                      source:
-                                                          ImageSource.gallery);
-                                              if (pickedFile != null) {
-                                                context
-                                                    .read<RecogniserBloc>()
-                                                    .add(PhotoPicked(
-                                                        File(pickedFile.path)));
-                                              }
-                                              await Future.delayed(
-                                                  const Duration(
-                                                      milliseconds: 500));
-                                              if (mounted)
-                                                setState(
-                                                    () => isPressing = false);
-                                            },
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8.0),
-                                        Expanded(
-                                          flex: 7,
-                                          child: _buildPickButton(
-                                            context,
-                                            'Take a photo'.tr(),
-                                            ImageSource.camera,
-                                            double.infinity,
-                                            true,
-                                            'photo',
-                                            isPressing,
-                                            () async {
-                                              setState(() => isPressing = true);
-                                              final picker = ImagePicker();
-                                              final pickedFile =
-                                                  await picker.pickImage(
-                                                      source:
-                                                          ImageSource.camera);
-                                              if (pickedFile != null) {
-                                                context
-                                                    .read<RecogniserBloc>()
-                                                    .add(PhotoPicked(
-                                                        File(pickedFile.path)));
-                                              }
-                                              await Future.delayed(
-                                                  const Duration(
-                                                      milliseconds: 500));
-                                              if (mounted)
-                                                setState(
-                                                    () => isPressing = false);
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ],
                         ],
                       ),
                     ),
                   );
                 },
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat,
+              floatingActionButton: Padding(
+                padding: isSmallMobile || isMobile
+                    ? const EdgeInsets.symmetric(horizontal: 20.0)
+                    : const EdgeInsets.symmetric(horizontal: 100.0),
+                child: SizedBox(
+                  width: isSmallMobile || isMobile ? double.infinity : 600,
+                  child: Builder(
+                    builder: (context) {
+                      final state = context.watch<RecogniserBloc>().state;
+                      if (state.status == RecogniserStatus.found) {
+                        // ปุ่ม Save/Cancel
+                        return Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: _buildResultButton(
+                                context,
+                                null,
+                                double.infinity,
+                                false,
+                                'cancel',
+                                state,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 7,
+                              child: _buildResultButton(
+                                context,
+                                'Save Result'.tr(),
+                                double.infinity,
+                                true,
+                                'save',
+                                state,
+                              ),
+                            ),
+                          ],
+                        );
+                      } else if (state.status != RecogniserStatus.analyzing) {
+                        // ปุ่ม Pick
+                        return Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: _buildPickButton(
+                                context,
+                                null,
+                                ImageSource.gallery,
+                                double.infinity,
+                                false,
+                                'gallery',
+                                isPressing,
+                                () async {
+                                  setState(() => isPressing = true);
+                                  final picker = ImagePicker();
+                                  final pickedFile = await picker.pickImage(
+                                      source: ImageSource.gallery);
+                                  if (pickedFile != null) {
+                                    context.read<RecogniserBloc>().add(
+                                        PhotoPicked(File(pickedFile.path)));
+                                  }
+                                  await Future.delayed(
+                                      const Duration(milliseconds: 500));
+                                  if (mounted)
+                                    setState(() => isPressing = false);
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 7,
+                              child: _buildPickButton(
+                                context,
+                                'Take a photo'.tr(),
+                                ImageSource.camera,
+                                double.infinity,
+                                true,
+                                'photo',
+                                isPressing,
+                                () async {
+                                  setState(() => isPressing = true);
+                                  final picker = ImagePicker();
+                                  final pickedFile = await picker.pickImage(
+                                      source: ImageSource.camera);
+                                  if (pickedFile != null) {
+                                    context.read<RecogniserBloc>().add(
+                                        PhotoPicked(File(pickedFile.path)));
+                                  }
+                                  await Future.delayed(
+                                      const Duration(milliseconds: 500));
+                                  if (mounted)
+                                    setState(() => isPressing = false);
+                                },
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    },
+                  ),
+                ),
               ),
             ),
             if (isResultButtonPressing)
@@ -595,7 +592,7 @@ class _RecogniserState extends State<Recogniser> {
     IconData icon;
     switch (type) {
       case 'save':
-        icon = Icons.save;
+        icon = Icons.download;
         break;
       case 'cancel':
         icon = Icons.refresh;
@@ -653,19 +650,27 @@ class _RecogniserState extends State<Recogniser> {
                 ? Icon(
                     icon,
                     color: isPrimary
-                        ? Colors.white
-                        : descTextStyleWhite(context,
-                                fontWeight: FontWeight.normal)
-                            .color,
-                    size: 28,
+                        ? AppTheme.themedIconColor(context)
+                        : AppTheme.selectedIconColor(context),
+                    size: 24.0,
                   )
-                : Text(
-                    title,
-                    style: isPrimary
-                        ? descTextStyleWhite(context,
-                            fontWeight: FontWeight.normal)
-                        : descTextStyleWhite(context,
-                            fontWeight: FontWeight.normal),
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        icon,
+                        color: isPrimary
+                            ? AppTheme.themedIconColor(context)
+                            : AppTheme.selectedIconColor(context),
+                        size: 24.0,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        title,
+                        style: AppTheme.smallTitle(context),
+                      ),
+                    ],
                   ),
           ),
         ),
