@@ -36,7 +36,6 @@ class _RecogniserState extends State<Recogniser> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
     final isSmallMobile = Responsive.isSmallMobile(context);
     final isMobile = Responsive.isMobile(context);
 
@@ -73,108 +72,127 @@ class _RecogniserState extends State<Recogniser> {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: AppTheme.alertGradient,
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.warning_amber_outlined,
-                                  color: AppTheme.light,
-                                  size: 24.0,
-                                ),
-                                onPressed: () async {
-                                  final confirm = await showDialog<bool>(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      backgroundColor:
-                                          AppTheme.themedBgColor(context),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(36.0),
+                            Builder(
+                              builder: (context) {
+                                final state =
+                                    context.watch<RecogniserBloc>().state;
+                                if (state.status == RecogniserStatus.timeout ||
+                                    state.status == RecogniserStatus.notFound) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      gradient: AppTheme.primaryGradient,
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Icons.refresh,
+                                        color: AppTheme.light,
+                                        size: 24.0,
                                       ),
-                                      title: Text('Confirm emergency stop',
-                                          style: AppTheme.mediumTitle(context)),
-                                      content: Text(
-                                        'Are you sure you want to stop the emergency operation?',
-                                        style: AppTheme.smallContent(context),
-                                      ),
-                                      actions: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: AppTheme.themedBgIconColor(
-                                                context), // หรือ gradient ที่ต้องการสำหรับ Cancel
-                                            borderRadius:
-                                                BorderRadius.circular(36),
-                                          ),
-                                          child: TextButton(
-                                            style: TextButton.styleFrom(
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(36),
-                                              ),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 24,
-                                                      vertical: 12),
+                                      onPressed: () async {
+                                        final confirm = await showDialog<bool>(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            backgroundColor:
+                                                AppTheme.themedBgColor(context),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(36.0),
                                             ),
-                                            onPressed: () =>
-                                                Navigator.pop(context, false),
-                                            child: Text('Cancel'.tr(),
-                                                style: AppTheme.smallContent(
-                                                    context,
-                                                    color: AppTheme
-                                                        .themedIconColor(
-                                                            context))),
-                                          ),
-                                        ),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            gradient: AppTheme
-                                                .alertGradient, // หรือ gradient ที่ต้องการสำหรับ Cancel
-                                            borderRadius:
-                                                BorderRadius.circular(36),
-                                          ),
-                                          child: TextButton(
-                                            style: TextButton.styleFrom(
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(36),
-                                              ),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 24,
-                                                      vertical: 12),
+                                            title: Text('Confirm to restart',
+                                                style: AppTheme.mediumTitle(
+                                                    context)),
+                                            content: Text(
+                                              'Are you sure you want to restart operation?',
+                                              style: AppTheme.smallContent(
+                                                  context),
                                             ),
-                                            onPressed: () =>
-                                                Navigator.pop(context, true),
-                                            child: Text('Confirm'.tr(),
-                                                style: AppTheme.smallContent(
-                                                    context,
-                                                    color: AppTheme.light)),
+                                            actions: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  color: AppTheme
+                                                      .themedBgIconColor(
+                                                          context),
+                                                  borderRadius:
+                                                      BorderRadius.circular(36),
+                                                ),
+                                                child: TextButton(
+                                                  style: TextButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              36),
+                                                    ),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 24,
+                                                        vertical: 12),
+                                                  ),
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                          context, false),
+                                                  child: Text('Cancel'.tr(),
+                                                      style: AppTheme.smallContent(
+                                                          context,
+                                                          color: AppTheme
+                                                              .themedIconColor(
+                                                                  context))),
+                                                ),
+                                              ),
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  gradient:
+                                                      AppTheme.primaryGradient,
+                                                  borderRadius:
+                                                      BorderRadius.circular(36),
+                                                ),
+                                                child: TextButton(
+                                                  style: TextButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              36),
+                                                    ),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 24,
+                                                        vertical: 12),
+                                                  ),
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                          context, true),
+                                                  child: Text('Confirm'.tr(),
+                                                      style:
+                                                          AppTheme.smallContent(
+                                                              context,
+                                                              color: AppTheme
+                                                                  .light)),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                      ],
+                                        );
+                                        if (confirm == true) {
+                                          setState(() {
+                                            selectedModel = 0;
+                                          });
+                                          context
+                                              .read<RecogniserBloc>()
+                                              .add(RecogniserReset());
+                                        }
+                                      },
                                     ),
                                   );
-                                  if (confirm == true) {
-                                    // ใส่โค้ดหยุดการทำงานฉุกเฉินที่นี่
-                                    // เช่น รีเซ็ตทุกอย่างหรือออกจากหน้า
-                                    setState(() {
-                                      selectedModel = 0;
-                                    });
-                                    context
-                                        .read<RecogniserBloc>()
-                                        .add(RecogniserReset());
-                                    // หรือเพิ่มโค้ดอื่นๆ ตามต้องการ
-                                  }
-                                },
-                              ),
+                                } else {
+                                  return const SizedBox.shrink();
+                                }
+                              },
                             ),
                             const SizedBox(width: 8),
                             Container(
@@ -183,7 +201,7 @@ class _RecogniserState extends State<Recogniser> {
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
                               child: IconButton(
-                                icon: Icon(Icons.close,
+                                icon: Icon(Icons.home,
                                     color: AppTheme.themedIconColor(context),
                                     size: 24.0),
                                 onPressed: widget.onClose, // เรียก callback
@@ -232,17 +250,28 @@ class _RecogniserState extends State<Recogniser> {
                             width: isSmallMobile || isMobile
                                 ? double.infinity
                                 : 600,
-                            height: isSmallMobile || isMobile ? 250 : 300,
+                            height: isSmallMobile || isMobile ? 200 : 250,
                             decoration: BoxDecoration(
-                              color: state.image == null
-                                  ? Colors.transparent
-                                  : null,
-                              gradient: state.image == null
-                                  ? null
-                                  : (state.status == RecogniserStatus.found
-                                      ? AppTheme.primaryGradient
-                                      : AppTheme.alertGradient),
                               borderRadius: BorderRadius.circular(36.0),
+                              border: state.image == null
+                                  ? null
+                                  : Border.all(
+                                      color: state.status ==
+                                              RecogniserStatus.analyzing
+                                          ? AppTheme.dark
+                                          : state.status ==
+                                                  RecogniserStatus.found
+                                              ? AppTheme.primaryColor
+                                              : state.status ==
+                                                          RecogniserStatus
+                                                              .timeout ||
+                                                      state.status ==
+                                                          RecogniserStatus
+                                                              .notFound
+                                                  ? AppTheme.alertColor
+                                                  : Colors.transparent,
+                                      width: 3,
+                                    ),
                             ),
                             child: state.image == null
                                 ? SingleChildScrollView(
@@ -269,7 +298,7 @@ class _RecogniserState extends State<Recogniser> {
                                           child: _buildModelSelector(
                                             context,
                                             'Comming Soon',
-                                            'Coming Soon',
+                                            'Comming Soon',
                                             onTap: () {
                                               // Placeholder for future model
                                             },
@@ -430,12 +459,10 @@ class _RecogniserState extends State<Recogniser> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white
-                : Color(0xFF151C21),
+            color: AppTheme.primaryColor,
             strokeWidth: 3,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8.0),
           Text(
             'Analyzing...'.tr(),
             style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
@@ -504,7 +531,7 @@ class _RecogniserState extends State<Recogniser> {
             style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8.0),
         if (accuracy.isNotEmpty)
           Text(
             accuracy,
@@ -707,10 +734,10 @@ class _RecogniserState extends State<Recogniser> {
           children: [
             Flexible(
               child: Text(
-                modelName,
+                modelName.tr(),
                 style: AppTheme.mediumTitle(context),
                 overflow: TextOverflow.ellipsis,
-                maxLines: 1,
+                maxLines: 2,
                 textAlign: TextAlign.start,
               ),
             ),
@@ -719,7 +746,7 @@ class _RecogniserState extends State<Recogniser> {
                 description.tr(),
                 style: AppTheme.smallContent(context),
                 overflow: TextOverflow.ellipsis,
-                maxLines: 1,
+                maxLines: 2,
                 textAlign: TextAlign.start,
               ),
             ),
