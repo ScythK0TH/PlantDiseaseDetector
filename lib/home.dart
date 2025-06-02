@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> {
                       maxWidth: 600,
                     ),
                     decoration: BoxDecoration(
-                      gradient: AppTheme.primaryGradient,
+                      gradient: _selectedIndex == 2 ? null : AppTheme.primaryGradient,
                     ),
                     child: BottomNavigationBar(
                       type: BottomNavigationBarType.fixed,
