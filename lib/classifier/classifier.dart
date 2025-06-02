@@ -76,7 +76,7 @@ class Classifier {
     _model.interpreter.close();
   }
 
-  ClassifierCategory predict(img.Image image) {
+  List<ClassifierCategory> predict(img.Image image) {
     debugPrint('Predicting...');
     debugPrint(
       'Image: ${image.width}x${image.height}, '
@@ -102,10 +102,9 @@ class Classifier {
 
     final resultCategories = _postProcessOutput(output[0]);
     final topResult = resultCategories.first;
-
     debugPrint('Top category: $topResult');
 
-    return topResult;
+    return resultCategories;
   }
 
   Float32List _preProcessInput(img.Image image) {

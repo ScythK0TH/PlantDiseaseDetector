@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:equatable/equatable.dart';
+import 'package:project_pdd/classifier/classifier_category.dart';
 
 enum RecogniserStatus {
   initial,
@@ -16,6 +17,7 @@ class RecogniserState extends Equatable {
   final String label;
   final double accuracy;
   final RecogniserStatus status;
+  final List<ClassifierCategory> results;
 
   const RecogniserState({
     this.image,
@@ -23,6 +25,7 @@ class RecogniserState extends Equatable {
     this.label = '',
     this.accuracy = 0.0,
     this.status = RecogniserStatus.initial,
+    this.results = const []
   });
 
   RecogniserState copyWith({
@@ -31,6 +34,7 @@ class RecogniserState extends Equatable {
     String? label,
     double? accuracy,
     RecogniserStatus? status,
+    List<ClassifierCategory>? results,
   }) {
     return RecogniserState(
       image: image ?? this.image,
@@ -38,9 +42,10 @@ class RecogniserState extends Equatable {
       label: label ?? this.label,
       accuracy: accuracy ?? this.accuracy,
       status: status ?? this.status,
+      results: results ?? this.results,
     );
   }
 
   @override
-  List<Object?> get props => [image, label, accuracy, status];
+  List<Object?> get props => [image, label, accuracy, status, results];
 }

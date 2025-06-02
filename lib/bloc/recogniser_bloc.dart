@@ -1,11 +1,11 @@
 import 'dart:async';
-
+import 'dart:io';
+import 'package:image/image.dart' as img;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:project_pdd/bloc/recogniser_event.dart';
 import 'package:project_pdd/bloc/recogniser_state.dart';
 import 'package:project_pdd/classifier/classifier.dart';
-import 'package:project_pdd/classifier/image_processing_helper.dart';
 
 const _labelsFileName = 'labels.txt';
 const _modelFileName = 'assets/my_model/plantVillage_model.tflite';
@@ -31,21 +31,22 @@ class RecogniserBloc extends Bloc<RecogniserEvent, RecogniserState> {
         state.copyWith(status: RecogniserStatus.analyzing, image: event.image));
 
     try {
-      final processed = await compute(processImage, event.image.path)
+      final image = await compute(_decodeImageFromPath, event.image.path)
           .timeout(const Duration(seconds: 7));
 
-      if (processed == null) {
+      if (image == null) {
         emit(state.copyWith(status: RecogniserStatus.notSupportedFormat));
         return;
       }
 
-      final result = _classifier.predict(processed);
+      final results = _classifier.predict(image);
 
       emit(state.copyWith(
         status: RecogniserStatus.found,
-        pid: result.pid,
-        label: result.label,
-        accuracy: result.score,
+        pid: results.first.pid,
+        label: results.first.label,
+        accuracy: results.first.score,
+        results: results,
       ));
     } on TimeoutException {
       emit(state.copyWith(status: RecogniserStatus.timeout));
@@ -53,4 +54,9 @@ class RecogniserBloc extends Bloc<RecogniserEvent, RecogniserState> {
       emit(state.copyWith(status: RecogniserStatus.notFound));
     }
   }
+}
+
+img.Image? _decodeImageFromPath(String path) {
+  final bytes = File(path).readAsBytesSync();
+  return img.decodeImage(bytes);
 }

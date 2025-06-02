@@ -14,7 +14,6 @@ import 'package:project_pdd/bloc/recogniser_state.dart';
 import 'package:project_pdd/home.dart';
 import 'package:project_pdd/main.dart';
 import 'package:project_pdd/services/database.dart';
-import 'package:project_pdd/style.dart';
 import 'package:project_pdd/ui/styles.dart';
 import 'package:project_pdd/widget/photo_view.dart';
 import 'package:project_pdd/ui/responsive.dart';
@@ -240,6 +239,14 @@ class _RecogniserState extends State<Recogniser> {
                                 borderRadius: BorderRadius.circular(36),
                               ),
                               child: TextButton(
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(36),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24, vertical: 12),
+                                  ),
                                   onPressed: () => Navigator.pop(context),
                                   child: Text(
                                     'Confirm'.tr(),
@@ -333,8 +340,8 @@ class _RecogniserState extends State<Recogniser> {
                                           height: 90,
                                           child: _buildModelSelector(
                                             context,
-                                            'Comming Soon',
-                                            'Comming Soon',
+                                            'Comming Soon'.tr(),
+                                            'Comming Soon'.tr(),
                                             onTap: () {
                                               // Placeholder for future model
                                             },
@@ -500,7 +507,7 @@ class _RecogniserState extends State<Recogniser> {
           const SizedBox(height: 8.0),
           Text(
             'Analyzing...'.tr(),
-            style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
+            style: AppTheme.mediumTitle(context),
           ),
         ],
       );
@@ -553,8 +560,8 @@ class _RecogniserState extends State<Recogniser> {
 
     final maxWidth = MediaQuery.of(context).size.width * 0.8;
 
-    List<String> labelLines = splitText(label,
-        subTitleTextStyleDark(context, fontWeight: FontWeight.bold), maxWidth);
+    List<String> labelLines =
+        splitText(label, AppTheme.mediumTitle(context), maxWidth);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -563,14 +570,102 @@ class _RecogniserState extends State<Recogniser> {
         for (var line in labelLines)
           Text(
             line.tr(),
-            style: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
+            style: AppTheme.mediumTitle(context),
             textAlign: TextAlign.center,
           ),
         const SizedBox(height: 8.0),
         if (accuracy.isNotEmpty)
           Text(
             accuracy,
-            style: successTextStyle(fontWeight: FontWeight.bold),
+            style: AppTheme.smallTitle(context, color: AppTheme.primaryColor),
+          ),
+        if (state.status == RecogniserStatus.found && state.results.length > 1)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.themedBgIconColor(
+                    context), // หรือ gradient ที่ต้องการสำหรับ Cancel
+                borderRadius: BorderRadius.circular(36),
+              ),
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(36),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      backgroundColor: AppTheme.themedBgColor(context),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(36.0),
+                      ),
+                      title: Text(
+                        'All Probabilities'.tr(),
+                        style: AppTheme.mediumTitle(context),
+                      ),
+                      content: SizedBox(
+                        width: double.maxFinite,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: state.results.length,
+                          itemBuilder: (context, index) {
+                            final r = state.results[index];
+                            final isTop = index == 0;
+                            return ListTile(
+                              title: Text(
+                                r.label,
+                                style: isTop
+                                    ? AppTheme.smallTitle(context,
+                                        color: AppTheme.primaryColor)
+                                    : AppTheme.smallContent(context),
+                              ).tr(),
+                              trailing: Text(
+                                '${(r.score * 100).toStringAsFixed(4)}%',
+                                style: isTop
+                                    ? AppTheme.smallTitle(context,
+                                        color: AppTheme.primaryColor)
+                                    : AppTheme.smallTitle(context),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      actions: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppTheme.themedBgIconColor(
+                                context), // หรือ gradient ที่ต้องการสำหรับ Cancel
+                            borderRadius: BorderRadius.circular(36),
+                          ),
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(36),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 12),
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('Close'.tr(),
+                                style: AppTheme.smallTitle(context,
+                                    color: AppTheme.themedIconColor(context))),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child:
+                    Text('View more'.tr(), style: AppTheme.smallTitle(context)),
+              ),
+            ),
           ),
       ],
     );
@@ -695,14 +790,6 @@ class _RecogniserState extends State<Recogniser> {
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(36.0),
-              side: isPrimary
-                  ? BorderSide.none
-                  : BorderSide(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : primaryColor,
-                      width: isPrimary ? 0 : 3.0,
-                    ),
             ),
             minimumSize: Size(width, 56.0),
             padding: EdgeInsets.zero,
@@ -769,7 +856,7 @@ class _RecogniserState extends State<Recogniser> {
           children: [
             Flexible(
               child: Text(
-                modelName.tr(),
+                modelName,
                 style: AppTheme.mediumTitle(context),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
@@ -778,7 +865,7 @@ class _RecogniserState extends State<Recogniser> {
             ),
             Flexible(
               child: Text(
-                description.tr(),
+                description,
                 style: AppTheme.smallContent(context),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
