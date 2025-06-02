@@ -667,6 +667,10 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
             _plants.removeWhere((p) => p['_id'] == plantId);
             _allPlants.removeWhere((p) => p['_id'] == plantId);
           });
+          final newStorageSize = await _calculateTotalStorageSize();
+          setState(() {
+            usedStorage = newStorageSize;
+          });
         }
       },
       child: Container(
