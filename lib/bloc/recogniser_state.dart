@@ -1,7 +1,14 @@
 import 'dart:io';
 import 'package:equatable/equatable.dart';
 
-enum RecogniserStatus { initial, analyzing, found, notFound, timeout }
+enum RecogniserStatus {
+  initial,
+  analyzing,
+  found,
+  notFound,
+  timeout,
+  notSupportedFormat
+}
 
 class RecogniserState extends Equatable {
   final File? image;

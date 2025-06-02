@@ -35,22 +35,18 @@ class RecogniserBloc extends Bloc<RecogniserEvent, RecogniserState> {
           .timeout(const Duration(seconds: 7));
 
       if (processed == null) {
-        emit(state.copyWith(status: RecogniserStatus.notFound));
+        emit(state.copyWith(status: RecogniserStatus.notSupportedFormat));
         return;
       }
 
       final result = _classifier.predict(processed);
 
-      if (result != null) {
-        emit(state.copyWith(
-          status: RecogniserStatus.found,
-          pid: result.pid,
-          label: result.label,
-          accuracy: result.score,
-        ));
-      } else {
-        emit(state.copyWith(status: RecogniserStatus.notFound));
-      }
+      emit(state.copyWith(
+        status: RecogniserStatus.found,
+        pid: result.pid,
+        label: result.label,
+        accuracy: result.score,
+      ));
     } on TimeoutException {
       emit(state.copyWith(status: RecogniserStatus.timeout));
     } catch (_) {

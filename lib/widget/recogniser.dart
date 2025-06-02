@@ -216,6 +216,42 @@ class _RecogniserState extends State<Recogniser> {
               ),
               body: BlocBuilder<RecogniserBloc, RecogniserState>(
                 builder: (context, state) {
+                  if (state.status == RecogniserStatus.notSupportedFormat) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          backgroundColor: AppTheme.themedBgColor(context),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(36.0),
+                          ),
+                          title: Text('File format not supported'.tr(),
+                              style: AppTheme.mediumTitle(context)),
+                          content: Text(
+                            'Please select or take a photo as JPG or PNG only'
+                                .tr(),
+                            style: AppTheme.smallContent(context),
+                          ),
+                          actions: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: AppTheme.themedBgIconColor(
+                                    context), // หรือ gradient ที่ต้องการสำหรับ Cancel
+                                borderRadius: BorderRadius.circular(36),
+                              ),
+                              child: TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(
+                                    'Confirm'.tr(),
+                                    style: AppTheme.smallContent(context),
+                                  )),
+                            ),
+                          ],
+                        ),
+                      );
+                      context.read<RecogniserBloc>().add(RecogniserReset());
+                    });
+                  }
                   return SingleChildScrollView(
                     padding: const EdgeInsets.only(bottom: 100.0),
                     child: Container(
@@ -408,7 +444,8 @@ class _RecogniserState extends State<Recogniser> {
                                   setState(() => isPressing = true);
                                   final picker = ImagePicker();
                                   final pickedFile = await picker.pickImage(
-                                      source: ImageSource.camera);
+                                      source: ImageSource.camera,
+                                      imageQuality: 100);
                                   if (pickedFile != null) {
                                     context.read<RecogniserBloc>().add(
                                         PhotoPicked(File(pickedFile.path)));
@@ -438,9 +475,7 @@ class _RecogniserState extends State<Recogniser> {
                       const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
                   child: Center(
                     child: CircularProgressIndicator(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : primaryColor,
+                      color: AppTheme.primaryColor,
                     ),
                   ),
                 ),
