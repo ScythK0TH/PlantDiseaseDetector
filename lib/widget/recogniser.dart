@@ -31,7 +31,6 @@ class Recogniser extends StatefulWidget {
 class _RecogniserState extends State<Recogniser> {
   bool isPressing = false;
   bool isResultButtonPressing = false;
-  int selectedModel = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -178,9 +177,6 @@ class _RecogniserState extends State<Recogniser> {
                                           ),
                                         );
                                         if (confirm == true) {
-                                          setState(() {
-                                            selectedModel = 0;
-                                          });
                                           context
                                               .read<RecogniserBloc>()
                                               .add(RecogniserReset());
@@ -323,31 +319,30 @@ class _RecogniserState extends State<Recogniser> {
                                           MainAxisAlignment.center,
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        SizedBox(
-                                          height: 90,
-                                          child: _buildModelSelector(
-                                            context,
-                                            'MobileNetV3 Small',
-                                            'Minimalistic Modify',
-                                            onTap: () {
-                                              setState(() => selectedModel = 0);
-                                            },
-                                            selected: selectedModel == 0,
+                                        for (int i = 0;
+                                            i < modelConfigs.length;
+                                            i++)
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 8.0),
+                                            child: SizedBox(
+                                              height: 90,
+                                              child: _buildModelSelector(
+                                                context,
+                                                modelConfigs[i]['display'] ??
+                                                    '',
+                                                modelConfigs[i]['desc'] ?? '',
+                                                onTap: () {
+                                                  context
+                                                      .read<RecogniserBloc>()
+                                                      .add(ModelChanged(i));
+                                                },
+                                                selected:
+                                                    state.selectedModelIndex ==
+                                                        i, // ใช้ state จาก BLoC
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(height: 8.0),
-                                        SizedBox(
-                                          height: 90,
-                                          child: _buildModelSelector(
-                                            context,
-                                            'Comming Soon'.tr(),
-                                            'Comming Soon'.tr(),
-                                            onTap: () {
-                                              // Placeholder for future model
-                                            },
-                                            selected: selectedModel == 1,
-                                          ),
-                                        ),
                                       ],
                                     ),
                                   )

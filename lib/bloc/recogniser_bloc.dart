@@ -7,29 +7,55 @@ import 'package:project_pdd/bloc/recogniser_event.dart';
 import 'package:project_pdd/bloc/recogniser_state.dart';
 import 'package:project_pdd/classifier/classifier.dart';
 
-const _labelsFileName = 'labels.txt';
-const _modelFileName = 'assets/my_model/plantVillage_model.tflite';
+final List<Map<String, String>> modelConfigs = [
+  {
+    'model': 'assets/my_model/mbnv3_plant_modify.tflite',
+    'labels': 'labels.txt',
+    'display': 'MobileNetV3 Small',
+    'desc': 'Minimalistic Modify'
+  },
+  {
+    'model': 'assets/my_model/mbnv3_plant_original.tflite',
+    'labels': 'labels.txt',
+    'display': 'MobileNetV3 Small',
+    'desc': 'Minimalistic Original'
+  },
+];
 
 class RecogniserBloc extends Bloc<RecogniserEvent, RecogniserState> {
-  late final Classifier _classifier;
+  Classifier? _classifier;
 
   RecogniserBloc() : super(const RecogniserState()) {
     on<RecogniserStarted>(_onStarted);
+    on<ModelChanged>(_onModelChanged);
     on<RecogniserReset>((event, emit) {
-      emit(const RecogniserState());
+      emit(RecogniserState(
+        selectedModelIndex: state.selectedModelIndex,
+      ));
     });
     on<PhotoPicked>(_onPhotoPicked);
   }
 
   Future<void> _onStarted(RecogniserStarted event, Emitter emit) async {
-    _classifier = (await Classifier.loadWith(
-        labelsFileName: _labelsFileName, modelFileName: _modelFileName))!;
+    final config = modelConfigs[state.selectedModelIndex];
+    _classifier = await Classifier.loadWith(
+      labelsFileName: config['labels']!,
+      modelFileName: config['model']!,
+    );
+  }
+
+  Future<void> _onModelChanged(ModelChanged event, Emitter emit) async {
+    final config = modelConfigs[event.modelIndex];
+    _classifier = await Classifier.loadWith(
+      labelsFileName: config['labels']!,
+      modelFileName: config['model']!,
+    );
+    emit(state.copyWith(selectedModelIndex: event.modelIndex));
   }
 
   Future<void> _onPhotoPicked(PhotoPicked event, Emitter emit) async {
     emit(
         state.copyWith(status: RecogniserStatus.analyzing, image: event.image));
-
     try {
       final image = await compute(_decodeImageFromPath, event.image.path)
           .timeout(const Duration(seconds: 7));
@@ -39,7 +65,7 @@ class RecogniserBloc extends Bloc<RecogniserEvent, RecogniserState> {
         return;
       }
 
-      final results = _classifier.predict(image);
+      final results = _classifier!.predict(image); // เติม ! ตรงนี้
 
       emit(state.copyWith(
         status: RecogniserStatus.found,

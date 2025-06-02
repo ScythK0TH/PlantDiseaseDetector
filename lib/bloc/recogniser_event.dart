@@ -17,3 +17,8 @@ class PhotoPicked extends RecogniserEvent {
   @override
   List<Object?> get props => [image];
 }
+
+class ModelChanged extends RecogniserEvent {
+  final int modelIndex;
+  ModelChanged(this.modelIndex);
+}

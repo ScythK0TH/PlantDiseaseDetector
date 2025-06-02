@@ -18,34 +18,36 @@ class RecogniserState extends Equatable {
   final double accuracy;
   final RecogniserStatus status;
   final List<ClassifierCategory> results;
+  final int selectedModelIndex;
 
-  const RecogniserState({
-    this.image,
-    this.pid = 0,
-    this.label = '',
-    this.accuracy = 0.0,
-    this.status = RecogniserStatus.initial,
-    this.results = const []
-  });
+  const RecogniserState(
+      {this.image,
+      this.pid = 0,
+      this.label = '',
+      this.accuracy = 0.0,
+      this.status = RecogniserStatus.initial,
+      this.results = const [],
+      this.selectedModelIndex = 0});
 
-  RecogniserState copyWith({
-    File? image,
-    int? pid,
-    String? label,
-    double? accuracy,
-    RecogniserStatus? status,
-    List<ClassifierCategory>? results,
-  }) {
+  RecogniserState copyWith(
+      {File? image,
+      int? pid,
+      String? label,
+      double? accuracy,
+      RecogniserStatus? status,
+      List<ClassifierCategory>? results,
+      int? selectedModelIndex}) {
     return RecogniserState(
-      image: image ?? this.image,
-      pid: pid ?? this.pid,
-      label: label ?? this.label,
-      accuracy: accuracy ?? this.accuracy,
-      status: status ?? this.status,
-      results: results ?? this.results,
-    );
+        image: image ?? this.image,
+        pid: pid ?? this.pid,
+        label: label ?? this.label,
+        accuracy: accuracy ?? this.accuracy,
+        status: status ?? this.status,
+        results: results ?? this.results,
+        selectedModelIndex: selectedModelIndex ?? this.selectedModelIndex);
   }
 
   @override
-  List<Object?> get props => [image, label, accuracy, status, results];
+  List<Object?> get props =>
+      [image, label, accuracy, status, results, selectedModelIndex];
 }
