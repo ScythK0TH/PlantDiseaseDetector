@@ -27,6 +27,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
   String selectedButton = 'Latest';
+  double usedStorage = 0.0;
 
   @override
   void initState() {
@@ -66,6 +67,9 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
       final query = {'userId': mongo.ObjectId.fromHexString(widget.userId)};
       final plants = await collection!.find(query).toList();
       if (!mounted) return;
+
+      final storageSize = await _calculateTotalStorageSize();
+
       // Optionally decode images for each plant if needed
       for (var plant in plants) {
         if (plant['image'] != null) {
@@ -81,6 +85,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
       setState(() {
         _allPlants = plants;
         _plants = plants;
+        usedStorage = storageSize;
       });
       imageCountUpdateNotifier.value = _plants.length;
     } catch (e) {
@@ -100,6 +105,27 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
               return title.contains(search);
             }).toList();
     });
+  }
+
+  Future<double> _calculateTotalStorageSize() async {
+    try {
+      final db = MongoService();
+      final collection = db.plantCollection;
+      final query = {'userId': mongo.ObjectId.fromHexString(widget.userId)};
+      final plants = await collection!.find(query).toList();
+
+      double totalSize = 0;
+      for (var plant in plants) {
+        final bsonSize = plant.toString().length;
+        totalSize += bsonSize / (1024 * 1024);
+      }
+
+      print('Total storage used: ${totalSize.toStringAsFixed(2)} MB');
+      return totalSize;
+    } catch (e) {
+      print('Error calculating storage size: $e');
+      return 0;
+    }
   }
 
   @override
@@ -411,7 +437,6 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
 
     //Mock up storage Value
     //MongoDB แก้ไขตรงนี้
-    final double usedStorage = 120;
     final double totalStorage = 1024;
     final String storageText =
         '${usedStorage.toStringAsFixed(2)} / ${totalStorage.toStringAsFixed(2)} MB';
