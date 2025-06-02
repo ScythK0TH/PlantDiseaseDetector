@@ -118,6 +118,9 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
       for (var plant in plants) {
         final bsonSize = plant.toString().length;
         totalSize += bsonSize / (1024 * 1024);
+
+        print(
+            'Document ${plant['title']}: ${(bsonSize / (1024 * 1024)).toStringAsFixed(2)} MB');
       }
 
       print('Total storage used: ${totalSize.toStringAsFixed(2)} MB');
