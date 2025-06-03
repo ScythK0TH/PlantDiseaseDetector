@@ -491,7 +491,7 @@ class _ProfilePageState extends State<ProfilePage>
                                 BorderRadius.vertical(top: Radius.circular(36)),
                           ),
                           padding: EdgeInsets.fromLTRB(
-                              20.0, 20.0, 20.0, bottomNavHeight),
+                              20.0, 20.0, 20.0, bottomNavHeight + 16.0),
                           child: ListView(
                             controller: scrollController,
                             children: [
