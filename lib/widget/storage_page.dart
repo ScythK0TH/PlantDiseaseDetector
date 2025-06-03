@@ -519,7 +519,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                           children: [
                             // เพื่มในอนาคต เรื่องการตรวจสอบ Internet สำหรับ Cloud Storage
                             Text(
-                              'Cloud Storage',
+                              'Cloud Storage'.tr(),
                               style: AppTheme.mediumTitle(
                                 context,
                               ),
@@ -545,16 +545,14 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                         : null,
                     color: selectedButton == 'Latest'
                         ? null
-                        : AppTheme.darkInverse,
+                        : AppTheme.themedBgIconColor(context),
                     borderRadius: BorderRadius.circular(36.0),
                   ),
                   child: TextButton(
                     onPressed: () => setState(() => selectedButton = 'Latest'),
                     child: Text(
                       'Latest'.tr(),
-                      style: selectedButton == 'Latest'
-                          ? AppTheme.smallTitle(context)
-                          : AppTheme.smallTitle(context, color: AppTheme.dark),
+                      style: AppTheme.smallTitle(context),
                     ),
                   ),
                 ),
@@ -568,17 +566,16 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                     gradient: selectedButton == 'All'
                         ? AppTheme.primaryGradient
                         : null,
-                    color:
-                        selectedButton == 'All' ? null : AppTheme.darkInverse,
+                    color: selectedButton == 'All'
+                        ? null
+                        : AppTheme.themedBgIconColor(context),
                     borderRadius: BorderRadius.circular(36.0),
                   ),
                   child: TextButton(
                     onPressed: () => setState(() => selectedButton = 'All'),
                     child: Text(
                       'All'.tr(),
-                      style: selectedButton == 'All'
-                          ? AppTheme.smallTitle(context)
-                          : AppTheme.smallTitle(context, color: AppTheme.dark),
+                      style: AppTheme.smallTitle(context),
                     ),
                   ),
                 ),
