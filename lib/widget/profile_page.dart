@@ -308,15 +308,16 @@ class _ProfilePageState extends State<ProfilePage>
                                     SnackBar(
                                       backgroundColor: AppTheme.alertColor,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(36.0),
-                                          topRight: Radius.circular(36.0),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(36.0),
                                         ),
                                       ),
                                       behavior: SnackBarBehavior.floating,
                                       margin: EdgeInsets.only(
-                                        bottom:
-                                            bottomNavHeight, // 56 (nav height) + 16 spacing
+                                        left: 20.0,
+                                        right: 20.0,
+                                        bottom: bottomNavHeight +
+                                            32.0, // 56 (nav height) + 16 spacing
                                       ),
                                       content: Text(
                                           'Name must be 20 characters or less!'
@@ -346,15 +347,16 @@ class _ProfilePageState extends State<ProfilePage>
                                     SnackBar(
                                         backgroundColor: AppTheme.primaryColor,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(36.0),
-                                            topRight: Radius.circular(36.0),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(36.0),
                                           ),
                                         ),
                                         behavior: SnackBarBehavior.floating,
                                         margin: EdgeInsets.only(
-                                          bottom:
-                                              bottomNavHeight, // 56 (nav height) + 16 spacing
+                                          left: 20.0,
+                                          right: 20.0,
+                                          bottom: bottomNavHeight +
+                                              32.0, // 56 (nav height) + 16 spacing
                                         ),
                                         content: Text('Name updated!'.tr(),
                                             style: AppTheme.smallContent(
@@ -365,15 +367,16 @@ class _ProfilePageState extends State<ProfilePage>
                                     SnackBar(
                                         backgroundColor: AppTheme.alertColor,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(36.0),
-                                            topRight: Radius.circular(36.0),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(36.0),
                                           ),
                                         ),
                                         behavior: SnackBarBehavior.floating,
                                         margin: EdgeInsets.only(
-                                          bottom:
-                                              bottomNavHeight, // 56 (nav height) + 16 spacing
+                                          left: 20.0,
+                                          right: 20.0,
+                                          bottom: bottomNavHeight +
+                                              32.0, // 56 (nav height) + 16 spacing
                                         ),
                                         content: Text(
                                             'Failed to update name:'.tr() +
