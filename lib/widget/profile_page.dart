@@ -19,6 +19,7 @@ class ProfilePage extends StatefulWidget {
     required this.email,
     required this.galleryCount,
     required this.onGalleryUpdate,
+    this.onUsernameUpdate,
   });
 
   final String userId;
@@ -26,6 +27,7 @@ class ProfilePage extends StatefulWidget {
   final String? email;
   final int galleryCount;
   final Function(int) onGalleryUpdate;
+  final Function(String)? onUsernameUpdate;
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -318,7 +320,10 @@ class _ProfilePageState extends State<ProfilePage>
                                   final db = MongoService();
                                   final collection = db.userCollection;
                                   await collection!.update(
-                                    {'_id': _userData!['_id']},
+                                    {
+                                      '_id': mongo.ObjectId.fromHexString(
+                                          widget.userId)
+                                    },
                                     {
                                       r'$set': {'username': newTitle.trim()}
                                     },
@@ -326,6 +331,10 @@ class _ProfilePageState extends State<ProfilePage>
                                   setState(() {
                                     _userData!['username'] = newTitle.trim();
                                   });
+
+                                  if (this.widget.onUsernameUpdate != null) {
+                                    widget.onUsernameUpdate!(newTitle.trim());
+                                  }
                                   ScaffoldMessenger.of(context)
                                       .hideCurrentSnackBar();
                                   ScaffoldMessenger.of(context).showSnackBar(

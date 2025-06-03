@@ -104,6 +104,11 @@ class _HomePageState extends State<HomePage> {
         email: email,
         galleryCount: galleryCount,
         onGalleryUpdate: _updateGalleryCount,
+        onUsernameUpdate: (String newUsername) {
+          setState(() {
+            username = newUsername;
+          });
+        },
       ),
     ];
 
