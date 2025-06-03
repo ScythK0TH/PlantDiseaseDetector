@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'package:project_pdd/services/database.dart';
 import 'package:project_pdd/widget/storage_page.dart';
 import 'package:project_pdd/widget/profile_page.dart';
 import 'package:project_pdd/widget/recogniser.dart';
@@ -17,12 +19,59 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late int _selectedIndex;
-  // เชื่อม MongoDB รับ UserId, Username และค่าเกี่ยวกับ UsedStorage
+  String? username;
+  String? email;
+  int galleryCount = 0;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      final db = MongoService();
+      final userCollection = db.userCollection;
+      final galleryCollection = db.plantCollection;
+
+      // Fetch user data
+      final user = await userCollection!.findOne(
+        mongo.where.eq('_id', mongo.ObjectId.fromHexString(widget.userId)),
+      );
+
+      // Fetch gallery count
+      final gallery = await galleryCollection!
+          .find(
+            mongo.where
+                .eq('userId', mongo.ObjectId.fromHexString(widget.userId)),
+          )
+          .toList();
+
+      if (mounted) {
+        setState(() {
+          username = user?['username'];
+          email = user?['email'];
+          galleryCount = gallery.length;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _updateGalleryCount(int newCount) {
+    setState(() {
+      galleryCount = newCount;
+    });
   }
 
   @override
@@ -44,9 +93,18 @@ class _HomePageState extends State<HomePage> {
         onClose: () {
           setState(() => _selectedIndex = 1);
         },
-      ), // พิเศษสำหรับ Recogniser ที่ไม่ต้องการ BottomNavigationBar
-      StoragePage(userId: widget.userId),
-      ProfilePage(userId: widget.userId),
+      ),
+      StoragePage(
+        userId: widget.userId,
+        username: username,
+      ),
+      ProfilePage(
+        userId: widget.userId,
+        username: username,
+        email: email,
+        galleryCount: galleryCount,
+        onGalleryUpdate: _updateGalleryCount,
+      ),
     ];
 
     return Scaffold(

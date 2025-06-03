@@ -12,8 +12,20 @@ import 'package:project_pdd/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key, required this.userId});
+  const ProfilePage({
+    super.key,
+    required this.userId,
+    required this.username,
+    required this.email,
+    required this.galleryCount,
+    required this.onGalleryUpdate,
+  });
+
   final String userId;
+  final String? username;
+  final String? email;
+  final int galleryCount;
+  final Function(int) onGalleryUpdate;
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -33,60 +45,33 @@ class _ProfilePageState extends State<ProfilePage>
     await prefs.remove('userId');
   }
 
-  Future<void> _fetchUserData() async {
-    if (!mounted) return;
-    setState(() {
-      _isLoading = true;
-    });
-    final db = MongoService();
-    try {
-      final collection = db.userCollection;
-      final galleryCollection = db.plantCollection;
-      final user = await collection!.findOne(
-        mongo.where.eq('_id', mongo.ObjectId.fromHexString(widget.userId)),
-      );
-      final gallery = await galleryCollection!
-          .find(
-            mongo.where
-                .eq('userId', mongo.ObjectId.fromHexString(widget.userId)),
-          )
-          .toList();
-      if (!mounted) return;
-      setState(() {
-        _userData = user;
-        galleryCount = gallery.length;
-      });
-    } catch (e) {
-      print('Error fetching user data: $e');
-    } finally {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     imageCountUpdateNotifier.addListener(_updateGalleryCount);
+    _initUserData();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fetchUserData().then((_) {
-        if (mounted) {
-          setState(() {
-            _showSheet = true;
-          });
-        }
-      });
+      if (mounted) {
+        setState(() {
+          _showSheet = true;
+        });
+      }
+    });
+  }
+
+  void _initUserData() {
+    setState(() {
+      _userData = {
+        'username': widget.username,
+        'email': widget.email,
+      };
     });
   }
 
   void _updateGalleryCount() {
     final newCount = imageCountUpdateNotifier.value;
-    if (galleryCount == null || galleryCount != newCount) {
-      setState(() {
-        galleryCount = newCount;
-      });
+    if (widget.galleryCount != newCount) {
+      widget.onGalleryUpdate(newCount);
     }
   }
 
@@ -518,11 +503,11 @@ class _ProfilePageState extends State<ProfilePage>
                                       children: [
                                         Text(
                                             'Welcome,'.tr() +
-                                                ' ${_userData?['username'] ?? 'User'}!',
+                                                ' ${widget.username ?? 'User'}!',
                                             style:
                                                 AppTheme.mediumTitle(context)),
                                         Text(
-                                          'Email: ${_userData?['email'] ?? '-'}',
+                                          'Email: ${widget.email ?? '-'}',
                                           style: AppTheme.mediumTitle(context),
                                         ),
                                       ],
@@ -572,7 +557,8 @@ class _ProfilePageState extends State<ProfilePage>
                                             TextSpan(
                                               children: <TextSpan>[
                                                 TextSpan(
-                                                  text: '${galleryCount ?? 0} ',
+                                                  text:
+                                                      '${widget.galleryCount} ',
                                                   style: AppTheme.largeTitle(
                                                           context)
                                                       .copyWith(fontSize: 56.0),

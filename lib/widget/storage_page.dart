@@ -14,7 +14,8 @@ import 'package:project_pdd/ui/styles.dart';
 
 class StoragePage extends StatefulWidget {
   final String userId; // Pass the logged-in user's _id
-  const StoragePage({required this.userId, super.key});
+  final String? username;
+  const StoragePage({required this.userId, this.username, super.key});
 
   @override
   State<StoragePage> createState() => _StoragePageState();
@@ -492,8 +493,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
                         style: AppTheme.mediumContent(context),
                       ),
                       Text(
-                        //MongoDB แก้ไขตรงนี้ สำหรับแสดงชื่อ User
-                        'OscarPattyThun',
+                        widget.username ?? 'Loading...'.tr(),
                         style: AppTheme.largeTitle(context),
                       ),
                       SizedBox(height: 8.0),
