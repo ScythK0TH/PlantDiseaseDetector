@@ -2,10 +2,9 @@ import 'dart:ui';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:bcrypt/bcrypt.dart';
 import 'package:project_pdd/services/database.dart';
-import 'package:project_pdd/style.dart';
+import 'package:project_pdd/ui/styles.dart';
 import 'package:project_pdd/widget/login.dart';
 
 class RegisApp extends StatefulWidget {
@@ -109,7 +108,7 @@ class _RegisAppState extends State<RegisApp> {
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? primaryColor : Colors.white,
+        color: AppTheme.themedBgColor(context),
         borderRadius: BorderRadius.vertical(top: Radius.circular(36.0)),
       ),
       child: SingleChildScrollView(
@@ -139,7 +138,8 @@ class _RegisAppState extends State<RegisApp> {
                           animatedTexts: [
                             TypewriterAnimatedText(
                               textSequence[index],
-                              textStyle: subTitleTextStyleDark(context, fontWeight: FontWeight.bold),
+                              textStyle: AppTheme.mediumTitle(context,
+                                  color: AppTheme.dark),
                               speed: Duration(milliseconds: 150),
                               cursor: '|',
                             ),
@@ -152,7 +152,7 @@ class _RegisAppState extends State<RegisApp> {
                     SizedBox(height: 10),
                     Text(
                       "Create your account".tr(),
-                      style: descTextStyleDark(context, fontWeight: FontWeight.normal),
+                      style: AppTheme.smallTitle(context, color: AppTheme.dark),
                     ),
                   ],
                 ),
@@ -171,15 +171,15 @@ class _RegisAppState extends State<RegisApp> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                               borderSide: BorderSide(
-                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 2),
+                                  color: AppTheme.themedIconColor(context),
+                                  width: 2),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(36.0))),
                           filled: true,
-                          fillColor: Theme.of(context).brightness == Brightness.dark
-                              ? primaryColor
-                              : Colors.white,
+                          fillColor: AppTheme.themedBgColor(context),
                           hintText: "Enter your email".tr(),
-                          hintStyle: subDescTextStyleDark(context, fontWeight: FontWeight.normal),
+                          hintStyle: AppTheme.smallContent(context,
+                              color: AppTheme.dark),
                           errorText: _emailErrorMessage?.tr(),
                         ),
                         onChanged: (_) => _validateForm(),
@@ -192,17 +192,17 @@ class _RegisAppState extends State<RegisApp> {
                         obscureText: _isObscure1,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 2),
+                            borderSide: BorderSide(
+                                color: AppTheme.themedIconColor(context),
+                                width: 2),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(36.0)),
                           ),
                           filled: true,
-                          fillColor: Theme.of(context).brightness == Brightness.dark
-                              ? primaryColor
-                              : Colors.white,
+                          fillColor: AppTheme.themedBgColor(context),
                           hintText: "Enter your password".tr(),
-                          hintStyle: subDescTextStyleDark(context, fontWeight: FontWeight.normal),
+                          hintStyle: AppTheme.smallContent(context,
+                              color: AppTheme.dark),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isObscure1
@@ -226,17 +226,17 @@ class _RegisAppState extends State<RegisApp> {
                         obscureText: _isObscure2,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : primaryColor, width: 2),
+                            borderSide: BorderSide(
+                                color: AppTheme.themedIconColor(context),
+                                width: 2),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(36.0)),
                           ),
                           filled: true,
-                          fillColor: Theme.of(context).brightness == Brightness.dark
-                              ? primaryColor
-                              : Colors.white,
+                          fillColor: AppTheme.themedBgColor(context),
                           hintText: "Confirm your password".tr(),
-                          hintStyle: subDescTextStyleDark(context, fontWeight: FontWeight.normal),
+                          hintStyle: AppTheme.smallContent(context,
+                              color: AppTheme.dark),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isObscure2
@@ -267,8 +267,8 @@ class _RegisAppState extends State<RegisApp> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _isRegisterEnabled
-                            ? primaryColor
-                            : secondaryColor,
+                            ? AppTheme.dark
+                            : AppTheme.darkInverse,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(36.0),
                         ),
@@ -280,11 +280,9 @@ class _RegisAppState extends State<RegisApp> {
                         width: 100,
                         child: Text("Register".tr(),
                             style: TextStyle(
-                                fontSize: 15.0,
-                                color: Theme.of(context).brightness == Brightness.dark
-                                    ? primaryColor
-                                    : Colors.white,
-                                    )),
+                              fontSize: 15.0,
+                              color: AppTheme.themedIconColor(context),
+                            )),
                       ),
                     ),
                   ),
@@ -294,12 +292,14 @@ class _RegisAppState extends State<RegisApp> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text("Already have an account?".tr(),
-                            style: subDescTextStyleDark(context, fontWeight: FontWeight.normal)),
+                            style: AppTheme.smallContent(context,
+                                color: AppTheme.dark)),
                         Container(
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             child: Text("Login now".tr(),
-                                style: subSuccessTextStyle(fontWeight: FontWeight.bold)),
+                                style: AppTheme.smallTitle(context,
+                                    color: AppTheme.primaryColor)),
                             onPressed: () {
                               Navigator.pop(context);
                               showFirstModal(context);

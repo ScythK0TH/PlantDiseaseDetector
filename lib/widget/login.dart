@@ -173,7 +173,7 @@ class LoginAppState extends State<LoginApp> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(36.0))),
                           filled: true,
-                          fillColor: AppTheme.light,
+                          fillColor: AppTheme.themedBgColor(context),
                           hintText: "Enter your email".tr(),
                           hintStyle: AppTheme.smallContent(context,
                               color: AppTheme.dark),
