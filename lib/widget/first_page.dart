@@ -3,8 +3,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:project_pdd/main.dart';
-import 'package:project_pdd/style.dart';
-import 'package:project_pdd/widget/storage_page.dart';
+import 'package:project_pdd/ui/styles.dart';
 import 'package:project_pdd/widget/tos_page.dart';
 import 'login.dart';
 import 'register.dart';
@@ -57,17 +56,7 @@ class FirstPageScreenState extends State<FirstPageScreen> {
           Container(
             height: screenHeight,
             width: screenWidth,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xffa8d5ba), // เขียวพาสเทลอ่อน
-                  Color(0xff77c1a4), // เขียวพาสเทลเข้ม
-                  Color(0xff4cb3b1), // เขียวพาสเทลมืด
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
+            decoration: BoxDecoration(gradient: AppTheme.firstPageGradient),
           ),
           // ส่วนแรกของเนื้อหา
           Column(
@@ -92,10 +81,10 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                 padding: EdgeInsets.only(top: 10.0),
                 child: Text('BaiRooRok'.tr(),
                     style: context.locale.languageCode == 'en'
-                        ? mainTitleTextStyleWhite(context,
-                            fontWeight: FontWeight.bold)
-                        : mainTitleTextStyleFirst(context,
-                            fontWeight: FontWeight.bold)),
+                        ? AppTheme.titleFirstPageEN(context,
+                            color: AppTheme.light)
+                        : AppTheme.titleFirstPageTH(context,
+                            color: AppTheme.light)),
               ),
               Flexible(
                 flex: 1, // เพิ่มส่วนนี้สำหรับข้อความที่พิมพ์
@@ -113,8 +102,7 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         animatedTexts: [
                           TypewriterAnimatedText(
                             textSequence[index],
-                            textStyle: subTitleTextStyleWhite(context,
-                                fontWeight: FontWeight.normal),
+                            textStyle: AppTheme.mediumTitle(context,color: AppTheme.light),
                             speed: Duration(milliseconds: 200),
                             cursor: '|', // Cursor ที่ท้ายข้อความ
                           ),
@@ -135,10 +123,7 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                     children: [
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? primaryColor
-                                  : Colors.white,
+                          backgroundColor: AppTheme.themedBgColor(context),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(36.0),
                           ),
@@ -182,8 +167,8 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         },
                         child: Text(
                           'Sign Up'.tr(),
-                          style: descTextStyleDark(context,
-                              fontWeight: FontWeight.normal),
+                          style: AppTheme.smallTitle(context,
+                              color: AppTheme.dark),
                         ),
                       ),
                       SizedBox(height: 15),
@@ -195,9 +180,7 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                           minimumSize: Size(0.70 * screenWidth, 55.0),
                           side: BorderSide(
                             color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? primaryColor
-                                    : Colors.white, // สีของเส้นขอบ
+                                AppTheme.themedBgColor(context), // สีของเส้นขอบ
                             width: 2.0, // ความหนาของเส้นขอบ
                           ),
                         ),
@@ -239,8 +222,8 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         },
                         child: Text(
                           'Log In'.tr(),
-                          style: descTextStyleWhite(context,
-                              fontWeight: FontWeight.normal),
+                          style: AppTheme.smallTitle(context,
+                              color: AppTheme.light),
                         ),
                       ),
                       SizedBox(height: 8),
@@ -251,14 +234,12 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                             context: context,
                             backgroundColor: Colors.transparent,
                             builder: (BuildContext context) {
-                              double keyboardHeight = MediaQuery.of(context)
-                                  .viewInsets
-                                  .bottom;
+                              double keyboardHeight =
+                                  MediaQuery.of(context).viewInsets.bottom;
                               return SizedBox(
                                 height: keyboardHeight > 0
                                     ? MediaQuery.of(context).size.height * 0.9
-                                    : MediaQuery.of(context).size.height *
-                                        0.6,
+                                    : MediaQuery.of(context).size.height * 0.6,
                                 child: Stack(
                                   children: [
                                     BackdropFilter(
@@ -279,8 +260,8 @@ class FirstPageScreenState extends State<FirstPageScreen> {
                         },
                         child: Text(
                           'Term of Service'.tr(),
-                          style: subDescTextStyleDark(context,
-                              fontWeight: FontWeight.bold),
+                          style: AppTheme.smallTitle(context,
+                              color: AppTheme.dark),
                         ),
                       ),
                     ],

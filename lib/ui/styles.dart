@@ -8,7 +8,7 @@ class AppTheme {
 
   //Gradient Color
   static const LinearGradient primaryGradient = LinearGradient(
-      colors: [Color(0xFF6CC964), Color.fromARGB(255, 146, 199, 141)],
+      colors: [Color(0xFF6CC964), Color(0xFF92C78D)],
       begin: Alignment.centerLeft,
       end: Alignment.centerRight);
 
@@ -16,6 +16,16 @@ class AppTheme {
       colors: [Color(0xFF6CC964), Color(0xFF89C584)],
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter);
+
+  static const LinearGradient firstPageGradient = LinearGradient(
+    colors: [
+      Color(0xffa8d5ba), // เขียวพาสเทลอ่อน
+      Color(0xff77c1a4), // เขียวพาสเทลเข้ม
+      Color(0xff4cb3b1), // เขียวพาสเทลมืด
+    ],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
 
   static const LinearGradient alertGradient = LinearGradient(
       colors: [Color(0xFFE56767), Color.fromARGB(255, 179, 114, 114)],
@@ -52,6 +62,28 @@ class AppTheme {
   }
 
   //Font Setting
+  static TextStyle titleFirstPageTH(BuildContext context, {Color? color}) {
+    return GoogleFonts.sriracha(
+      fontSize: 48,
+      fontWeight: FontWeight.bold,
+      color: color ??
+          (Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : dark),
+    );
+  }
+
+    static TextStyle titleFirstPageEN(BuildContext context, {Color? color}) {
+    return GoogleFonts.kanit(
+      fontSize: 48,
+      fontWeight: FontWeight.bold,
+      color: color ??
+          (Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : dark),
+    );
+  }
+
   static TextStyle largeTitle(
     BuildContext context, {
     Color? color,
