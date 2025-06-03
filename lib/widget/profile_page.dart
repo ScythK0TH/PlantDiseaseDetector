@@ -302,6 +302,7 @@ class _ProfilePageState extends State<ProfilePage>
                               if (newTitle != null &&
                                   newTitle.trim().isNotEmpty) {
                                 if (newTitle.trim().length > 20) {
+                                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       backgroundColor: AppTheme.alertColor,
@@ -338,6 +339,7 @@ class _ProfilePageState extends State<ProfilePage>
                                   setState(() {
                                     _userData!['username'] = newTitle.trim();
                                   });
+                                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                         backgroundColor: AppTheme.primaryColor,
