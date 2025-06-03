@@ -4,7 +4,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_pdd/services/database.dart';
-import 'package:project_pdd/style.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:project_pdd/ui/responsive.dart';
 import 'package:project_pdd/ui/styles.dart';
@@ -188,9 +187,11 @@ class _ProfilePageState extends State<ProfilePage>
                           opacity: tTitle,
                           child: FittedBox(
                             fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft, // ชิดซ้าย
                             child: Text(
                               '${_userData?['username'] ?? '-'}',
                               style: AppTheme.largeTitle(context),
+                              textAlign: TextAlign.left, // ชิดซ้าย
                             ),
                           ),
                         ),
@@ -199,31 +200,6 @@ class _ProfilePageState extends State<ProfilePage>
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: AppTheme.themedBgIconColor(context),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          child: IconButton(
-                            icon: Icon(
-                                AppTheme.isDarkMode(context)
-                                    ? Icons.dark_mode_rounded
-                                    : Icons.light_mode_rounded,
-                                color: AppTheme.themedIconColor(context)),
-                            onPressed: () {
-                              final isDark = Theme.of(context).brightness ==
-                                  Brightness.dark;
-                              final newMode =
-                                  isDark ? ThemeMode.light : ThemeMode.dark;
-                              themeModeNotifier.value = newMode;
-                              saveThemeMode(
-                                  newMode); // <-- save to SharedPreferences
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          width: 8.0,
-                        ),
                         Container(
                           decoration: BoxDecoration(
                             color: AppTheme.themedBgIconColor(context),
@@ -371,6 +347,11 @@ class _ProfilePageState extends State<ProfilePage>
                                             topRight: Radius.circular(36.0),
                                           ),
                                         ),
+                                        behavior: SnackBarBehavior.floating,
+                                        margin: EdgeInsets.only(
+                                          bottom:
+                                              bottomNavHeight, // 56 (nav height) + 16 spacing
+                                        ),
                                         content: Text('Name updated!'.tr(),
                                             style: AppTheme.smallContent(
                                                 context))),
@@ -440,323 +421,544 @@ class _ProfilePageState extends State<ProfilePage>
           },
         ),
       ),
-      body: Stack(
-        children: [
-          ValueListenableBuilder<double>(
-            valueListenable: _sheetExtent,
-            builder: (context, extent, _) {
-              // Fade out as soon as sheet starts moving up
-              double t = ((extent - minExtent) / (maxExtent - minExtent))
-                  .clamp(0.0, 1.0);
-              return Center(
-                child: _isLoading
-                    ? CircularProgressIndicator(
-                        color: AppTheme.themedIconColor(context))
-                    : _userData == null
-                        ? Text(
-                            'User not found.'.tr(),
-                            style: AppTheme.mediumContent(context),
-                          )
-                        : Opacity(
-                            opacity: 1 -
-                                t, // Fade out as soon as sheet starts to cover
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 56.0),
-                                  child: Text(
-                                    'User Profile'.tr(),
-                                    style: AppTheme.largeTitle(context),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-              );
-            },
-          ),
-          if (_showSheet && !_isLoading)
-            IgnorePointer(
-              ignoring: false,
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: DraggableScrollableSheet(
-                  initialChildSize: minExtent,
-                  minChildSize: minExtent,
-                  maxChildSize: maxExtent,
-                  builder: (context, scrollController) {
-                    return NotificationListener<
-                        DraggableScrollableNotification>(
-                      onNotification: (notification) {
-                        _sheetExtent.value = notification.extent;
-                        return true;
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: AppTheme.primaryGradient,
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(36)),
-                        ),
-                        padding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 0),
-                        child: ListView(
-                          controller: scrollController,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.account_circle,
-                                  size: 48,
-                                  color: AppTheme.themedIconColor(context),
-                                ),
-                                const SizedBox(width: 16.0),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                          'Welcome,'.tr() +
-                                              ' ${_userData?['username'] ?? 'User'}!',
-                                          style: AppTheme.mediumTitle(context)),
-                                      Text(
-                                        'Email: ${_userData?['email'] ?? '-'}',
-                                        style: AppTheme.mediumTitle(context),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Divider(
-                              color: AppTheme.themedIconColor(context),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(24.0),
-                              margin: EdgeInsets.all(2.0),
-                              decoration: BoxDecoration(
-                                color: AppTheme.dark.withValues(alpha: (0.15)),
-                                borderRadius: BorderRadius.circular(36),
-                              ),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            ValueListenableBuilder<double>(
+              valueListenable: _sheetExtent,
+              builder: (context, extent, _) {
+                // Fade out as soon as sheet starts moving up
+                double t = ((extent - minExtent) / (maxExtent - minExtent))
+                    .clamp(0.0, 1.0);
+                return Center(
+                  child: _isLoading
+                      ? CircularProgressIndicator(
+                          color: AppTheme.themedIconColor(context))
+                      : _userData == null
+                          ? Text(
+                              'User not found.'.tr(),
+                              style: AppTheme.mediumContent(context),
+                            )
+                          : Opacity(
+                              opacity: 1 -
+                                  t, // Fade out as soon as sheet starts to cover
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    margin: EdgeInsets.all(8.0),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 56.0),
+                                    child: Text(
+                                      'User Profile'.tr(),
+                                      style: AppTheme.largeTitle(context),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Text(
+                                      'Swipe up to see more'.tr(),
+                                      style: AppTheme.smallTitle(context),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                );
+              },
+            ),
+            if (_showSheet && !_isLoading)
+              IgnorePointer(
+                ignoring: false,
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: DraggableScrollableSheet(
+                    initialChildSize: minExtent,
+                    minChildSize: minExtent,
+                    maxChildSize: maxExtent,
+                    builder: (context, scrollController) {
+                      return NotificationListener<
+                          DraggableScrollableNotification>(
+                        onNotification: (notification) {
+                          _sheetExtent.value = notification.extent;
+                          return true;
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: AppTheme.primaryGradient,
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(36)),
+                          ),
+                          padding: EdgeInsets.fromLTRB(
+                              20.0, 20.0, 20.0, bottomNavHeight),
+                          child: ListView(
+                            controller: scrollController,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.account_circle,
+                                    size: 48,
+                                    color: AppTheme.themedIconColor(context),
+                                  ),
+                                  const SizedBox(width: 16.0),
+                                  Expanded(
                                     child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text('Your Gallery'.tr(),
+                                        Text(
+                                            'Welcome,'.tr() +
+                                                ' ${_userData?['username'] ?? 'User'}!',
                                             style:
                                                 AppTheme.mediumTitle(context)),
-                                        SizedBox(height: 8.0),
-                                        Text.rich(
-                                          TextSpan(
-                                            children: <TextSpan>[
-                                              TextSpan(
-                                                text: '${galleryCount ?? 0} ',
-                                                style:
-                                                    AppTheme.largeTitle(context)
-                                                        .copyWith(
-                                                            fontSize: 56.0),
-                                              ),
-                                              TextSpan(
-                                                text: 'images'.tr(),
-                                                style: AppTheme.smallTitle(
-                                                    context),
-                                              ),
-                                            ],
-                                          ),
-                                          style: TextStyle(
-                                              color: AppTheme.themedBgColor(
-                                                  context)),
+                                        Text(
+                                          'Email: ${_userData?['email'] ?? '-'}',
+                                          style: AppTheme.mediumTitle(context),
                                         ),
                                       ],
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                            SizedBox(
-                              height: 8.0,
-                            ),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: AppTheme.dark.withValues(alpha: (0.15)),
-                                borderRadius: BorderRadius.circular(36.0),
+                              SizedBox(
+                                height: 8.0,
                               ),
-                              child: Center(
+                              Row(
+                                children: [
+                                  Text(
+                                    'General'.tr(),
+                                    style: AppTheme.smallTitle(context),
+                                  ),
+                                  SizedBox(width: 8.0),
+                                  Expanded(
+                                      child: Divider(
+                                    color: AppTheme.darkInverse,
+                                  )),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 8.0,
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(24.0),
+                                margin: EdgeInsets.all(2.0),
+                                decoration: BoxDecoration(
+                                  color:
+                                      AppTheme.dark.withValues(alpha: (0.15)),
+                                  borderRadius: BorderRadius.circular(36),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      margin: EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: [
+                                          Text('Your Gallery'.tr(),
+                                              style: AppTheme.mediumTitle(
+                                                  context)),
+                                          SizedBox(height: 8.0),
+                                          Text.rich(
+                                            TextSpan(
+                                              children: <TextSpan>[
+                                                TextSpan(
+                                                  text: '${galleryCount ?? 0} ',
+                                                  style: AppTheme.largeTitle(
+                                                          context)
+                                                      .copyWith(fontSize: 56.0),
+                                                ),
+                                                TextSpan(
+                                                  text: 'images'.tr(),
+                                                  style: AppTheme.smallTitle(
+                                                      context),
+                                                ),
+                                              ],
+                                            ),
+                                            style: TextStyle(
+                                                color: AppTheme.themedBgColor(
+                                                    context)),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 8.0,
+                              ),
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color:
+                                      AppTheme.dark.withValues(alpha: (0.15)),
+                                  borderRadius: BorderRadius.circular(36.0),
+                                ),
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24.0, vertical: 16.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          isMobile || isSmallMobile
+                                              ? CrossAxisAlignment.center
+                                              : CrossAxisAlignment.start,
+                                      children: [
+                                        if (isMobile || isSmallMobile)
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'Cloud Storage'.tr(),
+                                                style: AppTheme.mediumTitle(
+                                                  context,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              SizedBox(height: 8),
+                                              storageInfoWidget,
+                                            ],
+                                          )
+                                        else
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              // เพื่มในอนาคต เรื่องการตรวจสอบ Internet สำหรับ Cloud Storage
+                                              Text(
+                                                'Cloud Storage'.tr(),
+                                                style: AppTheme.mediumTitle(
+                                                  context,
+                                                ),
+                                              ),
+                                              Spacer(),
+                                              storageInfoWidget,
+                                            ],
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 8.0,
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Theme Mode'.tr(),
+                                    style: AppTheme.smallTitle(context),
+                                  ),
+                                  SizedBox(width: 8.0),
+                                  Expanded(
+                                      child: Divider(
+                                    color: AppTheme.darkInverse,
+                                  )),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 8.0,
+                              ),
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color:
+                                      AppTheme.dark.withValues(alpha: (0.15)),
+                                  borderRadius: BorderRadius.circular(36.0),
+                                ),
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 24.0, vertical: 16.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        isMobile || isSmallMobile
-                                            ? CrossAxisAlignment.center
-                                            : CrossAxisAlignment.start,
+                                      horizontal: 24.0, vertical: 36.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      SizedBox(height: 8.0),
-                                      if (isMobile || isSmallMobile)
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
+                                      Text(
+                                        AppTheme.isDarkMode(context)
+                                            ? 'Dark Mode'.tr()
+                                            : 'Light Mode'.tr(),
+                                        style: AppTheme.mediumTitle(context),
+                                        textAlign: TextAlign.left,
+                                      ),
+                                      // Custom Switch
+                                      Container(
+                                        width: 80,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color:
+                                              AppTheme.themedBgColor(context),
+                                          borderRadius:
+                                              BorderRadius.circular(36.0),
+                                        ),
+                                        child: Stack(
+                                          alignment: Alignment.center,
                                           children: [
-                                            Text(
-                                              'Cloud Storage'.tr(),
-                                              style: AppTheme.mediumTitle(
-                                                context,
+                                            AnimatedAlign(
+                                              alignment:
+                                                  AppTheme.isDarkMode(context)
+                                                      ? Alignment.centerRight
+                                                      : Alignment.centerLeft,
+                                              duration: const Duration(
+                                                  milliseconds: 200),
+                                              curve: Curves.ease,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  final isDark =
+                                                      Theme.of(context)
+                                                              .brightness ==
+                                                          Brightness.dark;
+                                                  final newMode = isDark
+                                                      ? ThemeMode.light
+                                                      : ThemeMode.dark;
+                                                  themeModeNotifier.value =
+                                                      newMode;
+                                                  saveThemeMode(newMode);
+                                                },
+                                                child: Container(
+                                                  width: 36,
+                                                  height: 36,
+                                                  margin: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 2.0),
+                                                  decoration: BoxDecoration(
+                                                    color: AppTheme
+                                                        .primaryColor, // สีเขียว
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                ),
                                               ),
-                                              textAlign: TextAlign.center,
                                             ),
-                                            SizedBox(height: 8),
-                                            storageInfoWidget,
-                                          ],
-                                        )
-                                      else
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            // เพื่มในอนาคต เรื่องการตรวจสอบ Internet สำหรับ Cloud Storage
-                                            Text(
-                                              'Cloud Storage'.tr(),
-                                              style: AppTheme.mediumTitle(
-                                                context,
-                                              ),
+                                            // ไอคอนฝั่งตรงข้าม thumb
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                if (Theme.of(context)
+                                                        .brightness ==
+                                                    Brightness.dark)
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 8.0),
+                                                    child: Icon(
+                                                      Icons.nightlight_round,
+                                                      color: AppTheme
+                                                          .themedIconColor(
+                                                              context),
+                                                      size: 24,
+                                                    ),
+                                                  )
+                                                else
+                                                  const SizedBox(
+                                                      width: 24), // เว้นที่
+                                                if (Theme.of(context)
+                                                        .brightness ==
+                                                    Brightness.light)
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 8.0),
+                                                    child: Icon(
+                                                      Icons.wb_sunny,
+                                                      color: AppTheme
+                                                          .themedIconColor(
+                                                              context),
+                                                      size: 24,
+                                                    ),
+                                                  )
+                                                else
+                                                  const SizedBox(
+                                                      width: 24), // เว้นที่
+                                              ],
                                             ),
-                                            Spacer(),
-                                            storageInfoWidget,
                                           ],
                                         ),
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
-                            ),
-                            Divider(
-                              color: AppTheme.themedIconColor(context),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(0),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.grey[200]
-                                    : Colors.white,
-                                borderRadius: BorderRadius.circular(24),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.08),
-                                    blurRadius: 8,
-                                    offset: Offset(0, 2),
+                              SizedBox(
+                                height: 8.0,
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Language'.tr(),
+                                    style: AppTheme.smallTitle(context),
                                   ),
+                                  SizedBox(width: 8.0),
+                                  Expanded(
+                                      child: Divider(
+                                    color: AppTheme.darkInverse,
+                                  )),
                                 ],
                               ),
-                              child: Row(
+                              SizedBox(
+                                height: 8.0,
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(0),
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.circular(36.0),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          await context
+                                              .setLocale(Locale('en', 'US'));
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 24),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                context.locale.languageCode ==
+                                                        'en'
+                                                    ? AppTheme.themedIconColor(
+                                                        context)
+                                                    : Colors.transparent,
+                                            borderRadius:
+                                                BorderRadius.horizontal(
+                                                    left:
+                                                        Radius.circular(36.0)),
+                                            border: context
+                                                        .locale.languageCode ==
+                                                    'en'
+                                                ? Border.all(
+                                                    color: Colors.transparent,
+                                                    width: 3,
+                                                  )
+                                                : Border.all(
+                                                    color: AppTheme
+                                                        .themedIconColor(
+                                                            context),
+                                                    width: 3,
+                                                  ),
+                                          ),
+                                          child: Center(
+                                            child: Text('EN',
+                                                style: AppTheme.largeTitle(
+                                                  context,
+                                                  color: context.locale
+                                                              .languageCode ==
+                                                          'en'
+                                                      ? AppTheme.primaryColor
+                                                      : AppTheme
+                                                          .themedIconColor(
+                                                              context),
+                                                ).copyWith(letterSpacing: 2)),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          await context
+                                              .setLocale(Locale('th', 'TH'));
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 24),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                context.locale.languageCode ==
+                                                        'th'
+                                                    ? AppTheme.themedIconColor(
+                                                        context)
+                                                    : Colors.transparent,
+                                            borderRadius:
+                                                BorderRadius.horizontal(
+                                                    right:
+                                                        Radius.circular(36.0)),
+                                            border: context
+                                                        .locale.languageCode ==
+                                                    'th'
+                                                ? Border.all(
+                                                    color: Colors.transparent,
+                                                    width: 3,
+                                                  )
+                                                : Border.all(
+                                                    color: AppTheme
+                                                        .themedIconColor(
+                                                            context),
+                                                    width: 3,
+                                                  ),
+                                          ),
+                                          child: Center(
+                                            child: Text('TH',
+                                                style: AppTheme.largeTitle(
+                                                  context,
+                                                  color: context.locale
+                                                              .languageCode ==
+                                                          'th'
+                                                      ? AppTheme.primaryColor
+                                                      : AppTheme
+                                                          .themedIconColor(
+                                                              context),
+                                                ).copyWith(letterSpacing: 2)),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 8.0,
+                              ),
+                              Row(
                                 children: [
                                   Expanded(
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        await context
-                                            .setLocale(Locale('en', 'US'));
-                                      },
-                                      child: Container(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 24),
-                                        decoration: BoxDecoration(
-                                          color: context.locale.languageCode ==
-                                                  'en'
-                                              ? Colors.green
-                                              : Theme.of(context).brightness ==
-                                                      Brightness.dark
-                                                  ? Colors.grey[200]
-                                                  : primaryColor,
-                                          borderRadius: BorderRadius.horizontal(
-                                              left: Radius.circular(24)),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            'EN',
-                                            style: TextStyle(
-                                              fontSize: 28,
-                                              fontWeight: FontWeight.bold,
-                                              color:
-                                                  context.locale.languageCode ==
-                                                          'en'
-                                                      ? Colors.white
-                                                      : Colors.green,
-                                              letterSpacing: 2,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                    child: Divider(
+                                      color: AppTheme.darkInverse,
+                                      endIndent: 8.0,
                                     ),
                                   ),
+                                  Text(
+                                    'BaiRooRok'.tr(),
+                                    style: AppTheme.smallTitle(context),
+                                    textAlign: TextAlign.center,
+                                  ),
                                   Expanded(
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        await context
-                                            .setLocale(Locale('th', 'TH'));
-                                      },
-                                      child: Container(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 24),
-                                        decoration: BoxDecoration(
-                                          color: context.locale.languageCode ==
-                                                  'th'
-                                              ? Colors.green
-                                              : Theme.of(context).brightness ==
-                                                      Brightness.dark
-                                                  ? Colors.grey[200]
-                                                  : primaryColor,
-                                          borderRadius: BorderRadius.horizontal(
-                                              right: Radius.circular(24)),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            'TH',
-                                            style: TextStyle(
-                                              fontSize: 28,
-                                              fontWeight: FontWeight.bold,
-                                              color:
-                                                  context.locale.languageCode ==
-                                                          'th'
-                                                      ? Colors.white
-                                                      : Colors.green,
-                                              letterSpacing: 2,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                    child: Divider(
+                                      color: AppTheme.darkInverse,
+                                      indent: 8.0,
                                     ),
                                   ),
                                 ],
                               ),
-                            )
-                          ],
+                              SizedBox(
+                                height: 8.0,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-          if (_isUpdating)
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-              child: Container(
-                color:
-                    const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
-                child: Center(
-                  child: CircularProgressIndicator(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? primaryColor
-                          : Colors.white),
+            if (_isUpdating)
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                child: Container(
+                  color:
+                      const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.2),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                        color: AppTheme.themedBgColor(context)),
+                  ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
