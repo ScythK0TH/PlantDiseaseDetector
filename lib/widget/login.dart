@@ -2,11 +2,10 @@ import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:bcrypt/bcrypt.dart';
 import 'package:project_pdd/home.dart';
 import 'package:project_pdd/services/database.dart';
-import 'package:project_pdd/style.dart';
+import 'package:project_pdd/ui/styles.dart';
 import 'package:project_pdd/widget/register.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -79,8 +78,7 @@ class LoginAppState extends State<LoginApp> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  HomePage(userId: user['_id'].toHexString()),
+              builder: (context) => HomePage(userId: user['_id'].toHexString()),
             ),
           );
         } else {
@@ -95,7 +93,6 @@ class LoginAppState extends State<LoginApp> {
           _errorMessage = "Invalid email or User not found";
         });
       }
-
     } catch (e) {
       print('Error: $e');
     }
@@ -108,9 +105,7 @@ class LoginAppState extends State<LoginApp> {
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? primaryColor
-            : Colors.white,
+        color: AppTheme.themedBgColor(context),
         borderRadius: BorderRadius.vertical(top: Radius.circular(36.0)),
       ),
       child: SingleChildScrollView(
@@ -140,8 +135,8 @@ class LoginAppState extends State<LoginApp> {
                           animatedTexts: [
                             TypewriterAnimatedText(
                               textSequence[index],
-                              textStyle: subTitleTextStyleDark(context,
-                                  fontWeight: FontWeight.bold),
+                              textStyle: AppTheme.mediumTitle(context,
+                                  color: AppTheme.dark),
                               speed: Duration(milliseconds: 150),
                               cursor: '|',
                             ),
@@ -154,8 +149,7 @@ class LoginAppState extends State<LoginApp> {
                     SizedBox(height: 10),
                     Text(
                       "Sign into your account".tr(),
-                      style: descTextStyleDark(context,
-                          fontWeight: FontWeight.normal),
+                      style: AppTheme.smallTitle(context, color: AppTheme.dark),
                     ),
                   ],
                 ),
@@ -174,18 +168,15 @@ class LoginAppState extends State<LoginApp> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                               borderSide: BorderSide(
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.white
-                                      : primaryColor,
+                                  color: AppTheme.themedIconColor(context),
                                   width: 2),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(36.0))),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: AppTheme.light,
                           hintText: "Enter your email".tr(),
-                          hintStyle: subDescTextStyleDark(context,
-                              fontWeight: FontWeight.normal),
+                          hintStyle: AppTheme.smallContent(context,
+                              color: AppTheme.dark),
                         ),
                       ),
                     ),
@@ -197,22 +188,16 @@ class LoginAppState extends State<LoginApp> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderSide: BorderSide(
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : primaryColor,
+                                color: AppTheme.themedIconColor(context),
                                 width: 2),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(36.0)),
                           ),
                           filled: true,
-                          fillColor:
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? primaryColor
-                                  : Colors.white,
+                          fillColor: AppTheme.themedBgColor(context),
                           hintText: "Enter your password".tr(),
-                          hintStyle: subDescTextStyleDark(context,
-                              fontWeight: FontWeight.normal),
+                          hintStyle: AppTheme.smallContent(context,
+                              color: AppTheme.dark),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isObscure
@@ -233,7 +218,7 @@ class LoginAppState extends State<LoginApp> {
                         padding: const EdgeInsets.all(12.0),
                         child: Text(
                           _errorMessage!.tr(),
-                          style: TextStyle(color: Colors.red),
+                          style: TextStyle(color: AppTheme.alertColor),
                         ),
                       ),
                   ],
@@ -246,10 +231,7 @@ class LoginAppState extends State<LoginApp> {
                 children: [
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white
-                                : primaryColor,
+                        backgroundColor: AppTheme.themedIconColor(context),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(36.0),
                         ),
@@ -260,20 +242,20 @@ class LoginAppState extends State<LoginApp> {
                           alignment: Alignment.center,
                           width: 100,
                           child: Text("Login".tr(),
-                              style: TextStyle(
-                                  fontSize: 15.0, color: Colors.white)))),
+                              style: AppTheme.smallTitle(context,
+                                  color: AppTheme.light)))),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text("Don't have an account?".tr(),
-                          style: subDescTextStyleDark(context,
-                              fontWeight: FontWeight.normal)),
+                          style: AppTheme.smallContent(context,
+                              color: AppTheme.dark)),
                       Container(
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             child: Text("Register now".tr(),
-                                style: subSuccessTextStyle(
-                                    fontWeight: FontWeight.bold)),
+                                style: AppTheme.smallTitle(context,
+                                    color: AppTheme.primaryColor)),
                             onPressed: () {
                               Navigator.pop(context); // Close current modal
                               showSecondModal(
