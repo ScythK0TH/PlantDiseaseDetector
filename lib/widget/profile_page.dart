@@ -397,6 +397,8 @@ class _ProfilePageState extends State<ProfilePage>
                             onPressed: () {
                               themeModeNotifier.value = ThemeMode.light;
                               saveThemeMode(ThemeMode.light);
+                              ScaffoldMessenger.of(context)
+                                  .hideCurrentSnackBar();
                               clearLoginState().then((_) {
                                 // Clear the userId from SharedPreferences
                                 Navigator.pushAndRemoveUntil(

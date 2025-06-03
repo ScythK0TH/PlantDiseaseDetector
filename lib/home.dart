@@ -77,7 +77,8 @@ class _HomePageState extends State<HomePage> {
                       maxWidth: 600,
                     ),
                     decoration: BoxDecoration(
-                      gradient: _selectedIndex == 2 ? null : AppTheme.primaryGradient,
+                      gradient:
+                          _selectedIndex == 2 ? null : AppTheme.primaryGradient,
                     ),
                     child: BottomNavigationBar(
                       type: BottomNavigationBarType.fixed,
@@ -85,6 +86,7 @@ class _HomePageState extends State<HomePage> {
                       elevation: 0,
                       currentIndex: _selectedIndex,
                       onTap: (index) {
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
                         setState(() => _selectedIndex = index);
                       },
                       selectedItemColor: AppTheme.selectedIconColor(context),
