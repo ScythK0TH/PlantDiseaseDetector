@@ -20,12 +20,14 @@ class ProfilePage extends StatefulWidget {
     required this.galleryCount,
     required this.onGalleryUpdate,
     this.onUsernameUpdate,
+    required this.totalSize,
   });
 
   final String userId;
   final String? username;
   final String? email;
   final int galleryCount;
+  final double totalSize;
   final Function(int) onGalleryUpdate;
   final Function(String)? onUsernameUpdate;
 
@@ -97,8 +99,8 @@ class _ProfilePageState extends State<ProfilePage>
 
     //Mock up storage Value
     //MongoDB แก้ไขตรงนี้
-    final double usedStorage = 120;
-    final double totalStorage = 1024;
+    final double usedStorage = widget.totalSize;
+    final double totalStorage = 10;
     final String storageText =
         '${usedStorage.toStringAsFixed(2)} / ${totalStorage.toStringAsFixed(2)} MB';
 

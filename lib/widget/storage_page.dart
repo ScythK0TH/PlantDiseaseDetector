@@ -15,7 +15,12 @@ import 'package:project_pdd/ui/styles.dart';
 class StoragePage extends StatefulWidget {
   final String userId; // Pass the logged-in user's _id
   final String? username;
-  const StoragePage({required this.userId, this.username, super.key});
+  final double totalSize;
+  const StoragePage(
+      {required this.userId,
+      this.username,
+      required this.totalSize,
+      super.key});
 
   @override
   State<StoragePage> createState() => _StoragePageState();
@@ -412,8 +417,8 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
 
     //Mock up storage Value
     //MongoDB แก้ไขตรงนี้
-    final double usedStorage = 120;
-    final double totalStorage = 1024;
+    final double usedStorage = widget.totalSize;
+    final double totalStorage = 10;
     final String storageText =
         '${usedStorage.toStringAsFixed(2)} / ${totalStorage.toStringAsFixed(2)} MB';
 

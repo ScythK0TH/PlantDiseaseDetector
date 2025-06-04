@@ -22,6 +22,7 @@ class _HomePageState extends State<HomePage> {
   String? username;
   String? email;
   int galleryCount = 0;
+  double totalSize = 0;
   bool _isLoading = true;
 
   @override
@@ -50,11 +51,21 @@ class _HomePageState extends State<HomePage> {
           )
           .toList();
 
+      double totalSize = 0;
+      for (var plant in gallery) {
+        final bsonSize = plant.toString().length;
+        totalSize += bsonSize / (1024 * 1024);
+
+        print(
+            'Document ${plant['title']}: ${(bsonSize / (1024 * 1024)).toStringAsFixed(2)} MB');
+      }
+
       if (mounted) {
         setState(() {
           username = user?['username'];
           email = user?['email'];
           galleryCount = gallery.length;
+          this.totalSize = totalSize;
           _isLoading = false;
         });
       }
@@ -95,13 +106,12 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       StoragePage(
-        userId: widget.userId,
-        username: username,
-      ),
+          userId: widget.userId, username: username, totalSize: totalSize),
       ProfilePage(
         userId: widget.userId,
         username: username,
         email: email,
+        totalSize: totalSize,
         galleryCount: galleryCount,
         onGalleryUpdate: _updateGalleryCount,
         onUsernameUpdate: (String newUsername) {
