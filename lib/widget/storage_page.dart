@@ -16,10 +16,12 @@ class StoragePage extends StatefulWidget {
   final String userId; // Pass the logged-in user's _id
   final String? username;
   final double totalSize;
+  final Future<void> Function() onUpdateTotalSize;
   const StoragePage(
       {required this.userId,
       this.username,
       required this.totalSize,
+      required this.onUpdateTotalSize,
       super.key});
 
   @override
@@ -643,6 +645,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
             final plantId = plant['_id'];
             _plants.removeWhere((p) => p['_id'] == plantId);
             _allPlants.removeWhere((p) => p['_id'] == plantId);
+            widget.onUpdateTotalSize();
           });
         }
       },

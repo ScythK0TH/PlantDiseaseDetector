@@ -51,14 +51,7 @@ class _HomePageState extends State<HomePage> {
           )
           .toList();
 
-      double totalSize = 0;
-      for (var plant in gallery) {
-        final bsonSize = plant.toString().length;
-        totalSize += bsonSize / (1024 * 1024);
-
-        print(
-            'Document ${plant['title']}: ${(bsonSize / (1024 * 1024)).toStringAsFixed(2)} MB');
-      }
+      final totalSize = await _calculateTotalSize();
 
       if (mounted) {
         setState(() {
@@ -85,6 +78,42 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  //ทำไว้เพื่อเวลาลบรูปจะเรียกฟังก์ชันนี้แทนฟังก์ชันข้างบน
+  Future<double> _calculateTotalSize() async {
+    try {
+      final db = MongoService();
+      final galleryCollection = db.plantCollection;
+
+      final gallery = await galleryCollection!
+          .find(
+            mongo.where
+                .eq('userId', mongo.ObjectId.fromHexString(widget.userId)),
+          )
+          .toList();
+
+      double totalSize = 0;
+      for (var plant in gallery) {
+        final bsonSize = plant.toString().length;
+        final documentSize = bsonSize / (1024 * 1024);
+        totalSize += documentSize;
+
+        print(
+            'Document ${plant['title']}: ${documentSize.toStringAsFixed(2)} MB');
+      }
+      return totalSize;
+    } catch (e) {
+      print('Error calculating total size: $e');
+      return 0.0;
+    }
+  }
+
+  Future<void> _updateTotalSize() async {
+    final newSize = await _calculateTotalSize();
+    setState(() {
+      totalSize = newSize;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
@@ -106,7 +135,11 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       StoragePage(
-          userId: widget.userId, username: username, totalSize: totalSize),
+        userId: widget.userId,
+        username: username,
+        totalSize: totalSize,
+        onUpdateTotalSize: _updateTotalSize,
+      ),
       ProfilePage(
         userId: widget.userId,
         username: username,
