@@ -130,6 +130,7 @@ class _HomePageState extends State<HomePage> {
     final List<Widget> pages = [
       Recogniser(
         userId: widget.userId,
+        totalSize: totalSize,
         onClose: () {
           setState(() => _selectedIndex = 1);
         },

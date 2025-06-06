@@ -420,7 +420,7 @@ class _StoragePageState extends State<StoragePage> with RouteAware {
     //Mock up storage Value
     //MongoDB แก้ไขตรงนี้
     final double usedStorage = widget.totalSize;
-    final double totalStorage = 10;
+    final double totalStorage = 0.5;
     final String storageText =
         '${usedStorage.toStringAsFixed(2)} / ${totalStorage.toStringAsFixed(2)} MB';
 

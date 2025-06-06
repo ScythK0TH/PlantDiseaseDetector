@@ -20,9 +20,11 @@ import 'package:project_pdd/ui/responsive.dart';
 
 class Recogniser extends StatefulWidget {
   final String userId; // Pass the logged-in user's _id
+  final double totalSize;
   final VoidCallback?
       onClose; // พิเศษสำหรับ Recogniser ที่ไม่ต้องการ BottomNavigationBar
-  const Recogniser({required this.userId, this.onClose, super.key});
+  const Recogniser(
+      {required this.userId, required this.totalSize, this.onClose, super.key});
 
   @override
   State<Recogniser> createState() => _RecogniserState();
@@ -772,7 +774,8 @@ class _RecogniserState extends State<Recogniser> {
               : () async {
                   setState(() => isResultButtonPressing = true);
                   if (type == 'save') {
-                    await _savedData(context, state, widget.userId);
+                    await _savedData(
+                        context, state, widget.userId, widget.totalSize);
                   } else if (type == 'cancel') {
                     context.read<RecogniserBloc>().add(RecogniserReset());
                   }
@@ -910,60 +913,95 @@ Future<String> cropAndResizeToContainer(
   return base64Encode(img.encodeJpg(resized, quality: 80));
 }
 
-Future<void> _savedData(
-    BuildContext context, RecogniserState state, String userId) async {
+Future<void> _savedData(BuildContext context, RecogniserState state,
+    String userId, double totalSize) async {
+  const double MAX_STORAGE_SIZE = 0.5; // กำหนด size ของแต่ละ user
+
   if (userId.isEmpty) {
     print('Error: userId is empty.');
     return;
   }
 
-  mongo.ObjectId mongoUserId;
   try {
-    mongoUserId =
-        mongo.ObjectId.fromHexString(userId); // Convert userId to ObjectId
-  } catch (e) {
-    print('Error: Invalid userId format. ' + e.toString());
-    return;
-  }
-  final predict = state.label;
-  final image = state.image != null
-      ? await cropAndResizeToContainer(state.image!, 350, 300)
-      : null;
-  String title =
-      state.image != null ? state.image!.path.split('/').last : 'Unknown';
-  if (title.length > 15) {
-    title = title.substring(title.length - 15);
-  }
-  final accuracy = state.accuracy;
-  final dateTime = DateTime.now().toString();
-  final pid = state.pid;
+    final predict = state.label;
+    final image = state.image != null
+        ? await cropAndResizeToContainer(state.image!, 350, 300)
+        : null;
 
-  try {
-    print('Connecting to MongoDB...');
-    final db = MongoService();
-    print('Connected to MongoDB.');
-
-    final collection = db.plantCollection;
-    if (image != null) {
-      await collection!.insert({
-        'userId': mongoUserId,
-        'image': image,
-        'date': dateTime,
-        'predict_id': pid,
-        'predict': predict,
-        'title': title,
-        'probability': accuracy,
-      });
-      imageCountUpdateNotifier.value++;
-    } else {
+    if (image == null) {
       print('Error: Image is null.');
+      return;
     }
+
+    final newDocument = {
+      'userId': mongo.ObjectId.fromHexString(userId),
+      'image': image,
+      'date': DateTime.now().toString(),
+      'predict_id': state.pid,
+      'predict': predict,
+      'title': state.image!.path.split('/').last.length > 15
+          ? state.image!.path.split('/').last.substring(0, 15)
+          : state.image!.path.split('/').last,
+      'probability': state.accuracy,
+    };
+
+    // Calculate size
+    final newDocSize = (newDocument.toString().length) / (1024 * 1024);
+    final projectedTotalSize = totalSize + newDocSize;
+
+    if (projectedTotalSize > MAX_STORAGE_SIZE) {
+      // ไม่ได้ทำเปลี่ยนภาษา
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          backgroundColor: AppTheme.themedBgColor(context),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(36.0),
+          ),
+          title: Text('Storage Limit Exceeded',
+              style: AppTheme.mediumTitle(context)),
+          content: Text(
+            'You have reached your storage limit of 0.5 MB.',
+            style: AppTheme.smallContent(context),
+          ),
+          actions: [
+            Container(
+              decoration: BoxDecoration(
+                color: AppTheme.themedBgIconColor(context),
+                borderRadius: BorderRadius.circular(36),
+              ),
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(36),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK', style: AppTheme.smallContent(context)),
+              ),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    // If within limits
+    // Document save
+    final db = MongoService();
+    final collection = db.plantCollection;
+    await collection!.insert(newDocument);
+    imageCountUpdateNotifier.value++;
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => HomePage(
-          userId: userId,
-        ),
+        builder: (context) => HomePage(userId: userId),
       ),
     );
   } catch (e) {
