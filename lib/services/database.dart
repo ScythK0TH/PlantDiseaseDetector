@@ -12,12 +12,12 @@ class MongoService {
   DbCollection? get userCollection => _db?.collection('users');
   DbCollection? get assistantCollection => _db?.collection('gemini_cache');
 
-  final String _mongoUrl = "mongodb+srv://PDD:cp242@pdd.ptb4wxq.mongodb.net/cp242?retryWrites=true&w=majority&appName=PDD";
+  final String _mongoUrl = "url"; // input mongodb url here
 
   Future<void> connect() async {
     if (_db == null || !_db!.isConnected) {
       try {
-        _db = await Db.create(_mongoUrl);
+        _db = await Db.create(_mongoUrl); 
         await _db!.open();
       } catch (e) {
         print('MongoDB connection error: $e');
