@@ -20,7 +20,7 @@
 
 1.  **Clone โปรเจกต์นี้**
     ```bash
-    git clone [https://github.com/ScythK0TH/PlantDiseaseDetector.git](https://github.com/ScythK0TH/PlantDiseaseDetector.git)
+    git clone https://github.com/ScythK0TH/PlantDiseaseDetector.git
     cd PlantDiseaseDetector
     ```
 
